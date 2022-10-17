@@ -1,40 +1,40 @@
 package orot.apps.smartcounselor.presentation.guide
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import javax.inject.Inject
 
 @HiltViewModel
 class GuideViewModel @Inject constructor() : ViewModel(), GuideImpl {
 
-    private val guideTextList: List<String> = listOf(
-        "안녕하세요 고객님",
-        "Mago 헬스케어 AI를 준비중이에요",
-        "잠시만 기다려주세요",
-    )
-    private var currentRenderIndex: Int = 0
-    val currentRenderText: MutableStateFlow<String> = MutableStateFlow(guideTextList[currentRenderIndex])
+    val currentRenderText: MutableStateFlow<String> = MutableStateFlow("Loading")
 
     init {
-        viewModelScope.launch {
-            startGuide()
-        }
+        startGuide()
     }
 
-    override suspend fun startGuide() = withContext(Dispatchers.Default) {
+    override fun startGuide() = onDefault {
+        var loadingIndex = 0
+        var content = currentRenderText.value
         while (true) {
-            delay(1000)
-            currentRenderIndex += 1
-            if (currentRenderIndex == guideTextList.size) {
-                currentRenderIndex = 0
-            }
-            currentRenderText.emit(guideTextList[currentRenderIndex])
+            delay(700)
+            content
+                .takeIf { loadingIndex == 3 }
+                ?.apply {
+                    content = "Loading"
+                    loadingIndex = 0
+                }
+                ?: run {
+                    content += "."
+                    loadingIndex += 1
+                }
+
+            currentRenderText.emit(content)
         }
     }
 
-    override suspend fun connectSocket() {
-    }
+    override fun connectSocket() {}
 }

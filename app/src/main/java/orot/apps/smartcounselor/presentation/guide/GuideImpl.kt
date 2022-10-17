@@ -1,6 +1,8 @@
 package orot.apps.smartcounselor.presentation.guide
 
+import kotlinx.coroutines.Job
+
 interface GuideImpl {
-    suspend fun startGuide()
-    suspend fun connectSocket()
+    fun startGuide(): Job
+    fun connectSocket()
 }
