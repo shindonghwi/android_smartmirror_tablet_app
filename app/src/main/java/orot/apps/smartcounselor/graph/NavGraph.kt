@@ -6,6 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import orot.apps.smartcounselor.Screens
+import orot.apps.smartcounselor.presentation.blood_pressure.BloodPressureScreen
+import orot.apps.smartcounselor.presentation.chat_list.ChatListScreen
+import orot.apps.smartcounselor.presentation.conversation.ConversationScreen
 import orot.apps.smartcounselor.presentation.guide.GuideScreen
 import orot.apps.smartcounselor.presentation.home.HomeScreen
 
@@ -22,6 +25,15 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(route = Screens.Guide.route) {
             GuideScreen(navController)
+        }
+        composable(route = Screens.Conversation.route) {
+            ConversationScreen(navController)
+        }
+        composable(route = Screens.BloodPressure.route) {
+            BloodPressureScreen(navController)
+        }
+        composable(route = Screens.ChatList.route) {
+            ChatListScreen(navController)
         }
     }
 }
