@@ -3,6 +3,7 @@ package orot.apps.smartcounselor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -44,7 +45,7 @@ private fun MagoHCApp() {
                 topBar = { MagoAppBar(navController = navController) },
                 bottomBar = { MagoBottomBar(navController = navController) }
             ) {
-                Box(modifier = Modifier.padding(top = it.calculateTopPadding())) {
+                Box(modifier = Modifier.padding(paddingValues = it)) {
                     NavGraph(navController = navController)
                 }
             }

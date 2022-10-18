@@ -80,7 +80,7 @@ private fun HomeBottomBar(navController: NavController) {
                 .clickBounce { navController.navigate(Screens.Guide.route) }
                 .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
                 .background(Primary)
-                .padding(vertical = 16.dp),
+                .padding(vertical = 36.dp),
             textAlign = TextAlign.Center,
             text = "시작",
             style = MaterialTheme.typography.Display1,
