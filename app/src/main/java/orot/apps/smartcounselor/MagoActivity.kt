@@ -17,6 +17,7 @@ import orot.apps.resources.Black80
 import orot.apps.smartcounselor.graph.NavGraph
 import orot.apps.smartcounselor.presentation.app_style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.components.MagoAppBar
+import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
 
 @AndroidEntryPoint
@@ -40,7 +41,8 @@ private fun MagoHCApp() {
             val navController = rememberNavController()
             Scaffold(
                 backgroundColor = Color.Transparent,
-                topBar = { MagoAppBar(navController = navController) }
+                topBar = { MagoAppBar(navController = navController) },
+                bottomBar = { MagoBottomBar(navController = navController) }
             ) {
                 Box(modifier = Modifier.padding(top = it.calculateTopPadding())) {
                     NavGraph(navController = navController)

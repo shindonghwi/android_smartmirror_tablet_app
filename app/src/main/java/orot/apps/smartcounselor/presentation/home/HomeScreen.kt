@@ -31,7 +31,6 @@ fun HomeScreen(navController: NavController) {
 
     val configuration = LocalConfiguration.current
     val logoWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.72f }
-    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
 
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(),
@@ -45,31 +44,15 @@ fun HomeScreen(navController: NavController) {
             contentDescription = "mago-logo",
             contentScale = ContentScale.FillWidth
         )
-
-        Box(modifier = Modifier
-            .layoutId("startButton")
-            .clickBounce { navController.navigate(Screens.Guide.route) }
-            .sizeIn(minWidth = startWidth, minHeight = startWidth / 2)
-            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
-            .background(Primary)
-            .padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-            Text(text = "시작", style = MaterialTheme.typography.Display1, color = White)
-        }
     }
 }
 
 @Composable
 private fun homeScreenConstraintSet() = ConstraintSet {
     val description = createRefFor("description")
-    val startButton = createRefFor("startButton")
 
     constrain(description) {
         linkTo(start = parent.start, end = parent.end, bias = 0.5f)
         linkTo(top = parent.top, bottom = parent.bottom, bias = 0.2f)
-    }
-
-    constrain(startButton) {
-        linkTo(start = parent.start, end = parent.end, bias = 0.5f)
-        linkTo(top = parent.top, bottom = parent.bottom, bias = 0.90f)
     }
 }
