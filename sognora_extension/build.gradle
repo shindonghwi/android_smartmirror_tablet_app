@@ -44,6 +44,9 @@ android {
 
 dependencies {
 
+    implementation 'androidx.core:core:1.7.0'
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+
     def lifecycle_version = "2.5.1"
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
