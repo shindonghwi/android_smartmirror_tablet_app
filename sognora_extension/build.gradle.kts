@@ -1,7 +1,6 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
 }
 
@@ -40,7 +39,6 @@ android{
 dependencies {
 
     Libraries.apply {
-
         Libraries.KTX.apply {
             api (lifecycleRuntime)
             api (lifecycleViewModel)
@@ -55,21 +53,10 @@ dependencies {
             api (constraintLayout)
         }
 
-        Libraries.Hilt.apply {
-            api(NavigationCompose)
-            api(dagger)
-        }
-
         Libraries.OkHttp.apply {
             implementation(okhttp)
         }
-
     }
 
-    Kapts.apply {
-        Kapts.Hilt.apply {
-            kapt(hiltCompiler)
-        }
-    }
 
 }

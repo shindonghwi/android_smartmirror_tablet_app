@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -53,8 +54,20 @@ dependencies {
             implementation(core)
         }
 
+        Libraries.Hilt.apply {
+            implementation(NavigationCompose)
+            implementation(dagger)
+        }
+
         Libraries.AndroidX.apply {
             implementation(constraintLayout)
+        }
+    }
+
+
+    Kapts.apply {
+        Kapts.Hilt.apply {
+            kapt(hiltCompiler)
         }
     }
 }
