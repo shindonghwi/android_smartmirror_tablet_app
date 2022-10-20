@@ -40,7 +40,7 @@ fun MagoBottomBar(
 ) {
 
     val configuration = LocalConfiguration.current
-    val maxHeight = configuration.screenHeightDp * 0.25f
+    val maxHeight = configuration.screenHeightDp * 0.2f
 
 
     mainViewModel.currentBottomMenu.collectAsState().value.let { route ->
@@ -274,7 +274,8 @@ fun ConversationBottomBar() {
     val isEnded = remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = 40.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -284,13 +285,19 @@ fun ConversationBottomBar() {
         )
 
         AnimationText(
-            modifier = Modifier.padding(horizontal = 50.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 50.dp),
             initDelay = 1000,
             enterTransition = fadeIn(),
             isEnded = isEnded,
             exitTransition = fadeOut()
         ) {
-            Text("안녕하세요", color = Color.White, style = MaterialTheme.typography.Display3)
+            Text(
+                "안녕하세요",
+                color = Color.White,
+                style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
+            )
         }
     }
 }
