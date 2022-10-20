@@ -2,7 +2,9 @@ package orot.apps.smartcounselor.graph
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import orot.apps.smartcounselor.Screens
@@ -33,5 +35,10 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Screens.ChatList.route) {
             ChatListScreen(navController)
         }
+    }
+}
+fun NavOptionsBuilder.popUpToTop(navController: NavController) {
+    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return) {
+        inclusive =  true
     }
 }

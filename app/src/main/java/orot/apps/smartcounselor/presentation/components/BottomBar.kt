@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
+import orot.apps.smartcounselor.graph.popUpToTop
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
@@ -65,7 +66,9 @@ private fun HomeBottomBar(navController: NavController) {
         Text(
             modifier = Modifier
                 .width(startWidth)
-                .clickBounce { navController.navigate(Screens.Guide.route) }
+                .clickBounce {
+                    navController.navigate(Screens.Guide.route) { popUpToTop(navController) }
+                }
                 .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
                 .background(Primary)
                 .padding(vertical = 36.dp),

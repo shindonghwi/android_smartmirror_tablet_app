@@ -16,6 +16,8 @@ private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
 
 class AudioStreamManager @Inject constructor() {
 
+    val webSocketURL: String = "http://localhost"
+
     init {
         initWebSocket() // 웹 소켓 연결
     }
@@ -31,7 +33,7 @@ class AudioStreamManager @Inject constructor() {
     private val okHttpClient = OkHttpClient.Builder() // 웹 소켓 클라이언트 설정
         .connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
 
-    private val request = Request.Builder().url("our ws:// url").build() // 웹 소켓 연결 빌더 생성
+    private var request: Request? = Request.Builder().url(webSocketURL).build() // 웹 소켓 연결 빌더 생성
 
     /** 웹 소켓 연결하기 */
     private fun initWebSocket() {
