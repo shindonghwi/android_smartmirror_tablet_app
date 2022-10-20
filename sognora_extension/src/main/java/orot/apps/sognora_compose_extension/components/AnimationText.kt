@@ -1,12 +1,13 @@
 package orot.apps.sognora_compose_extension.components
 
-import androidx.compose.runtime.Composable
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 fun AnimationText(
     modifier: Modifier = Modifier,
     initDelay: Long,
+    isEnded: MutableState<Boolean>,
     enterDuration: Int = 2000,
     exitDuration: Int = 1000,
     enterTransition: EnterTransition = slideInVertically(
@@ -30,12 +32,18 @@ fun AnimationText(
     content: @Composable () -> Unit
 ) {
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
-        CoroutineScope(Dispatchers.Default).launch {
-            takeIf { initDelay != 0L }?.run {
-                delay(initDelay)
-                targetState = true
+        if (!isEnded.value) {
+            CoroutineScope(Dispatchers.Default).launch {
+                takeIf { initDelay != 0L }?.run {
+                    delay(initDelay)
+                    targetState = true
+                }
             }
         }
+    }
+
+    if (isEnded.value) {
+        animVisibleState.targetState = false
     }
 
     AnimatedVisibility(
