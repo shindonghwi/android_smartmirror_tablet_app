@@ -16,10 +16,8 @@ import orot.apps.smartcounselor.presentation.home.HomeScreen
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(
-        navController = navController,
-        startDestination = Screens.Home.route
-    )
-    {
+        navController = navController, startDestination = Screens.Home.route
+    ) {
         composable(route = Screens.Home.route) {
             HomeScreen()
         }
