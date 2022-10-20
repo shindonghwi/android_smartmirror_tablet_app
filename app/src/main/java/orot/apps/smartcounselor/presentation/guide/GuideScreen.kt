@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
@@ -15,23 +14,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
 
 @ExperimentalAnimationApi
 @Composable
-fun GuideScreen(
-    navController: NavController,
-) {
-//    LaunchedEffect(key1 = Unit) {
-//        if (mainViewModel.audioStreamManager == null) {
-//            mainViewModel.createAudioStreamManager()
-//        }
-//    }
-
+fun GuideScreen() {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(), constraintSet = guideScreenConstraintSet()
     ) {

@@ -8,13 +8,12 @@ import okhttp3.*
 import okio.ByteString.Companion.toByteString
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 private const val RECORDER_SAMPLERATE = 44100
 private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
 private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
 
-class AudioStreamManager @Inject constructor() {
+class AudioStreamManager{
 
     val webSocketURL: String = "http://localhost"
 

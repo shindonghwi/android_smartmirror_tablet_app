@@ -24,7 +24,7 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen()
         }
         composable(route = Screens.Guide.route) {
-            GuideScreen(navController)
+            GuideScreen()
         }
         composable(route = Screens.Conversation.route) {
             ConversationScreen(navController)
@@ -33,7 +33,7 @@ fun NavGraph(navController: NavHostController) {
             BloodPressureScreen(navController)
         }
         composable(route = Screens.ChatList.route) {
-            ChatListScreen(navController)
+            ChatListScreen()
         }
     }
 }
