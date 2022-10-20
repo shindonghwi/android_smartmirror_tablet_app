@@ -51,7 +51,9 @@ fun MagoBottomBar(
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
-                    StartBottomBar(navController)
+//                    StartBottomBar(navController)
+                    VDivider()
+                    ConversationBottomBar()
                 }
                 BottomMenu.Loading.type -> {
                     LoadingBottomBar()
@@ -274,22 +276,23 @@ fun ConversationBottomBar() {
     val isEnded = remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .padding(horizontal = 40.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RotationAnimation(
-            modifier = Modifier.padding(start = 100.dp),
-            isPlaying = isPlaying, iconDrawable = R.drawable.mago_logo_icon, iconSize = 50.dp
+            modifier = Modifier.padding(start = 60.dp),
+            isPlaying = isPlaying, iconDrawable = R.drawable.mago_logo_icon, iconSize = 80.dp
         )
 
         AnimationText(
-            modifier = Modifier.padding(start = 100.dp),
+            modifier = Modifier.padding(horizontal = 50.dp),
             initDelay = 1000,
             enterTransition = fadeIn(),
             isEnded = isEnded,
             exitTransition = fadeOut()
         ) {
-            Text("안녕하세요", color = Color.White, style = MaterialTheme.typography.Display2)
+            Text("안녕하세요", color = Color.White, style = MaterialTheme.typography.Display3)
         }
     }
 }
