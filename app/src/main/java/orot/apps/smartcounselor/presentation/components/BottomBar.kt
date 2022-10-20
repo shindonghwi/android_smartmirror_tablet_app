@@ -1,24 +1,20 @@
 package orot.apps.smartcounselor.presentation.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -26,7 +22,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
@@ -35,6 +30,8 @@ import orot.apps.smartcounselor.graph.popUpToTop
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
+import orot.apps.sognora_compose_extension.components.AnimationText
+import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
 
 @Composable
@@ -63,15 +60,18 @@ fun MagoBottomBar(
 
                 }
                 BottomMenu.Conversation.type -> {
-
+                    VDivider()
+                    ConversationBottomBar()
                 }
                 BottomMenu.BloodPressure.type -> {
                     BloodPressureBottomBar()
                 }
                 BottomMenu.Retry.type -> {
+                    VDivider()
                     RetryBottomBar()
                 }
                 BottomMenu.RetryAndChat.type -> {
+                    VDivider()
                     RetryAndChatBottomBar()
                 }
                 BottomMenu.Call.type -> {
@@ -80,7 +80,15 @@ fun MagoBottomBar(
             }
         }
     }
+}
 
+@Composable
+private fun VDivider() {
+    Divider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp), color = GrayDivider
+    )
 }
 
 
@@ -113,8 +121,7 @@ private fun StartBottomBar(
     }
 }
 
-
-/** 가이드 화면 바텀 바 */
+/** 로딩 바텀 바 */
 @Composable
 private fun LoadingBottomBar() {
     Column(
@@ -140,7 +147,7 @@ private fun LoadingText(guideViewModel: GuideViewModel = hiltViewModel()) {
     }
 }
 
-/** 권고멘트 화면 바텀 바 */
+/** 권고멘트 바텀 바 */
 @Composable
 private fun RetryAndChatBottomBar() {
     Row(
@@ -173,7 +180,7 @@ private fun RetryAndChatBottomBar() {
     }
 }
 
-/** 혈압측정 화면 바텀 바 */
+/** 혈압측정 바텀 바 */
 @Composable
 private fun BloodPressureBottomBar() {
     Row(
@@ -209,6 +216,7 @@ private fun BloodPressureBottomBar() {
     }
 }
 
+/** 다시하기 */
 @Composable
 fun RetryBottomBar() {
     Row(
@@ -230,11 +238,11 @@ fun RetryBottomBar() {
     }
 }
 
+/** 상담원 전화 걸려올때 */
 @Composable
 fun CallBottomBar() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd
     ) {
         Column(
             modifier = Modifier.padding(all = 50.dp),
@@ -248,7 +256,7 @@ fun CallBottomBar() {
                 color = Color.White,
                 textAlign = TextAlign.Center
             )
-            WavesAnimation{
+            WavesAnimation {
                 Icon(
                     painter = painterResource(id = R.drawable.call),
                     "call",
@@ -256,6 +264,32 @@ fun CallBottomBar() {
                 )
             }
         }
+    }
+}
 
+/** 상담원 전화 걸려올때 */
+@Composable
+fun ConversationBottomBar() {
+    val isPlaying = remember { mutableStateOf(true) }
+    val isEnded = remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RotationAnimation(
+            modifier = Modifier.padding(start = 100.dp),
+            isPlaying = isPlaying, iconDrawable = R.drawable.mago_logo_icon, iconSize = 50.dp
+        )
+
+        AnimationText(
+            modifier = Modifier.padding(start = 100.dp),
+            initDelay = 1000,
+            enterTransition = fadeIn(),
+            isEnded = isEnded,
+            exitTransition = fadeOut()
+        ) {
+            Text("안녕하세요", color = Color.White, style = MaterialTheme.typography.Display2)
+        }
     }
 }
