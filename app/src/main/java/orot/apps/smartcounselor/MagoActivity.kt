@@ -51,9 +51,6 @@ class MagoActivity : ComponentActivity() {
             }
         }
     }
-    companion object{
-        lateinit var audioStreamManager: AudioStreamManager
-    }
 }
 
 @Composable

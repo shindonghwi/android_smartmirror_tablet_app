@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
 }
 
@@ -24,8 +23,7 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -47,7 +45,7 @@ android {
 
 dependencies {
 
-    api (project(":sognora_extension"))
+    implementation(project(":sognora_extension"))
 
     Libraries.apply {
 
@@ -55,19 +53,8 @@ dependencies {
             implementation(core)
         }
 
-        Libraries.Hilt.apply {
-            implementation(NavigationCompose)
-            implementation(dagger)
-        }
-
         Libraries.AndroidX.apply {
             implementation(constraintLayout)
-        }
-    }
-
-    Kapts.apply {
-        Kapts.Hilt.apply {
-            kapt(hiltCompiler)
         }
     }
 }
