@@ -22,7 +22,7 @@ import orot.apps.smartcounselor.presentation.app_style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.components.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
-import orot.apps.sognora_permission.CheckPermission
+import orot.apps.sognora_compose_extension.permission.CheckPermission
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package orot.apps.sognora_permission
+package orot.apps.sognora_compose_extension.permission
 
 import android.app.Activity
 import android.content.pm.PackageManager
