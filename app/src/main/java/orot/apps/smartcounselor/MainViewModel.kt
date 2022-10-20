@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import java.text.SimpleDateFormat
@@ -12,6 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
+
+    val currentBottomMenu = MutableStateFlow(BottomMenu.Start.type)
 
     val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
     var audioStreamManager: AudioStreamManager? = null
@@ -31,6 +34,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun createAudioStreamManager(){
         audioStreamManager = AudioStreamManager()
+    }
+
+    fun updateBottomMenu(bottomMenu: BottomMenu){
+        currentBottomMenu.update { bottomMenu.type }
     }
 
 }

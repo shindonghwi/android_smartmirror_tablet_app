@@ -13,7 +13,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 
 @Composable
 fun HomeScreen() {
