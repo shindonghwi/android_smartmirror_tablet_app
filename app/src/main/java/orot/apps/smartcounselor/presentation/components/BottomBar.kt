@@ -51,9 +51,7 @@ fun MagoBottomBar(
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
-//                    StartBottomBar(navController)
-                    VDivider()
-                    ConversationBottomBar()
+                    StartBottomBar(navController)
                 }
                 BottomMenu.Loading.type -> {
                     LoadingBottomBar()
