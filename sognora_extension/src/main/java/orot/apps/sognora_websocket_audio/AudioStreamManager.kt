@@ -8,12 +8,13 @@ import okhttp3.*
 import okio.ByteString.Companion.toByteString
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val RECORDER_SAMPLERATE = 44100
 private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
 private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
 
-class AudioStreamManager {
+class AudioStreamManager @Inject constructor() {
 
     init {
         initWebSocket() // 웹 소켓 연결
@@ -26,29 +27,30 @@ class AudioStreamManager {
     ) * 4
 
     /** 웹 소켓 */
-    private var webSocket: WebSocket? = null
+    var webSocket: WebSocket? = null
     private val okHttpClient = OkHttpClient.Builder() // 웹 소켓 클라이언트 설정
         .connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
 
     private val request = Request.Builder().url("our ws:// url").build() // 웹 소켓 연결 빌더 생성
 
-
     /** 웹 소켓 연결하기 */
     private fun initWebSocket() {
-        webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                super.onOpen(webSocket, response)
-                initAudioRecorder() // 오디오 레코더 생성
-            }
+        request?.run {
+            webSocket = okHttpClient.newWebSocket(this, object : WebSocketListener() {
+                override fun onOpen(webSocket: WebSocket, response: Response) {
+                    super.onOpen(webSocket, response)
+                    initAudioRecorder() // 오디오 레코더 생성
+                }
 
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                super.onMessage(webSocket, text)
-            }
+                override fun onMessage(webSocket: WebSocket, text: String) {
+                    super.onMessage(webSocket, text)
+                }
 
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                super.onFailure(webSocket, t, response)
-            }
-        })
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    super.onFailure(webSocket, t, response)
+                }
+            })
+        }
     }
 
     /** 오디오 녹음 시작 */

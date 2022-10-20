@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.components
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -16,13 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
@@ -54,16 +53,6 @@ fun MagoBottomBar(navController: NavController) {
     }
 }
 
-
-@Composable
-private fun VDivider() {
-    Divider(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp), color = GrayDivider
-    )
-}
-
 /** 홈(시작하기) 화면 바텀 바 */
 @Composable
 private fun HomeBottomBar(navController: NavController) {
@@ -91,10 +80,13 @@ private fun HomeBottomBar(navController: NavController) {
 
 /** 가이드 화면 바텀 바 */
 @Composable
-private fun GuideBottomBar(guideViewModel: GuideViewModel = hiltViewModel()) {
-    val ctx = LocalContext.current
-    LaunchedEffect(key1 = Unit){
-        Toast.makeText(ctx, guideViewModel.toString() , Toast.LENGTH_SHORT).show()
+private fun GuideBottomBar(
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
+    LaunchedEffect(key1 = Unit) {
+        if (mainViewModel.audioStreamManager == null) {
+            mainViewModel.createAudioStreamManager()
+        }
     }
 
     Column(

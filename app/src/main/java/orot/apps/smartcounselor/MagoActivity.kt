@@ -23,7 +23,6 @@ import orot.apps.smartcounselor.presentation.components.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
 import orot.apps.sognora_compose_extension.permission.CheckPermission
-import orot.apps.sognora_websocket_audio.AudioStreamManager
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
