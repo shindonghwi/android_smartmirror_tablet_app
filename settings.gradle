@@ -16,3 +16,4 @@ rootProject.name = "SmartCounselor"
 include ':app'
 include ':resources'
 include ':sognora_extension'
+include ':sognora_websocket_audio'
