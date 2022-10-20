@@ -68,7 +68,7 @@ fun MagoBottomBar(
                 }
                 BottomMenu.Retry.type -> {
                     VDivider()
-                    RetryBottomBar()
+                    RetryBottomBar(navController)
                 }
                 BottomMenu.RetryAndChat.type -> {
                     VDivider()
@@ -218,7 +218,10 @@ private fun BloodPressureBottomBar() {
 
 /** 다시하기 */
 @Composable
-fun RetryBottomBar() {
+fun RetryBottomBar(
+    navController: NavController,
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -227,7 +230,10 @@ fun RetryBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-
+                    navController.navigate(Screens.Home.route) {
+                        popUpToTop(navController)
+                        mainViewModel.updateBottomMenu(BottomMenu.Empty)
+                    }
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
