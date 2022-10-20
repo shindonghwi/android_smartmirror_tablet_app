@@ -15,14 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import orot.apps.resources.Black
-import orot.apps.resources.Black80
 import orot.apps.smartcounselor.graph.NavGraph
+import orot.apps.smartcounselor.presentation.app_style.Black
+import orot.apps.smartcounselor.presentation.app_style.Black80
 import orot.apps.smartcounselor.presentation.app_style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.components.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
 import orot.apps.sognora_compose_extension.permission.CheckPermission
+import orot.apps.sognora_websocket_audio.AudioStreamManager
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
@@ -49,6 +50,9 @@ class MagoActivity : ComponentActivity() {
                 finish()
             }
         }
+    }
+    companion object{
+        lateinit var audioStreamManager: AudioStreamManager
     }
 }
 

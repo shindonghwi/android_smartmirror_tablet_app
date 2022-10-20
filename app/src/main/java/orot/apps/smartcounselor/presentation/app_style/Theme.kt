@@ -5,7 +5,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import orot.apps.resources.Primary
 
 private val DarkColorPalette = darkColors(
     primary = Primary,

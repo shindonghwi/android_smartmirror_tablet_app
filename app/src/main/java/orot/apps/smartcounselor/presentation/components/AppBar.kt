@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import orot.apps.resources.R
-import orot.apps.resources.White
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.app_style.Pretendard
+import orot.apps.smartcounselor.presentation.app_style.White
+import orot.apps.smartcounselor.R
 
 @Composable
 fun MagoAppBar(

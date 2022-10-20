@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -9,23 +10,21 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import orot.apps.resources.Gray20
-import orot.apps.resources.GrayDivider
-import orot.apps.resources.Primary
-import orot.apps.resources.White
 import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.presentation.app_style.Display1
+import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
 
@@ -92,7 +91,12 @@ private fun HomeBottomBar(navController: NavController) {
 
 /** 가이드 화면 바텀 바 */
 @Composable
-private fun GuideBottomBar() {
+private fun GuideBottomBar(guideViewModel: GuideViewModel = hiltViewModel()) {
+    val ctx = LocalContext.current
+    LaunchedEffect(key1 = Unit){
+        Toast.makeText(ctx, guideViewModel.toString() , Toast.LENGTH_SHORT).show()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

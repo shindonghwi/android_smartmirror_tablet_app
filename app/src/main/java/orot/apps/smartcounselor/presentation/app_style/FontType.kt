@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import orot.apps.resources.R
+import orot.apps.smartcounselor.R
 
 val Pretendard = FontFamily(
     Font(R.font.pretendard_thin, FontWeight.W100),
