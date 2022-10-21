@@ -1,10 +1,10 @@
 package orot.apps.smartcounselor
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import java.text.SimpleDateFormat
@@ -30,14 +30,15 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun getCurrentTime() = SimpleDateFormat("yyyy.MM.dd-HH:mm-EE", Locale.KOREA).format(Date())
+    private fun getCurrentTime() =
+        SimpleDateFormat("yyyy.MM.dd-HH:mm-EE", Locale.KOREA).format(Date())
 
-    fun createAudioStreamManager(){
+    fun createAudioStreamManager() {
         audioStreamManager = AudioStreamManager()
     }
 
-    fun updateBottomMenu(bottomMenu: BottomMenu){
-        currentBottomMenu.update { bottomMenu.type }
+    fun updateBottomMenu(bottomMenu: BottomMenu) {
+        currentBottomMenu.value = bottomMenu.type
     }
 
 }
