@@ -5,13 +5,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
-import orot.apps.sognora_websocket_audio.AudioStreamManager
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class GuideViewModel @Inject constructor() : ViewModel(), GuideImpl {
-    val currentRenderText: MutableStateFlow<String> = MutableStateFlow("Loading")
+    val currentRenderText: MutableStateFlow<String> = MutableStateFlow("")
 
     init {
         startGuide()
@@ -25,7 +23,7 @@ class GuideViewModel @Inject constructor() : ViewModel(), GuideImpl {
             content
                 .takeIf { loadingIndex == 3 }
                 ?.apply {
-                    content = "Loading"
+                    content = ""
                     loadingIndex = 0
                 }
                 ?: run {
