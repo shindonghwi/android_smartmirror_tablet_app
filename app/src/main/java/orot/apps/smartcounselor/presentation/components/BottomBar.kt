@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -33,17 +34,17 @@ import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.AnimationText
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
+import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoBottomBar(
-    navController: NavController, mainViewModel: MainViewModel = hiltViewModel()
+    navController: NavController,
+    mainViewModel: MainViewModel = getViewModel(key = "1", vm = hiltViewModel())
 ) {
-
     val configuration = LocalConfiguration.current
     val maxHeight = configuration.screenHeightDp * 0.2f
 
-
-    mainViewModel.currentBottomMenu.collectAsState().value.let { route ->
+    mainViewModel.currentBottomMenu.value.let { route ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,12 +136,16 @@ private fun LoadingBottomBar() {
 }
 
 @Composable
-private fun LoadingText(guideViewModel: GuideViewModel = hiltViewModel()) {
-    guideViewModel.currentRenderText.collectAsState().value.let { content ->
+fun LoadingText(
+    defaultContent: String = "Loading",
+    textStyle: TextStyle = MaterialTheme.typography.body1,
+    guideViewModel: GuideViewModel = hiltViewModel()
+) {
+    guideViewModel.currentRenderText.collectAsState().value.let { dot ->
         Text(
-            content,
+            "${defaultContent}$dot",
             modifier = Modifier.padding(top = 16.dp),
-            style = MaterialTheme.typography.body1,
+            style = textStyle,
             color = Gray20,
             textAlign = TextAlign.Center
         )
@@ -219,8 +224,7 @@ private fun BloodPressureBottomBar() {
 /** 다시하기 */
 @Composable
 fun RetryBottomBar(
-    navController: NavController,
-    mainViewModel: MainViewModel = hiltViewModel()
+    navController: NavController, mainViewModel: MainViewModel = hiltViewModel()
 ) {
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -287,7 +291,9 @@ fun ConversationBottomBar() {
     ) {
         RotationAnimation(
             modifier = Modifier.padding(start = 60.dp),
-            isPlaying = isPlaying, iconDrawable = R.drawable.mago_logo_icon, iconSize = 80.dp
+            isPlaying = isPlaying,
+            iconDrawable = R.drawable.mago_logo_icon,
+            iconSize = 80.dp
         )
 
         AnimationText(
