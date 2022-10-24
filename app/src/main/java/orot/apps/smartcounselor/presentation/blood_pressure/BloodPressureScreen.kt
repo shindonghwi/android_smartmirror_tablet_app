@@ -32,13 +32,20 @@ fun BloodPressureScreen(
 ) {
     val scaleAnimationIsRunning = remember { mutableStateOf(true) }
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
-        coroutineScopeOnDefault {
-            delay(1000)
-            targetState = true
-            delay(4000)
-            mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
-            scaleAnimationIsRunning.value = false
-        }
+
+        DisposableEffect(key1 = Unit, effect = {
+            val animationJob = coroutineScopeOnDefault {
+                delay(1000)
+                targetState = true
+                delay(4000)
+                mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
+                scaleAnimationIsRunning.value = false
+            }
+
+            onDispose {
+                animationJob.cancel()
+            }
+        })
     }
 
     val infiniteTransition = rememberInfiniteTransition()
