@@ -28,7 +28,7 @@ import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 @Composable
 fun BloodPressureScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel = getViewModel(key = "1", vm = hiltViewModel())
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     val scaleAnimationIsRunning = remember { mutableStateOf(true) }
     val animVisibleState = remember { MutableTransitionState(false) }.apply {

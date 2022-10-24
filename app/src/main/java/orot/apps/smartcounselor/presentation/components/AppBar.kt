@@ -1,6 +1,8 @@
 package orot.apps.smartcounselor.presentation.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,38 +15,149 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
+import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.Screens
+import orot.apps.smartcounselor.graph.popUpToTop
+import orot.apps.smartcounselor.presentation.app_style.Gray20
 import orot.apps.smartcounselor.presentation.app_style.Pretendard
 import orot.apps.smartcounselor.presentation.app_style.White
-import orot.apps.smartcounselor.R
+import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoAppBar(
-    navController: NavController
+    navController: NavController,
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     navController.currentBackStackEntryAsState().value?.destination?.route?.let { route ->
-        route.takeIf { it != "home" }?.run {
+        val mod = Modifier
+            .padding(horizontal = 20.dp)
+            .size(40.dp, 30.dp)
+            .background(Gray20)
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    modifier = Modifier.weight(0.25f).padding(top = 10.dp),
-                    painter = painterResource(id = R.drawable.mago_full_logo_white),
-                    contentDescription = "mago-logo",
-                    contentScale = ContentScale.FillWidth
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Home.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Start)
+                        }
+                    }),
+                    text = "1",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
                 )
-                Spacer(modifier = Modifier.weight(0.33f))
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Guide.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                        }
+                    }),
+                    text = "2",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Conversation.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
+                        }
+                    }),
+                    text = "3",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Conversation.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Conversation)
+                        }
+                    }),
+                    text = "3-1",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.BloodPressure.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
+                        }
+                    }),
+                    text = "4",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Conversation.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                        }
+                    }),
+                    text = "4-1",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.Conversation.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
+                        }
+                    }),
+                    text = "5",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.ChatList.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Retry)
+                        }
+                    }),
+                    text = "6",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+                Text(
+                    modifier = mod.then(Modifier.clickable {
+                        navController.navigate(Screens.ChatList.route) {
+                            popUpToTop(navController)
+                            mainViewModel.updateBottomMenu(BottomMenu.Call)
+                        }
+                    }),
+                    text = "7",
+                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+                )
+            }
 
-                TimeContent()
+            route.takeIf { it != "home" }?.run {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .weight(0.25f)
+                            .padding(top = 10.dp),
+                        painter = painterResource(id = R.drawable.mago_full_logo_white),
+                        contentDescription = "mago-logo",
+                        contentScale = ContentScale.FillWidth
+                    )
+                    Spacer(modifier = Modifier.weight(0.33f))
+
+                    TimeContent()
+                }
             }
         }
     }
