@@ -26,16 +26,15 @@ import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.graph.popUpToTop
 import orot.apps.smartcounselor.presentation.app_style.Gray20
 import orot.apps.smartcounselor.presentation.app_style.Pretendard
 import orot.apps.smartcounselor.presentation.app_style.White
+import orot.apps.sognora_compose_extension.nav_controller.popUpToTop
 import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoAppBar(
-    navController: NavController,
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
+    navController: NavController, mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     navController.currentBackStackEntryAsState().value?.destination?.route?.let { route ->
         val mod = Modifier

@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
@@ -16,16 +17,24 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
+import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
+import orot.apps.sognora_compose_extension.nav_controller.popUpToTop
 import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.sognora_websocket_audio.AudioStreamData
 
 @ExperimentalAnimationApi
 @Composable
 fun GuideScreen(
+    navController: NavHostController,
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
+    WebSocketState(navController)
+
     LaunchedEffect(key1 = Unit) {
         mainViewModel.createAudioStreamManager() // 가이드 화면 진입시 소켓 연결
     }
@@ -34,6 +43,22 @@ fun GuideScreen(
         modifier = Modifier.fillMaxSize(), constraintSet = guideScreenConstraintSet()
     ) {
         GuideContent(modifier = Modifier.layoutId("description"))
+    }
+}
+
+@Composable
+private fun WebSocketState(
+    navController: NavHostController,
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
+) {
+    val data = mainViewModel.receiveMsg.collectAsState().value
+    if (data is AudioStreamData.WebSocketConnected) {
+        LaunchedEffect(key1 = Unit) {
+            navController.navigate(Screens.Conversation.route) {
+                popUpToTop(navController)
+                mainViewModel.updateBottomMenu(BottomMenu.Conversation)
+            }
+        }
     }
 }
 

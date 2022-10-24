@@ -24,7 +24,7 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen()
         }
         composable(route = Screens.Guide.route) {
-            GuideScreen()
+            GuideScreen(navController)
         }
         composable(route = Screens.Conversation.route) {
             ConversationScreen(navController)
@@ -35,10 +35,5 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Screens.ChatList.route) {
             ChatListScreen()
         }
-    }
-}
-fun NavOptionsBuilder.popUpToTop(navController: NavController) {
-    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return) {
-        inclusive =  true
     }
 }

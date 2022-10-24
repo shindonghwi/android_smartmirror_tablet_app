@@ -27,19 +27,19 @@ import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.graph.popUpToTop
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.AnimationText
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
+import orot.apps.sognora_compose_extension.nav_controller.popUpToTop
 import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoBottomBar(
     navController: NavController,
-    mainViewModel: MainViewModel = getViewModel(key = "1", vm = hiltViewModel())
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     val configuration = LocalConfiguration.current
     val maxHeight = configuration.screenHeightDp * 0.2f
