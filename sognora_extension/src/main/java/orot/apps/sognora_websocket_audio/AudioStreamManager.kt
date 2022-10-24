@@ -4,28 +4,30 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.util.Log
 import okhttp3.*
-import okio.ByteString.Companion.toByteString
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import java.util.concurrent.TimeUnit
 
-private const val RECORDER_SAMPLERATE = 44100
-private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
-private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
 
-class AudioStreamManager{
+class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
     val webSocketURL: String = "http://localhost"
 
-    init {
-        initWebSocket() // 웹 소켓 연결
-    }
-
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
+    private val RECORDER_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION
+    private val RECORDER_SAMPLERATE = 44100
+    private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
+    private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
     private val BUFFER_SIZE_RECORDING = AudioRecord.getMinBufferSize( // 오디오 버퍼 설정
         RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING
-    ) * 4
+    ) * 12
+
+    init {
+        initWebSocket()
+    }
 
     /** 웹 소켓 */
     var webSocket: WebSocket? = null
@@ -40,25 +42,33 @@ class AudioStreamManager{
             webSocket = okHttpClient.newWebSocket(this, object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
-                    initAudioRecorder() // 오디오 레코더 생성
+                    coroutineScopeOnDefault {
+                        audioStreamImpl.connectedWebSocket()
+                    }
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
+                    coroutineScopeOnIO {
+                        audioStreamImpl.receivedMsg(AudioStreamData.ReceivedData(text))
+                    }
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
+                    coroutineScopeOnDefault {
+                        audioStreamImpl.disConnectedWebSocket()
+                    }
                 }
             })
         }
     }
 
     /** 오디오 녹음 시작 */
-    @SuppressLint("MissingPermission") // 권한이 추가되어야 사용가능
+    @SuppressLint("MissingPermission")
     fun initAudioRecorder() {
         audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            RECORDER_SOURCE,
             RECORDER_SAMPLERATE,
             RECORDER_CHANNELS,
             RECORDER_AUDIO_ENCODING,
@@ -73,9 +83,12 @@ class AudioStreamManager{
         coroutineScopeOnIO {
             try {
                 do {
+                    var start = System.currentTimeMillis()
                     val byteRead = audioRecord?.read(buf, 0, buf.size) ?: break
                     if (byteRead < -1) break
-                    webSocket?.send(buf.toByteString(0, byteRead))
+                    var end = System.currentTimeMillis()
+                    Log.d("ASdasddsaads", "sendAudioRecord: time: ${end - start}")
+//                    webSocket?.send(buf.toByteString(0, byteRead))
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()
