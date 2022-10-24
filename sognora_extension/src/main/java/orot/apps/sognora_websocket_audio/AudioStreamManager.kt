@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
-    val webSocketURL: String = "http://localhost"
+    val webSocketURL: String = "ws://www.naver.com"
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
