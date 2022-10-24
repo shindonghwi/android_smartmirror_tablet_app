@@ -8,14 +8,14 @@ import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import javax.inject.Inject
 
 @HiltViewModel
-class GuideViewModel @Inject constructor() : ViewModel(), GuideImpl {
+class GuideViewModel @Inject constructor() : ViewModel() {
     val currentRenderText: MutableStateFlow<String> = MutableStateFlow("")
 
     init {
         startGuide()
     }
 
-    override fun startGuide() = onDefault {
+    private fun startGuide() = onDefault {
         var loadingIndex = 0
         var content = currentRenderText.value
         while (true) {
@@ -34,6 +34,4 @@ class GuideViewModel @Inject constructor() : ViewModel(), GuideImpl {
             currentRenderText.emit(content)
         }
     }
-
-    override fun connectSocket() {}
 }
