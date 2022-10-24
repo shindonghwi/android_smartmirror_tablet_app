@@ -20,23 +20,23 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Gray20
 import orot.apps.smartcounselor.presentation.app_style.Pretendard
 import orot.apps.smartcounselor.presentation.app_style.White
-import orot.apps.sognora_compose_extension.nav_controller.popUpToTop
 import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoAppBar(
-    navController: NavController, mainViewModel: MainViewModel = getViewModel(hiltViewModel())
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    navController.currentBackStackEntryAsState().value?.destination?.route?.let { route ->
+    val controller = navigationKit.navHostController
+    controller.currentBackStackEntryAsState().value?.destination?.route?.let { route ->
         val mod = Modifier
             .padding(horizontal = 20.dp)
             .size(40.dp, 30.dp)
@@ -48,8 +48,7 @@ fun MagoAppBar(
             ) {
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Home.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Home.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Start)
                         }
                     }),
@@ -58,8 +57,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Guide.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Guide.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Loading)
                         }
                     }),
@@ -68,8 +66,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Conversation.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Conversation.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Empty)
                         }
                     }),
@@ -78,8 +75,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Conversation.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Conversation.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Conversation)
                         }
                     }),
@@ -88,8 +84,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.BloodPressure.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.BloodPressure.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Empty)
                         }
                     }),
@@ -98,8 +93,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Conversation.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Conversation.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Loading)
                         }
                     }),
@@ -108,8 +102,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.Conversation.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.Conversation.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
                         }
                     }),
@@ -118,8 +111,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.ChatList.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.ChatList.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Retry)
                         }
                     }),
@@ -128,8 +120,7 @@ fun MagoAppBar(
                 )
                 Text(
                     modifier = mod.then(Modifier.clickable {
-                        navController.navigate(Screens.ChatList.route) {
-                            popUpToTop(navController)
+                        navigationKit.clearAndMove(Screens.ChatList.route) {
                             mainViewModel.updateBottomMenu(BottomMenu.Call)
                         }
                     }),

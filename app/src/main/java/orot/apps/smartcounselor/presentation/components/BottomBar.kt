@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
@@ -33,12 +33,10 @@ import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.AnimationText
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
-import orot.apps.sognora_compose_extension.nav_controller.popUpToTop
 import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun MagoBottomBar(
-    navController: NavController,
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     val configuration = LocalConfiguration.current
@@ -52,7 +50,7 @@ fun MagoBottomBar(
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
-                    StartBottomBar(navController)
+                    StartBottomBar()
                 }
                 BottomMenu.Loading.type -> {
                     LoadingBottomBar()
@@ -69,7 +67,7 @@ fun MagoBottomBar(
                 }
                 BottomMenu.Retry.type -> {
                     VDivider()
-                    RetryBottomBar(navController)
+                    RetryBottomBar()
                 }
                 BottomMenu.RetryAndChat.type -> {
                     VDivider()
@@ -96,7 +94,7 @@ private fun VDivider() {
 /** 홈(시작하기) 화면 바텀 바 */
 @Composable
 private fun StartBottomBar(
-    navController: NavController, mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
@@ -107,8 +105,7 @@ private fun StartBottomBar(
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                navController.navigate(Screens.Guide.route) {
-                    popUpToTop(navController)
+                navigationKit.clearAndMove(Screens.Guide.route){
                     mainViewModel.updateBottomMenu(BottomMenu.Loading)
                 }
             }
@@ -224,7 +221,7 @@ private fun BloodPressureBottomBar() {
 /** 다시하기 */
 @Composable
 fun RetryBottomBar(
-    navController: NavController, mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -234,8 +231,7 @@ fun RetryBottomBar(
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    navController.navigate(Screens.Home.route) {
-                        popUpToTop(navController)
+                    navigationKit.clearAndMove(Screens.Home.route){
                         mainViewModel.updateBottomMenu(BottomMenu.Empty)
                     }
                 }

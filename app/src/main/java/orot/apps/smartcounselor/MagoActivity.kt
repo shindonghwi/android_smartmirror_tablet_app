@@ -13,6 +13,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import orot.apps.smartcounselor.graph.NavGraph
@@ -22,7 +23,9 @@ import orot.apps.smartcounselor.presentation.app_style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.components.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
+import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
 import orot.apps.sognora_compose_extension.permission.CheckPermission
+import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
@@ -32,6 +35,8 @@ class MagoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            navigationKit = NavigationKit(rememberNavController())
+
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()
         }
@@ -50,24 +55,29 @@ class MagoActivity : ComponentActivity() {
             }
         }
     }
+
+    companion object{
+        lateinit var navigationKit: NavigationKit
+    }
 }
 
 @Composable
-private fun MagoHCApp() {
+private fun MagoHCApp(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
     SmartCounselorTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .backgroundVGradient(listOf(Black80, Black))
         ) {
-            val navController = rememberNavController()
             Scaffold(
                 backgroundColor = Color.Transparent,
-                topBar = { MagoAppBar(navController = navController) },
-                bottomBar = { MagoBottomBar(navController = navController) }
+                topBar = { MagoAppBar() },
+                bottomBar = { MagoBottomBar() }
             ) {
                 Box(modifier = Modifier.padding(paddingValues = it)) {
-                    NavGraph(navController = navController)
+                    NavGraph()
                 }
             }
         }

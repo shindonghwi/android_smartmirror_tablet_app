@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamData
 import orot.apps.sognora_websocket_audio.AudioStreamManager
@@ -17,11 +20,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor() : ViewModel() {
 
     val currentBottomMenu = mutableStateOf(BottomMenu.Start.type)
-
     val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
     var audioStreamManager: AudioStreamManager? = null
     val receiveMsg: MutableStateFlow<AudioStreamData<String>> =
         MutableStateFlow(AudioStreamData.WebSocketDisConnected)
+
 
     init {
         setCurrentTime()
@@ -39,18 +42,23 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun createAudioStreamManager() {
         if (audioStreamManager == null) {
+            coroutineScopeOnDefault {
+                delay(5000)
+                receiveMsg.emit(AudioStreamData.WebSocketConnected)
+            }
             audioStreamManager = AudioStreamManager(object : AudioStreamManagerImpl {
                 override suspend fun connectedWebSocket() {
-                    receiveMsg.emit(AudioStreamData.WebSocketConnected)
+                    receiveMsg.update { AudioStreamData.WebSocketConnected }
                 }
 
                 override suspend fun disConnectedWebSocket() {
-                    receiveMsg.emit(AudioStreamData.WebSocketDisConnected)
+                    receiveMsg.update { AudioStreamData.WebSocketDisConnected }
                 }
 
-                override suspend fun receivedMsg(receivedData: AudioStreamData.ReceivedData) {
-                    receiveMsg.emit(receivedData)
+                override suspend fun receivedMsg(audioStreamData: AudioStreamData.ReceivedData<String>) {
+                    receiveMsg.update { AudioStreamData.ReceivedData(audioStreamData.msg) }
                 }
+
             })
         }
     }

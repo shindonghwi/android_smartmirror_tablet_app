@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MainViewModel
@@ -27,7 +26,6 @@ import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 
 @Composable
 fun BloodPressureScreen(
-    navController: NavHostController,
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     val scaleAnimationIsRunning = remember { mutableStateOf(true) }

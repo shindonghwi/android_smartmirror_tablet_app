@@ -2,11 +2,9 @@ package orot.apps.smartcounselor.graph
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.blood_pressure.BloodPressureScreen
 import orot.apps.smartcounselor.presentation.chat_list.ChatListScreen
@@ -16,7 +14,8 @@ import orot.apps.smartcounselor.presentation.home.HomeScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph() {
+    val navController = navigationKit.navHostController
     NavHost(
         navController = navController, startDestination = Screens.Home.route
     ) {
@@ -24,13 +23,13 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen()
         }
         composable(route = Screens.Guide.route) {
-            GuideScreen(navController)
+            GuideScreen()
         }
         composable(route = Screens.Conversation.route) {
-            ConversationScreen(navController)
+            ConversationScreen()
         }
         composable(route = Screens.BloodPressure.route) {
-            BloodPressureScreen(navController)
+            BloodPressureScreen()
         }
         composable(route = Screens.ChatList.route) {
             ChatListScreen()
