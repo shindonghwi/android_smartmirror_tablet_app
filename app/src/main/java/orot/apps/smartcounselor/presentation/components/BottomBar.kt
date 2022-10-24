@@ -44,7 +44,7 @@ fun MagoBottomBar(
     val configuration = LocalConfiguration.current
     val maxHeight = configuration.screenHeightDp * 0.2f
 
-    mainViewModel.currentBottomMenu.collectAsState().value.let { route ->
+    mainViewModel.currentBottomMenu.value.let { route ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()

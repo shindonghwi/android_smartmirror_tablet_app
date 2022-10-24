@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
-    val currentBottomMenu = MutableStateFlow(BottomMenu.Start.type)
+    val currentBottomMenu = mutableStateOf(BottomMenu.Start.type)
 
     val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
     var audioStreamManager: AudioStreamManager? = null
