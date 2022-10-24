@@ -32,6 +32,10 @@ object Versions {
     object OkHttp{
         const val version = "4.9.3"
     }
+
+    object Retrofit{
+        const val version = "2.6.0"
+    }
 }
 
 object Libraries {
@@ -72,6 +76,11 @@ object Libraries {
 
     object OkHttp{
         const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.OkHttp.version}"
+    }
+
+    object Retrofit{
+        const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.Retrofit.version}"
+        const val retrofit_gson = "com.squareup.retrofit2:converter-gson:${Versions.Retrofit.version}"
     }
 }
 
