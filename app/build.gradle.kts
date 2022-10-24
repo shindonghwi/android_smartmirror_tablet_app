@@ -62,6 +62,11 @@ dependencies {
         Libraries.AndroidX.apply {
             implementation(constraintLayout)
         }
+
+        Libraries.Retrofit.apply {
+            implementation(retrofit)
+            implementation(retrofit_gson)
+        }
     }
 
 

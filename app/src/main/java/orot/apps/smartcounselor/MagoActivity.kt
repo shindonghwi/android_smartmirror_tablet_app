@@ -13,7 +13,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import orot.apps.smartcounselor.graph.NavGraph
@@ -25,7 +24,6 @@ import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
 import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
 import orot.apps.sognora_compose_extension.permission.CheckPermission
-import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
@@ -56,15 +54,13 @@ class MagoActivity : ComponentActivity() {
         }
     }
 
-    companion object{
+    companion object {
         lateinit var navigationKit: NavigationKit
     }
 }
 
 @Composable
-private fun MagoHCApp(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+private fun MagoHCApp() {
     SmartCounselorTheme {
         Box(
             modifier = Modifier

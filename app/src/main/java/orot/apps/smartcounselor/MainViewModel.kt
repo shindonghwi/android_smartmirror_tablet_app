@@ -3,11 +3,15 @@ package orot.apps.smartcounselor
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
+import orot.apps.smartcounselor.network.service.TtsService
+import orot.apps.smartcounselor.network.service.ttsService
+import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamData
 import orot.apps.sognora_websocket_audio.AudioStreamManager
@@ -19,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
+    val sognoraMediaPlayer = SognoraMediaPlayer()
     val currentBottomMenu = mutableStateOf(BottomMenu.Start.type)
     val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
     var audioStreamManager: AudioStreamManager? = null
@@ -67,11 +72,25 @@ class MainViewModel @Inject constructor() : ViewModel() {
         currentBottomMenu.value = bottomMenu.type
     }
 
+    var ttsJob: Job? = null
+    fun fetchTtsMessage(msg: String) {
+        ttsJob?.let {
+            if (it.isActive) {
+                it.cancel()
+            }
+        }
+        ttsJob = coroutineScopeOnIO {
+            val response = ttsService.getConvertTts(msg = msg)
+            sognoraMediaPlayer.playAudio("${TtsService.BASE_URL}/audio/${response.body()?.id}")
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         audioStreamManager?.run {
             stopAudioRecord()
             null
         }
+        ttsJob?.cancel()
     }
 }
