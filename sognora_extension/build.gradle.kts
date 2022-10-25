@@ -4,7 +4,7 @@ plugins {
     id("kotlin-kapt")
 }
 
-android{
+android {
     namespace = "orot.apps.sognora_compose_extension"
     compileSdk = AppConfig.compileSdk
     defaultConfig {
@@ -39,18 +39,24 @@ android{
 dependencies {
 
     Libraries.apply {
+
+        Libraries.Kotlin.apply {
+            api(stdlib)
+            api(jvmDependency)
+        }
+
         Libraries.KTX.apply {
-            api (lifecycleRuntime)
-            api (lifecycleViewModel)
+            api(lifecycleRuntime)
+            api(lifecycleViewModel)
         }
 
         Libraries.Compose.apply {
-            api (material)
-            api (activity)
-            api (ui)
-            api (uiTooling)
-            api (navigation)
-            api (constraintLayout)
+            api(material)
+            api(activity)
+            api(ui)
+            api(uiTooling)
+            api(navigation)
+            api(constraintLayout)
         }
 
         Libraries.OkHttp.apply {

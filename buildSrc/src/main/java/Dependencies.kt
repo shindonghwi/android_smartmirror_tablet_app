@@ -6,6 +6,7 @@ object Versions {
 
     object Kotlin{
         const val version = "1.7.10"
+        const val serializationJson = "1.0.1"
     }
 
     object AndroidX{
@@ -46,6 +47,9 @@ object Libraries {
 
     object Kotlin {
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Kotlin.version}"
+        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.version}"
+        const val jvmDependency = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serializationJson}"
+        const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.Kotlin.version}"
     }
 
     object AndroidX {
