@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.update
 import orot.apps.smartcounselor.network.service.TtsService
 import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamData
@@ -47,10 +46,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun createAudioStreamManager() {
         if (audioStreamManager == null) {
-            coroutineScopeOnDefault {
-                delay(5000)
-                receiveMsg.emit(AudioStreamData.WebSocketConnected)
-            }
             audioStreamManager = AudioStreamManager(object : AudioStreamManagerImpl {
                 override suspend fun connectedWebSocket() {
                     receiveMsg.update { AudioStreamData.WebSocketConnected }
