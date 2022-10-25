@@ -57,6 +57,10 @@ dependencies {
         Libraries.OkHttp.apply {
             implementation(okhttp)
         }
+
+        Libraries.Gson.apply {
+            implementation(gson)
+        }
     }
 
 

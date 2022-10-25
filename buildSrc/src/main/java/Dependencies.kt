@@ -37,6 +37,10 @@ object Versions {
     object Retrofit{
         const val version = "2.6.0"
     }
+
+    object Gson{
+        const val version = "2.10"
+    }
 }
 
 object Libraries {
@@ -82,6 +86,10 @@ object Libraries {
     object Retrofit{
         const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.Retrofit.version}"
         const val retrofit_gson = "com.squareup.retrofit2:converter-gson:${Versions.Retrofit.version}"
+    }
+
+    object Gson{
+        const val gson = "com.google.code.gson:gson:${Versions.Gson.version}"
     }
 }
 
