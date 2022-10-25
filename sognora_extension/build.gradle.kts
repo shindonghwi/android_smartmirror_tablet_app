@@ -40,11 +40,6 @@ dependencies {
 
     Libraries.apply {
 
-        Libraries.Kotlin.apply {
-            api(stdlib)
-            api(jvmDependency)
-        }
-
         Libraries.KTX.apply {
             api(lifecycleRuntime)
             api(lifecycleViewModel)
