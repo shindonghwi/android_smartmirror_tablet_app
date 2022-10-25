@@ -1,4 +1,4 @@
-package orot.apps.sognora_websocket_audio
+package orot.apps.sognora_websocket_audio.model
 
 sealed class AudioStreamData<out T>{
     object WebSocketConnected: AudioStreamData<Nothing>()

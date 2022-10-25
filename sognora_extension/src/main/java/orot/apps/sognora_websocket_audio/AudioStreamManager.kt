@@ -8,12 +8,12 @@ import android.util.Log
 import okhttp3.*
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
-import java.util.concurrent.TimeUnit
+import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 
 class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
-    val webSocketURL: String = "ws://www.naver.com"
+    val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
@@ -25,21 +25,21 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
         RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING
     ) * 12
 
+
+    /** 웹 소켓 */
+    var webSocket: WebSocket? = null
+    private var request: Request? = Request.Builder().url(webSocketURL).build() // 웹 소켓 연결 빌더 생성
+    private var client: OkHttpClient = OkHttpClient()
+
     init {
         initWebSocket()
     }
 
-    /** 웹 소켓 */
-    var webSocket: WebSocket? = null
-    private val okHttpClient = OkHttpClient.Builder() // 웹 소켓 클라이언트 설정
-        .connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
-
-    private var request: Request? = Request.Builder().url(webSocketURL).build() // 웹 소켓 연결 빌더 생성
 
     /** 웹 소켓 연결하기 */
     private fun initWebSocket() {
         request?.run {
-            webSocket = okHttpClient.newWebSocket(this, object : WebSocketListener() {
+            webSocket = client.newWebSocket(this, object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
                     coroutineScopeOnDefault {

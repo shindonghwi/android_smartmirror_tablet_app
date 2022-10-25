@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,7 @@ import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
-import orot.apps.sognora_websocket_audio.AudioStreamData
+import orot.apps.sognora_websocket_audio.model.AudioStreamData
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.AudioStreamManagerImpl
 import java.text.SimpleDateFormat

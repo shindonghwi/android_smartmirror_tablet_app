@@ -17,16 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import orot.apps.smartcounselor.BottomMenu
-import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
 import orot.apps.sognora_viewmodel_extension.getViewModel
-import orot.apps.sognora_websocket_audio.AudioStreamData
+import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @ExperimentalAnimationApi
 @Composable
