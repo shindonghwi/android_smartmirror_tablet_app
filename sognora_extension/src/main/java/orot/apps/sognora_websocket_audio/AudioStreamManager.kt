@@ -5,10 +5,14 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import com.google.gson.Gson
 import okhttp3.*
+import okio.ByteString.Companion.toByteString
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
-import orot.apps.sognora_websocket_audio.model.AudioStreamData
+import orot.apps.sognora_websocket_audio.model.protocol.HeaderInfo
+import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
+import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 
 
 class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
@@ -49,8 +53,22 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
+                    Log.d("RECEIVED MESSAGE", "onMessage: $text")
                     coroutineScopeOnIO {
-                        audioStreamImpl.receivedMsg(AudioStreamData.ReceivedData(text))
+                        when (parsingProtocolFromReceiveMsg(text)) {
+                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
+                                audioStreamImpl.startUtteranceReq()
+                            }
+                            MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
+                                audioStreamImpl.startAudioStream()
+                            }
+//                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
+//                                audioStreamImpl.startAudioStream()
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
+//                                audioStreamImpl.startAudioStream()
+//                            }
+                        }
                     }
                 }
 
@@ -64,17 +82,37 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
         }
     }
 
-    /** 오디오 녹음 시작 */
+    /** 서버에서 전달받은 메세지 파싱 */
+    private fun parsingProtocolFromReceiveMsg(text: String): String {
+        val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
+        return receivedMsg.header.protocol_id
+    }
+
+    /** 오디오 녹음기 초기화 */
     @SuppressLint("MissingPermission")
     fun initAudioRecorder() {
+        if (audioRecord != null) {
+            stopAudioRecord()
+        }
         audioRecord = AudioRecord(
-            RECORDER_SOURCE,
-            RECORDER_SAMPLERATE,
-            RECORDER_CHANNELS,
-            RECORDER_AUDIO_ENCODING,
-            BUFFER_SIZE_RECORDING
+            RECORDER_SOURCE, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, BUFFER_SIZE_RECORDING
         )
         audioRecord?.startRecording()
+    }
+
+    /** 웹 소켓으로 이벤트 전달하기 */
+    fun sendProtocol(protocolNum: Int) {
+        var protocolId = ""
+
+        when (protocolNum) {
+            1 -> protocolId = MAGO_PROTOCOL.PROTOCOL_1.id
+            3 -> protocolId = MAGO_PROTOCOL.PROTOCOL_3.id
+            11 -> protocolId = MAGO_PROTOCOL.PROTOCOL_11.id
+            13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
+        }
+
+        val msg = Gson().toJson(MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null))
+        webSocket?.send(msg)
     }
 
     /** 녹음한 오디오 버퍼 전송하기 */
@@ -83,12 +121,9 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
         coroutineScopeOnIO {
             try {
                 do {
-                    var start = System.currentTimeMillis()
                     val byteRead = audioRecord?.read(buf, 0, buf.size) ?: break
                     if (byteRead < -1) break
-                    var end = System.currentTimeMillis()
-                    Log.d("ASdasddsaads", "sendAudioRecord: time: ${end - start}")
-//                    webSocket?.send(buf.toByteString(0, byteRead))
+                    webSocket?.send(buf.toByteString(0, byteRead))
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()

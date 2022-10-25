@@ -4,6 +4,7 @@ enum class MAGO_PROTOCOL(val id: String) {
     PROTOCOL_1("APP_DIALOG_START_REQ"),
     PROTOCOL_2("APP_DIALOG_START_ACK"),
     PROTOCOL_3("APP_UTTERANCE_START_REQ"),
+    PROTOCOL_4("APP_UTTERANCE_START_ACK"),
     PROTOCOL_5("AUDIO STREAM"), // not used
     PROTOCOL_6("EPD"),  // not used
     PROTOCOL_7("STT_REQ"), // not used
@@ -16,10 +17,10 @@ enum class MAGO_PROTOCOL(val id: String) {
     PROTOCOL_14("APP_DIALOG_END_ACK")
 }
 
-@kotlinx.serialization.Serializable
+
 data class MessageProtocol(
     val header: HeaderInfo,
-    val body: BodyInfo?,
+    val body: BodyInfo?
 )
 
 data class HeaderInfo(

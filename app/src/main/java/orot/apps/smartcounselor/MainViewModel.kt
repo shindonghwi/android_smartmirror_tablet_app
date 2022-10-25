@@ -48,7 +48,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
             audioStreamManager = AudioStreamManager(object : AudioStreamManagerImpl {
                 override suspend fun connectedWebSocket() {
                     coroutineScopeOnDefault {
-                        delay(AnimationDelay) // 자연스럽게 보이기 위하여 웹소켓 연결 지연
+                        delay(2000) // 자연스럽게 보이기 위하여 웹소켓 연결 지연
 
                         receiveMsg.update { AudioStreamData.WebSocketConnected }
 

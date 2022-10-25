@@ -1,7 +1,5 @@
 package orot.apps.smartcounselor.presentation.components
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -30,7 +28,6 @@ import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
-import orot.apps.sognora_compose_extension.components.AnimationText
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
 import orot.apps.sognora_viewmodel_extension.getViewModel
@@ -105,7 +102,7 @@ private fun StartBottomBar(
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                navigationKit.clearAndMove(Screens.Guide.route){
+                navigationKit.clearAndMove(Screens.Guide.route) {
                     mainViewModel.updateBottomMenu(BottomMenu.Loading)
                 }
             }
@@ -231,7 +228,7 @@ fun RetryBottomBar(
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    navigationKit.clearAndMove(Screens.Home.route){
+                    navigationKit.clearAndMove(Screens.Home.route) {
                         mainViewModel.updateBottomMenu(BottomMenu.Empty)
                     }
                 }
@@ -276,7 +273,7 @@ fun CallBottomBar() {
 /** 상담원 전화 걸려올때 */
 @Composable
 fun ConversationBottomBar() {
-    val isPlaying = remember { mutableStateOf(true) }
+    val isPlaying = remember { mutableStateOf(false) }
     val isEnded = remember { mutableStateOf(false) }
 
     Row(
@@ -292,20 +289,20 @@ fun ConversationBottomBar() {
             iconSize = 80.dp
         )
 
-        AnimationText(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 50.dp),
-            initDelay = 1000,
-            enterTransition = fadeIn(),
-            isEnded = isEnded,
-            exitTransition = fadeOut()
-        ) {
-            Text(
-                "안녕하세요",
-                color = Color.White,
-                style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
-            )
-        }
+//        AnimationText(
+//            modifier = Modifier
+//                .weight(1f)
+//                .padding(horizontal = 50.dp),
+//            initDelay = 1000,
+//            enterTransition = fadeIn(),
+//            isEnded = isEnded,
+//            exitTransition = fadeOut()
+//        ) {
+//            Text(
+//                "",
+//                color = Color.White,
+//                style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
+//            )
+//        }
     }
 }
