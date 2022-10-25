@@ -1,12 +1,12 @@
 package orot.apps.sognora_compose_extension.components
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
@@ -18,32 +18,30 @@ import kotlinx.coroutines.launch
 @Composable
 fun AnimationText(
     modifier: Modifier = Modifier,
-    initDelay: Long,
-    isEnded: MutableState<Boolean>,
-    enterDuration: Int = 2000,
+    enterDuration: Int = 1500,
     exitDuration: Int = 1000,
-    enterTransition: EnterTransition = slideInVertically(
-        animationSpec = tween(durationMillis = enterDuration, easing = LinearOutSlowInEasing),
-        initialOffsetY = { offset -> -offset / 4 }
+    termDuration: Long = 1000,
+    enterTransition: EnterTransition = fadeIn(
+        animationSpec = tween(durationMillis = enterDuration, easing = FastOutLinearInEasing),
     ),
     exitTransition: ExitTransition = fadeOut(
         animationSpec = tween(durationMillis = exitDuration, easing = FastOutSlowInEasing),
     ),
-    content: @Composable () -> Unit
+    textList: List<String>,
+    content: @Composable (String) -> Unit,
 ) {
+    val currentText = remember { mutableStateOf(textList.first()) }
+
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
-        if (!isEnded.value) {
-            CoroutineScope(Dispatchers.Default).launch {
-                takeIf { initDelay != 0L }?.run {
-                    delay(initDelay)
-                    targetState = true
-                }
+        CoroutineScope(Dispatchers.Default).launch {
+            repeat(textList.size) {
+                delay(enterDuration.toLong())
+                targetState = true
+                currentText.value = textList[it]
+                delay(enterDuration.toLong() + exitDuration.toLong() + termDuration)
+                targetState = false
             }
         }
-    }
-
-    if (isEnded.value) {
-        animVisibleState.targetState = false
     }
 
     AnimatedVisibility(
@@ -52,7 +50,7 @@ fun AnimationText(
         enter = enterTransition,
         exit = exitTransition,
     ) {
-        content()
+        content(currentText.value)
     }
 
 }

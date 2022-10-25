@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,11 +10,12 @@ import kotlinx.coroutines.flow.update
 import orot.apps.smartcounselor.network.service.TtsService
 import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_viewmodel_extension.scope.onDefault
-import orot.apps.sognora_websocket_audio.model.AudioStreamData
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.AudioStreamManagerImpl
+import orot.apps.sognora_websocket_audio.model.AudioStreamData
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -27,8 +27,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val currentBottomMenu = mutableStateOf(BottomMenu.Start.type)
     val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
     var audioStreamManager: AudioStreamManager? = null
-    val receiveMsg: MutableStateFlow<AudioStreamData<String>> =
-        MutableStateFlow(AudioStreamData.WebSocketDisConnected)
+    val receiveMsg: MutableStateFlow<AudioStreamData<String>> = MutableStateFlow(AudioStreamData.WebSocketDisConnected)
 
 
     init {
@@ -42,24 +41,35 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun getCurrentTime() =
-        SimpleDateFormat("yyyy.MM.dd-HH:mm-EE", Locale.KOREA).format(Date())
+    private fun getCurrentTime() = SimpleDateFormat("yyyy.MM.dd-HH:mm-EE", Locale.KOREA).format(Date())
 
     fun createAudioStreamManager() {
         if (audioStreamManager == null) {
             audioStreamManager = AudioStreamManager(object : AudioStreamManagerImpl {
                 override suspend fun connectedWebSocket() {
-                    receiveMsg.update { AudioStreamData.WebSocketConnected }
+                    coroutineScopeOnDefault {
+                        delay(AnimationDelay) // 자연스럽게 보이기 위하여 웹소켓 연결 지연
+
+                        receiveMsg.update { AudioStreamData.WebSocketConnected }
+
+                        audioStreamManager?.run {
+                            initAudioRecorder()
+                            sendProtocol(1)
+                        }
+                    }
                 }
 
                 override suspend fun disConnectedWebSocket() {
                     receiveMsg.update { AudioStreamData.WebSocketDisConnected }
                 }
 
-                override suspend fun receivedMsg(audioStreamData: AudioStreamData.ReceivedData<String>) {
-                    receiveMsg.update { AudioStreamData.ReceivedData(audioStreamData.msg) }
+                override suspend fun startUtteranceReq() {
+                    audioStreamManager?.sendProtocol(3)
                 }
 
+                override suspend fun startAudioStream() {
+                    audioStreamManager?.sendAudioRecord()
+                }
             })
         }
     }
