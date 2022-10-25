@@ -7,6 +7,7 @@ import android.media.MediaRecorder
 import android.util.Log
 import com.google.gson.Gson
 import okhttp3.*
+import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
@@ -21,7 +22,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
-    private val RECORDER_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION
+    private val RECORDER_SOURCE = MediaRecorder.AudioSource.MIC
     private val RECORDER_SAMPLERATE = 44100
     private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
     private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
@@ -46,6 +47,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
             webSocket = client.newWebSocket(this, object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
+                    Log.d("WEBSOCKET", "onOpen: $response")
                     coroutineScopeOnDefault {
                         audioStreamImpl.connectedWebSocket()
                     }
@@ -53,7 +55,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
-                    Log.d("RECEIVED MESSAGE", "onMessage: $text")
+                    Log.d("WEBSOCKET", "onMessage: $text")
                     coroutineScopeOnIO {
                         when (parsingProtocolFromReceiveMsg(text)) {
                             MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
@@ -74,9 +76,25 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
+                    Log.d("WEBSOCKET", "onFailure: $t || $response")
                     coroutineScopeOnDefault {
                         audioStreamImpl.disConnectedWebSocket()
                     }
+                }
+
+                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                    super.onClosed(webSocket, code, reason)
+                    Log.d("WEBSOCKET", "onClosed: $code || $reason")
+                }
+
+                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                    super.onClosing(webSocket, code, reason)
+                    Log.d("WEBSOCKET", "onClosing: $code || $reason")
+                }
+
+                override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+                    super.onMessage(webSocket, bytes)
+                    Log.d("WEBSOCKET", "onMessage: $bytes")
                 }
             })
         }
@@ -124,6 +142,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
                     val byteRead = audioRecord?.read(buf, 0, buf.size) ?: break
                     if (byteRead < -1) break
                     webSocket?.send(buf.toByteString(0, byteRead))
+                    Log.d("WEBSOCKET", "sendAudioRecord: $byteRead")
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()
