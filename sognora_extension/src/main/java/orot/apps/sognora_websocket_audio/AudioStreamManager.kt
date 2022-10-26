@@ -18,7 +18,7 @@ import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 
 class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
-    val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
+    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
