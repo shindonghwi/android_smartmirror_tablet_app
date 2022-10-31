@@ -32,6 +32,7 @@ object Versions {
 
     object OkHttp{
         const val version = "4.9.3"
+        const val logging = "3.9.1"
     }
 
     object Retrofit{
@@ -81,6 +82,7 @@ object Libraries {
 
     object OkHttp{
         const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.OkHttp.version}"
+        const val logging = "com.squareup.okhttp3:logging-interceptor:${Versions.OkHttp.version}"
     }
 
     object Retrofit{

@@ -55,11 +55,12 @@ dependencies {
         }
 
         Libraries.OkHttp.apply {
-            implementation(okhttp)
+            api(okhttp)
+            api(logging)
         }
 
         Libraries.Gson.apply {
-            implementation(gson)
+            api(gson)
         }
     }
 
