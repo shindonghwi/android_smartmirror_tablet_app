@@ -32,14 +32,14 @@ fun AnimationText(
         animationSpec = tween(durationMillis = exitDuration, easing = FastOutSlowInEasing),
     ),
     textList: List<String>,
-    iAnimationTextCallback: IAnimationTextCallback,
+    iAnimationTextCallback: IAnimationTextCallback? = null,
     content: @Composable (String) -> Unit,
 ) {
     val currentText = remember { mutableStateOf(textList.first()) }
 
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
         CoroutineScope(Dispatchers.Default).launch {
-            iAnimationTextCallback.startAnimation()
+            iAnimationTextCallback?.startAnimation()
             repeat(textList.size) {
                 delay(enterDuration.toLong())
                 targetState = true
@@ -47,7 +47,7 @@ fun AnimationText(
                 delay(enterDuration.toLong() + exitDuration.toLong() + termDuration)
                 targetState = false
             }
-            iAnimationTextCallback.endAnimation()
+            iAnimationTextCallback?.endAnimation()
         }
     }
 

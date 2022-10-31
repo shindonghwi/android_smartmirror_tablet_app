@@ -44,12 +44,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val audioState: MutableStateFlow<AudioStreamData<String>> = MutableStateFlow(AudioStreamData.UnAvailable)
     val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
 
-    fun updateRotating(flag: Boolean) {
-        if (audioState.value is AudioStreamData.Available) {
-            micIsAvailable.value = flag
-        }
-    }
-
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
         audioStreamManager?.run {
@@ -87,7 +81,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
     fun changeSendingStateAudioBuffer(flag: Boolean) {
-        audioStreamManager?.audioSendAvailable = flag
+        if (audioState.value is AudioStreamData.Available) {
+            micIsAvailable.value = flag
+            audioStreamManager?.audioSendAvailable = flag
+        }
     }
 
     /**
@@ -124,14 +121,14 @@ class MainViewModel @Inject constructor() : ViewModel() {
     var guideMsgList = listOf(
         "안녕하세요",
         "Mago Healthcare 서비스에 오신걸 환영합니다",
-        "AI와 대화를 시작하세요"
+        "AI의 대화를 기다려주세요"
     )
     var guideTtsList = arrayListOf<Pair<String, String>>()
 
     suspend fun setGuideTtsUrlList() {
         viewModelScope.launch(Dispatchers.IO) {
             guideMsgList.forEach {
-                val response = async { ttsService.getConvertTts(msg = guideMsgList[0]) }
+                val response = async { ttsService.getConvertTts(msg = it) }
                 val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.await().body()?.id}")
                 if (!guideTtsList.contains(item)) {
                     guideTtsList.add(item)
