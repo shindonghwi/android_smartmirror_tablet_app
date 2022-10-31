@@ -45,11 +45,11 @@ fun GuideScreen(
 }
 
 @Composable
-private fun WebSocketState(
+fun WebSocketState(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    val data = mainViewModel.receiveMsg.collectAsState().value
-    if (data is AudioStreamData.WebSocketConnected) {
+    val data = mainViewModel.audioState.collectAsState().value
+    if (data is AudioStreamData.Available) {
         LaunchedEffect(key1 = Unit) {
             navigationKit.clearAndMove(Screens.Conversation.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Conversation)

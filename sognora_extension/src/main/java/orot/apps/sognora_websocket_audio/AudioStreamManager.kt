@@ -16,7 +16,7 @@ import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
 import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 
 
-class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
+class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
     val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
 
@@ -51,6 +51,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
                     coroutineScopeOnDefault {
                         audioStreamImpl.connectedWebSocket()
                     }
+                    sendProtocol(1)
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
@@ -59,10 +60,10 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
                     coroutineScopeOnIO {
                         when (parsingProtocolFromReceiveMsg(text)) {
                             MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
-                                audioStreamImpl.startUtteranceReq()
+                                sendProtocol(3)
                             }
                             MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
-                                audioStreamImpl.startAudioStream()
+                                audioStreamImpl.availableAudioStream()
                             }
 //                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
 //                                audioStreamImpl.startAudioStream()
@@ -136,7 +137,6 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
     /** 녹음한 오디오 버퍼 전송하기 */
     fun sendAudioRecord() {
-//        val buffer = ByteBuffer.allocateDirect(BUFFER_SIZE_RECORDING)
         val buf = ByteArray(BUFFER_SIZE_RECORDING)
         coroutineScopeOnIO {
             try {
@@ -144,7 +144,6 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
                     val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
                     if (byteRead < -1) break
                     webSocket?.send(buf.toByteString(0, byteRead))
-                    Log.d("WEBSOCKET", "sendAudioRecord: $byteRead | ${buf.size}")
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()
