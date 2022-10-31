@@ -29,103 +29,103 @@ fun MagoAppBar(
 ) {
     val controller = navigationKit.navHostController
     controller.currentBackStackEntryAsState().value?.destination?.route?.let { route ->
-        val mod = Modifier
-            .padding(horizontal = 20.dp)
-            .size(40.dp, 30.dp)
-            .background(Gray20)
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Home.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Start)
-                        }
-                    }),
-                    text = "1",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Guide.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                        }
-                    }),
-                    text = "2",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Conversation.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
-                        }
-                    }),
-                    text = "3",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Conversation.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Conversation)
-                        }
-                    }),
-                    text = "3-1",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.BloodPressure.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
-                        }
-                    }),
-                    text = "4",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Conversation.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                        }
-                    }),
-                    text = "4-1",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.Conversation.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
-                        }
-                    }),
-                    text = "5",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.ChatList.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Retry)
-                        }
-                    }),
-                    text = "6",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-                Text(
-                    modifier = mod.then(Modifier.clickable {
-                        navigationKit.clearAndMove(Screens.ChatList.route) {
-                            mainViewModel.updateBottomMenu(BottomMenu.Call)
-                        }
-                    }),
-                    text = "7",
-                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
-                )
-            }
+//        val mod = Modifier
+//            .padding(horizontal = 20.dp)
+//            .size(40.dp, 30.dp)
+//            .background(Gray20)
+//        Column(modifier = Modifier.fillMaxWidth()) {
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Home.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Start)
+//                        }
+//                    }),
+//                    text = "1",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Guide.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                        }
+//                    }),
+//                    text = "2",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Conversation.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
+//                        }
+//                    }),
+//                    text = "3",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Conversation.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Conversation)
+//                        }
+//                    }),
+//                    text = "3-1",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.BloodPressure.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Empty)
+//                        }
+//                    }),
+//                    text = "4",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Conversation.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                        }
+//                    }),
+//                    text = "4-1",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.Conversation.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
+//                        }
+//                    }),
+//                    text = "5",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.ChatList.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Retry)
+//                        }
+//                    }),
+//                    text = "6",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//                Text(
+//                    modifier = mod.then(Modifier.clickable {
+//                        navigationKit.clearAndMove(Screens.ChatList.route) {
+//                            mainViewModel.updateBottomMenu(BottomMenu.Call)
+//                        }
+//                    }),
+//                    text = "7",
+//                    style = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center),
+//                )
+//            }
 
             route.takeIf { it != "home" }?.run {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                        .padding(start = 20.dp, end = 20.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Image(
@@ -141,4 +141,4 @@ fun MagoAppBar(
             }
         }
     }
-}
+//}

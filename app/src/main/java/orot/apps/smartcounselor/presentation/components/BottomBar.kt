@@ -43,6 +43,7 @@ fun MagoBottomBar(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 20.dp)
                 .height(maxHeight.dp),
         ) {
             when (route) {
