@@ -11,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.app_style.Display2
 import orot.apps.sognora_compose_extension.components.AnimationText
 import orot.apps.sognora_compose_extension.components.IAnimationTextCallback
 import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 
 @Composable
 fun ConversationScreen(
@@ -27,7 +29,15 @@ fun ConversationScreen(
             textList = mainViewModel.guideMsgList,
             iAnimationTextCallback = object : IAnimationTextCallback {
                 override suspend fun startAnimation() {}
-                override suspend fun endAnimation() = mainViewModel.updateRotating(true)
+                override suspend fun endAnimation() {
+                    coroutineScopeOnDefault {
+                        mainViewModel.run {
+                            delay(1000)
+                            updateRotating(true)
+                            changeSendingStateAudioBuffer(true)
+                        }
+                    }
+                }
             }
         ) { content ->
             LaunchedEffect(key1 = Unit) {

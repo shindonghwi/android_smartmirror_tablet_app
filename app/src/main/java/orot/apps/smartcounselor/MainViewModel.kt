@@ -67,6 +67,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 override suspend fun disConnectedWebSocket() {
                     coroutineScopeOnDefault {
                         audioState.update { AudioStreamData.UnAvailable }
+                        changeSendingStateAudioBuffer(false)
                     }
                 }
 
