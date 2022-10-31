@@ -18,6 +18,7 @@ import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 
 class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
+    var audioSendAvailable = false
     val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
 
     /** 오디오 */
@@ -121,7 +122,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     }
 
     /** 웹 소켓으로 이벤트 전달하기 */
-    fun sendProtocol(protocolNum: Int) {
+    private fun sendProtocol(protocolNum: Int) {
         var protocolId = ""
 
         when (protocolNum) {
@@ -141,9 +142,11 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
         coroutineScopeOnIO {
             try {
                 do {
-                    val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
-                    if (byteRead < -1) break
-                    webSocket?.send(buf.toByteString(0, byteRead))
+                    if (audioSendAvailable) {
+                        val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
+                        if (byteRead < -1) break
+                        webSocket?.send(buf.toByteString(0, byteRead))
+                    }
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()

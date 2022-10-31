@@ -12,6 +12,7 @@ import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.IAudioStreamManager
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
@@ -48,7 +49,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
-        Log.d("asdjkahsdkjasd", "createAudioStreamManager: ")
         audioStreamManager?.run {
             stopAudioRecord()
             null
@@ -60,7 +60,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 override suspend fun connectedWebSocket() {
                     coroutineScopeOnDefault(initDelay = 2000) {
                         audioState.update { AudioStreamData.Available() }
-                        audioStreamManager?.sendProtocol(1) // APP_DIALOG_START_REQ
                     }
                 }
 
@@ -75,16 +74,17 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 override suspend fun availableAudioStream() {
                     coroutineScopeOnDefault {
                         audioStreamManager?.initAudioRecorder()
+                        sendAudioBuffer()
                     }
                 }
             })
         }
     }
 
-    fun createAudioRecorder() = audioStreamManager?.initAudioRecorder()
     fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
-    fun pauseAudioBuffer() = audioStreamManager?.stopAudioRecord()
-
+    fun changeSendingStateAudioBuffer(flag: Boolean) {
+        audioStreamManager?.audioSendAvailable = flag
+    }
 
     /**
      * ================================================
@@ -103,6 +103,36 @@ class MainViewModel @Inject constructor() : ViewModel() {
         ttsJob = coroutineScopeOnIO {
             val response = ttsService.getConvertTts(msg = msg)
             sognoraMediaPlayer.playAudio("${TtsService.BASE_URL}/audio/${response.body()?.id}")
+        }
+    }
+
+    fun playTts(url: String) {
+        ttsJob?.let {
+            if (it.isActive) {
+                it.cancel()
+            }
+        }
+        ttsJob = coroutineScopeOnMain {
+            sognoraMediaPlayer.playAudio(url)
+        }
+    }
+
+    var guideMsgList = listOf(
+        "안녕하세요",
+        "Mago Healthcare 서비스에 오신걸 환영합니다",
+        "AI와 대화를 시작하세요"
+    )
+    var guideTtsList = arrayListOf<Pair<String, String>>()
+
+    fun setGuideTtsUrlList() {
+        coroutineScopeOnIO {
+            guideMsgList.forEach {
+                val response = ttsService.getConvertTts(msg = it)
+                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.body()?.id}")
+                if (!guideTtsList.contains(item)) {
+                    guideTtsList.add(item)
+                }
+            }
         }
     }
 
