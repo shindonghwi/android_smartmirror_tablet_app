@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,26 +21,27 @@ import orot.apps.sognora_viewmodel_extension.getViewModel
 fun ConversationScreen(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    val guideTextList = listOf(
-        "안녕하세요",
-        "Mago Healthcare 서비스에 오신걸 환영합니다",
-        "AI와 대화를 시작하세요"
-    )
-
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         AnimationText(
             modifier = Modifier,
-            textList = guideTextList,
+            textList = mainViewModel.guideMsgList,
             iAnimationTextCallback = object : IAnimationTextCallback {
                 override suspend fun startAnimation() {}
                 override suspend fun endAnimation() = mainViewModel.updateRotating(true)
             }
-        ) {
+        ) { content ->
+            LaunchedEffect(key1 = Unit) {
+                mainViewModel.run {
+                    playTts(guideTtsList.filter { it.first == content }[0].second)
+                }
+            }
+
             Text(
-                text = it,
+                text = content,
                 color = Color.White,
                 style = MaterialTheme.typography.Display2.copy(textAlign = TextAlign.Center)
             )
         }
     }
+
 }
