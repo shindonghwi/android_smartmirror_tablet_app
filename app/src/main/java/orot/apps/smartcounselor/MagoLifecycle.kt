@@ -23,9 +23,6 @@ fun MagoLifecycle(
             }
             Lifecycle.Event.ON_CREATE -> {
                 Log.d(TAG, "MagoLifecycle: ON_CREATE")
-                coroutineScopeOnIO {
-                    mainViewModel.setGuideTtsUrlList()
-                }
             }
             Lifecycle.Event.ON_DESTROY -> Log.d(TAG, "MagoLifecycle: ON_DESTROY")
             Lifecycle.Event.ON_START -> Log.d(TAG, "MagoLifecycle: ON_START")

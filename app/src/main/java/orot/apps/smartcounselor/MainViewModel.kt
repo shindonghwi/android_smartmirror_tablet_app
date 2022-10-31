@@ -76,6 +76,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
                         sendAudioBuffer()
                     }
                 }
+
+                override suspend fun streamAiTalk() {
+                }
             })
         }
     }
@@ -135,17 +138,17 @@ class MainViewModel @Inject constructor() : ViewModel() {
     )
     var guideTtsList = arrayListOf<Pair<String, String>>()
 
-    suspend fun setGuideTtsUrlList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            guideMsgList.forEach {
-                val response = async { ttsService.getConvertTts(msg = it) }
-                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.await().body()?.id}")
-                if (!guideTtsList.contains(item)) {
-                    guideTtsList.add(item)
-                }
-            }
-        }
-    }
+//    suspend fun setGuideTtsUrlList() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            guideMsgList.forEach {
+////                val response = async { ttsService.getConvertTts(msg = it) }
+//                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.await().body()?.id}")
+//                if (!guideTtsList.contains(item)) {
+//                    guideTtsList.add(item)
+//                }
+//            }
+//        }
+//    }
 
 
     override fun onCleared() {

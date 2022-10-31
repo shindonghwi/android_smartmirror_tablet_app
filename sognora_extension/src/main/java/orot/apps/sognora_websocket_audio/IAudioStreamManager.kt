@@ -4,4 +4,5 @@ interface IAudioStreamManager {
     suspend fun connectedWebSocket()
     suspend fun disConnectedWebSocket()
     suspend fun availableAudioStream()
+    suspend fun streamAiTalk()
 }
