@@ -1,7 +1,7 @@
 package orot.apps.sognora_mediaplayer
 
+import android.content.Context
 import android.media.MediaPlayer
-
 
 class SognoraMediaPlayer {
     var player: MediaPlayer? = null
@@ -14,6 +14,18 @@ class SognoraMediaPlayer {
             player?.run {
                 setDataSource(url)
                 prepare()
+                start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun playRaw(context: Context, rawFile: Int) {
+        try {
+            closePlayer()
+            player = MediaPlayer.create(context, rawFile)
+            player?.run {
                 start()
             }
         } catch (e: Exception) {

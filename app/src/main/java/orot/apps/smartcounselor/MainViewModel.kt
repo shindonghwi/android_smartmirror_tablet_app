@@ -1,15 +1,12 @@
 package orot.apps.smartcounselor
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import orot.apps.smartcounselor.network.service.TtsService
 import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
@@ -120,6 +117,16 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
         ttsJob = coroutineScopeOnMain {
             sognoraMediaPlayer.playAudio(url)
+        }
+    }
+    fun playMediaPlayerTts(context: Context, rawFile: Int) {
+        ttsJob?.let {
+            if (it.isActive) {
+                it.cancel()
+            }
+        }
+        ttsJob = coroutineScopeOnMain {
+            sognoraMediaPlayer.playRaw(context, rawFile)
         }
     }
 
