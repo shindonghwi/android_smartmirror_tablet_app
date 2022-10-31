@@ -1,10 +1,10 @@
 package orot.apps.smartcounselor
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import orot.apps.smartcounselor.network.service.TtsService
@@ -12,72 +12,87 @@ import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
-import orot.apps.sognora_viewmodel_extension.scope.onDefault
 import orot.apps.sognora_websocket_audio.AudioStreamManager
-import orot.apps.sognora_websocket_audio.AudioStreamManagerImpl
+import orot.apps.sognora_websocket_audio.IAudioStreamManager
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
-    val sognoraMediaPlayer = SognoraMediaPlayer()
-    val currentBottomMenu = mutableStateOf(BottomMenu.Start.type)
-    val currentTime: MutableStateFlow<String> = MutableStateFlow(getCurrentTime())
-    var audioStreamManager: AudioStreamManager? = null
-    val receiveMsg: MutableStateFlow<AudioStreamData<String>> = MutableStateFlow(AudioStreamData.WebSocketDisConnected)
-
-
-    init {
-        setCurrentTime()
-    }
-
-    private fun setCurrentTime() = onDefault {
-        while (true) {
-            currentTime.emit(getCurrentTime())
-            delay(1000L)
-        }
-    }
-
-    private fun getCurrentTime() = SimpleDateFormat("yyyy.MM.dd-HH:mm-EE", Locale.KOREA).format(Date())
-
-    fun createAudioStreamManager() {
-        if (audioStreamManager == null) {
-            audioStreamManager = AudioStreamManager(object : AudioStreamManagerImpl {
-                override suspend fun connectedWebSocket() {
-                    coroutineScopeOnDefault {
-                        delay(2000) // 자연스럽게 보이기 위하여 웹소켓 연결 지연
-
-                        receiveMsg.update { AudioStreamData.WebSocketConnected }
-
-                        audioStreamManager?.run {
-                            initAudioRecorder()
-                            sendProtocol(1)
-                        }
-                    }
-                }
-
-                override suspend fun disConnectedWebSocket() {
-                    receiveMsg.update { AudioStreamData.WebSocketDisConnected }
-                }
-
-                override suspend fun startUtteranceReq() {
-                    audioStreamManager?.sendProtocol(3)
-                }
-
-                override suspend fun startAudioStream() {
-                    audioStreamManager?.sendAudioRecord()
-                }
-            })
-        }
-    }
+    /**
+     * ================================================
+     *     UI STATE
+     * ================================================
+     * */
+    val currentBottomMenu = mutableStateOf(BottomMenu.Start.type) // 바텀 메뉴
 
     fun updateBottomMenu(bottomMenu: BottomMenu) {
         currentBottomMenu.value = bottomMenu.type
     }
 
+    /**
+     * ================================================
+     *     Audio Stream
+     * ================================================
+     * */
+    var audioStreamManager: AudioStreamManager? = null
+    val audioState: MutableStateFlow<AudioStreamData<String>> = MutableStateFlow(AudioStreamData.UnAvailable)
+    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
+
+    fun updateRotating(flag: Boolean) {
+        if (audioState.value is AudioStreamData.Available) {
+            micIsAvailable.value = flag
+        }
+    }
+
+    /** 오디오스트림 생성*/
+    fun createAudioStreamManager() {
+        Log.d("asdjkahsdkjasd", "createAudioStreamManager: ")
+        audioStreamManager?.run {
+            stopAudioRecord()
+            null
+        }
+
+        if (audioStreamManager == null) {
+            audioStreamManager = AudioStreamManager(object : IAudioStreamManager {
+                // 웹소켓(챗서버) 연결: 오디오를 사용가능한 상태로 만들고, 서버에 dm 시작을 알린다.
+                override suspend fun connectedWebSocket() {
+                    coroutineScopeOnDefault(initDelay = 2000) {
+                        audioState.update { AudioStreamData.Available() }
+                        audioStreamManager?.sendProtocol(1) // APP_DIALOG_START_REQ
+                    }
+                }
+
+                // 웹소켓 해제: 오디오를 사용 불가능한 상태로 만든다.
+                override suspend fun disConnectedWebSocket() {
+                    coroutineScopeOnDefault {
+                        audioState.update { AudioStreamData.UnAvailable }
+                    }
+                }
+
+                // 오디오 버퍼를 서버로 전송한다.
+                override suspend fun availableAudioStream() {
+                    coroutineScopeOnDefault {
+                        audioStreamManager?.initAudioRecorder()
+                    }
+                }
+            })
+        }
+    }
+
+    fun createAudioRecorder() = audioStreamManager?.initAudioRecorder()
+    fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
+    fun pauseAudioBuffer() = audioStreamManager?.stopAudioRecord()
+
+
+    /**
+     * ================================================
+     *     TTS
+     * ================================================
+     * */
+
+    val sognoraMediaPlayer = SognoraMediaPlayer() // tts media player
     var ttsJob: Job? = null
     fun fetchTtsMessage(msg: String) {
         ttsJob?.let {

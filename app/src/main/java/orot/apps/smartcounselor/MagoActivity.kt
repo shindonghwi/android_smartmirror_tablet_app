@@ -62,6 +62,9 @@ class MagoActivity : ComponentActivity() {
 @Composable
 private fun MagoHCApp() {
     SmartCounselorTheme {
+
+        MagoLifecycle()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

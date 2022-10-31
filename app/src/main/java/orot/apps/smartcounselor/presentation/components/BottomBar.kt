@@ -272,9 +272,10 @@ fun CallBottomBar() {
 
 /** 상담원 전화 걸려올때 */
 @Composable
-fun ConversationBottomBar() {
-    val isPlaying = remember { mutableStateOf(false) }
-    val isEnded = remember { mutableStateOf(false) }
+fun ConversationBottomBar(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    val isPlaying = remember { mainViewModel.micIsAvailable }
 
     Row(
         modifier = Modifier
