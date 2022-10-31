@@ -19,7 +19,8 @@ private fun checkPermission(permission: String, requestCode: Int, activity: Acti
         ) == PackageManager.PERMISSION_DENIED
     ) {
         ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
-    } else {
-        Toast.makeText(activity, "Permission already granted..", Toast.LENGTH_SHORT).show()
     }
+//    else {
+//        Toast.makeText(activity, "Permission already granted..", Toast.LENGTH_SHORT).show()
+//    }
 }
