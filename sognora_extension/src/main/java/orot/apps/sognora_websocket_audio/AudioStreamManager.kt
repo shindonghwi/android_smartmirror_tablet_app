@@ -22,11 +22,11 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
-    private val RECORDER_SOURCE = MediaRecorder.AudioSource.MIC
-    private val RECORDER_SAMPLERATE = 44100
-    private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO
-    private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT
-    private val BUFFER_SIZE_RECORDING = AudioRecord.getMinBufferSize( // 오디오 버퍼 설정
+    private val RECORDER_SOURCE = MediaRecorder.AudioSource.MIC // 마이크 ( 보이스 인식만 가능한 마이크도 있음 )
+    private val RECORDER_SAMPLERATE = 16000 // 샘플링 속도
+    private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO // 모노 ( 스테레오 선택가능 )
+    private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT // 오디오 인코딩 타입
+    private val BUFFER_SIZE_RECORDING = AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
         RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING
     ) * 12
 
@@ -115,6 +115,7 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
         audioRecord = AudioRecord(
             RECORDER_SOURCE, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, BUFFER_SIZE_RECORDING
         )
+
         audioRecord?.startRecording()
     }
 
@@ -135,14 +136,15 @@ class AudioStreamManager(private val audioStreamImpl: AudioStreamManagerImpl) {
 
     /** 녹음한 오디오 버퍼 전송하기 */
     fun sendAudioRecord() {
+//        val buffer = ByteBuffer.allocateDirect(BUFFER_SIZE_RECORDING)
         val buf = ByteArray(BUFFER_SIZE_RECORDING)
         coroutineScopeOnIO {
             try {
                 do {
-                    val byteRead = audioRecord?.read(buf, 0, buf.size) ?: break
+                    val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
                     if (byteRead < -1) break
                     webSocket?.send(buf.toByteString(0, byteRead))
-                    Log.d("WEBSOCKET", "sendAudioRecord: $byteRead")
+                    Log.d("WEBSOCKET", "sendAudioRecord: $byteRead | ${buf.size}")
                 } while (true)
             } catch (e: Exception) {
                 stopAudioRecord()
