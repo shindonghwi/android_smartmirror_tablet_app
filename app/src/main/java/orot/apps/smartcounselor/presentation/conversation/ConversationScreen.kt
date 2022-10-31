@@ -27,7 +27,7 @@ fun ConversationScreen(
         ) { content ->
             LaunchedEffect(key1 = Unit) {
                 mainViewModel.run {
-                    playTts(guideTtsList.filter { it.first == content }[0].second)
+                    playGoogleTts(guideTtsList.filter { it.first == content }[0].first)
                 }
             }
 

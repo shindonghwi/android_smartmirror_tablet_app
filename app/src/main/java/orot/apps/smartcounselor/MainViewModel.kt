@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import orot.apps.smartcounselor.network.service.TtsService
 import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
+import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
@@ -94,8 +95,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
      * */
 
     val sognoraMediaPlayer = SognoraMediaPlayer() // tts media player
+    val sognoraTts = SognoraTTS() // tts media player
     var ttsJob: Job? = null
-    fun fetchTtsMessage(msg: String) {
+    fun fetchMediaPlayerTtsMessage(msg: String) {
         ttsJob?.let {
             if (it.isActive) {
                 it.cancel()
@@ -107,7 +109,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun playTts(url: String) {
+    fun playMediaPlayerTts(url: String) {
         ttsJob?.let {
             if (it.isActive) {
                 it.cancel()
@@ -116,6 +118,14 @@ class MainViewModel @Inject constructor() : ViewModel() {
         ttsJob = coroutineScopeOnMain {
             sognoraMediaPlayer.playAudio(url)
         }
+    }
+
+    fun playGoogleTts(msg: String){
+        sognoraTts.startPlay(msg)
+    }
+
+    fun stopGoogleTts(){
+        sognoraTts.clear()
     }
 
     var guideMsgList = listOf(
