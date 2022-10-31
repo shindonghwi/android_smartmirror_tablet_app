@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import orot.apps.sognora_compose_extension.lifecycle.OnLifecycleEvent
 import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 
 @Composable
 fun MagoLifecycle(
@@ -20,7 +21,9 @@ fun MagoLifecycle(
             }
             Lifecycle.Event.ON_CREATE -> {
                 Log.d(TAG, "MagoLifecycle: ON_CREATE")
-                mainViewModel.setGuideTtsUrlList()
+                coroutineScopeOnIO {
+                    mainViewModel.setGuideTtsUrlList()
+                }
             }
             Lifecycle.Event.ON_DESTROY -> Log.d(TAG, "MagoLifecycle: ON_DESTROY")
             Lifecycle.Event.ON_START -> Log.d(TAG, "MagoLifecycle: ON_START")

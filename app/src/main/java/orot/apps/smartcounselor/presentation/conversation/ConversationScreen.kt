@@ -32,7 +32,7 @@ fun ConversationScreen(
                 override suspend fun endAnimation() {
                     coroutineScopeOnDefault {
                         mainViewModel.run {
-                            delay(1000)
+                            delay(1000) // 애니메이션이 끝나고 tts 끝부분이 작동중이므로 1초간 대기한다.
                             updateRotating(true)
                             changeSendingStateAudioBuffer(true)
                         }

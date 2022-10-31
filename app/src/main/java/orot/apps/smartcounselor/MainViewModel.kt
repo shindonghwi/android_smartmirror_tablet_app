@@ -1,12 +1,15 @@
 package orot.apps.smartcounselor
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import orot.apps.smartcounselor.network.service.TtsService
 import orot.apps.smartcounselor.network.service.ttsService
 import orot.apps.sognora_mediaplayer.SognoraMediaPlayer
@@ -125,17 +128,18 @@ class MainViewModel @Inject constructor() : ViewModel() {
     )
     var guideTtsList = arrayListOf<Pair<String, String>>()
 
-    fun setGuideTtsUrlList() {
-        coroutineScopeOnIO {
+    suspend fun setGuideTtsUrlList() {
+        viewModelScope.launch(Dispatchers.IO) {
             guideMsgList.forEach {
-                val response = ttsService.getConvertTts(msg = it)
-                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.body()?.id}")
+                val response = async { ttsService.getConvertTts(msg = guideMsgList[0]) }
+                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.await().body()?.id}")
                 if (!guideTtsList.contains(item)) {
                     guideTtsList.add(item)
                 }
             }
         }
     }
+
 
     override fun onCleared() {
         super.onCleared()
