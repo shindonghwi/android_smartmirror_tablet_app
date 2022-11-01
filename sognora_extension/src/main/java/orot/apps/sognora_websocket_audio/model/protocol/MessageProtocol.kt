@@ -30,7 +30,17 @@ data class HeaderInfo(
 )
 
 data class BodyInfo(
+    val ment: MentInfo,
+    val action: String,
+    val turn: Int,
     val code: Int,
     val message: String,
     val reason: String,
+)
+
+data class MentInfo(
+    val id: String,
+    val text: String,
+    val type: String,
+    val uri: String,
 )

@@ -30,3 +30,7 @@ inline fun <reified type : ViewModel> getViewModel(
             }
         })
 }
+
+fun clearVMS(){
+    vms.clear()
+}

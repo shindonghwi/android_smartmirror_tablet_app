@@ -20,7 +20,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
     val TAG = "AudioStreamManager"
     var audioSendAvailable = false
-    val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
+    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
 
     /** 오디오 */
     private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
@@ -53,7 +53,6 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                     coroutineScopeOnDefault {
                         audioStreamImpl.connectedWebSocket()
                     }
-                    sendProtocol(1)
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
@@ -61,8 +60,9 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                     Log.d(TAG, "onMessage: $text")
                     coroutineScopeOnIO {
                         when (parsingProtocolFromReceiveMsg(text)) {
-                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
-                                sendProtocol(3)
+                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK                                 sProtocol(3)
+                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
+                                audioStreamImpl.streamAiTalk(MAGO_PROTOCOL.PROTOCOL_2.id, receivedMsg)
                             }
                             MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
                                 audioStreamImpl.availableAudioStream()
@@ -126,7 +126,8 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     }
 
     /** 웹 소켓으로 이벤트 전달하기 */
-    private fun sendProtocol(protocolNum: Int) {
+    fun sendProtocol(protocolNum: Int) {
+        Log.d(TAG, "sendProtocol: $protocolNum")
         var protocolId = ""
 
         when (protocolNum) {
