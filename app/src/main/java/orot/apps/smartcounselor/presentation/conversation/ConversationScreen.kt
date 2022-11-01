@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.app_style.Display2
-import orot.apps.sognora_compose_extension.components.AnimationText
+import orot.apps.sognora_compose_extension.components.AnimationTTSText
 import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
@@ -21,7 +21,7 @@ fun ConversationScreen(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimationText(
+        AnimationTTSText(
             modifier = Modifier,
             textList = mainViewModel.guideMsgList,
         ) { content ->

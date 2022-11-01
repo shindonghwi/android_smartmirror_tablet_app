@@ -11,22 +11,16 @@ class SognoraTTS {
     private val params = Bundle()
     var tts: TextToSpeech? = null
 
-    fun createTts(context: Context) {
-        if (tts != null) return
-
+    fun createTts(context: Context, listener: UtteranceProgressListener) {
         params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, null)
         tts = TextToSpeech(context) { state ->
             if (state == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.KOREAN
+                tts?.apply {
+                    language = Locale.KOREAN
+                    setOnUtteranceProgressListener(listener)
+                }
             }
         }
-
-        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(s: String) {}
-            override fun onDone(s: String) {}
-            override fun onError(s: String) {}
-            override fun onRangeStart(utteranceId: String, start: Int, end: Int, frame: Int) {}
-        })
     }
 
     fun startPlay(msg: String) {
