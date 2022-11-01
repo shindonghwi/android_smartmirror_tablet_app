@@ -67,9 +67,14 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                             MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
                                 audioStreamImpl.availableAudioStream()
                             }
-//                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
-//                                audioStreamImpl.startAudioStream()
-//                            }
+                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
+                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
+                                audioStreamImpl.saidMe(MAGO_PROTOCOL.PROTOCOL_11.id, receivedMsg)
+                            }
+                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
+                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
+                                audioStreamImpl.streamAiTalk(MAGO_PROTOCOL.PROTOCOL_12.id, receivedMsg)
+                            }
 //                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
 //                                audioStreamImpl.startAudioStream()
 //                            }
@@ -126,7 +131,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     }
 
     /** 웹 소켓으로 이벤트 전달하기 */
-    fun sendProtocol(protocolNum: Int) {
+    fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
         Log.d(TAG, "sendProtocol: $protocolNum")
         var protocolId = ""
 
@@ -137,8 +142,14 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
             13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
         }
 
-        val msg = Gson().toJson(MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null))
-        webSocket?.send(msg)
+        val msg = if (body == null) {
+            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null)
+        } else {
+            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body.body)
+        }
+
+        val params = Gson().toJson(msg)
+        webSocket?.send(params)
     }
 
     /** 녹음한 오디오 버퍼 전송하기 */

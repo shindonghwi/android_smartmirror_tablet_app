@@ -1,15 +1,20 @@
 package orot.apps.smartcounselor
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import orot.apps.smartcounselor.network.model.ChatData
+import orot.apps.smartcounselor.presentation.conversation.ConversationType
 import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.IAudioStreamManager
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
+import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
+import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,8 +74,12 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 }
             }
 
+            // 웹소켓 연결 실패: 서버가 닫힌 경우
             override suspend fun failedWebSocket() {
-                audioState.update { AudioStreamData.Failed }
+                coroutineScopeOnDefault {
+                    audioState.update { AudioStreamData.Failed }
+                    changeSendingStateAudioBuffer(false)
+                }
             }
 
             // 오디오 버퍼를 서버로 전송한다.
@@ -81,7 +90,35 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 }
             }
 
-            override suspend fun streamAiTalk() {
+            override suspend fun streamAiTalk(id: String, receivedMsg: MessageProtocol) {
+                chatList.add(ChatData(msg = receivedMsg.body?.ment?.text.toString(), isUser = false))
+                when (id) {
+                    MAGO_PROTOCOL.PROTOCOL_2.id -> {
+                        changeSendingStateAudioBuffer(false)
+                        changeConversationList(
+                            ConversationType.CONVERSATION,
+                            listOf(receivedMsg.body?.ment?.text.toString()),
+                            receivedMsg
+                        )
+                    }
+                    MAGO_PROTOCOL.PROTOCOL_12.id -> {
+                        changeSendingStateAudioBuffer(false)
+                        changeConversationList(
+                            ConversationType.CONVERSATION,
+                            listOf(receivedMsg.body?.ment?.text.toString()),
+                            receivedMsg
+                        )
+                    }
+
+                    else -> {
+                    }
+                }
+            }
+
+            override suspend fun saidMe(id: String, receivedMsg: MessageProtocol) {
+                chatList.add(ChatData(msg = receivedMsg.body?.ment?.text.toString(), isUser = true))
+                changeSendingStateAudioBuffer(false)
+                changeSaidMeText(receivedMsg.body?.ment?.text.toString())
             }
         })
     }
@@ -94,10 +131,16 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
     fun changeSendingStateAudioBuffer(flag: Boolean) {
+        audioStreamManager?.audioSendAvailable = flag
         if (audioState.value is AudioStreamData.Success) {
             micIsAvailable.value = flag
-            audioStreamManager?.audioSendAvailable = flag
         }
+    }
+
+    val saidMeText = MutableStateFlow("")
+    val chatList = arrayListOf<ChatData>()
+    fun changeSaidMeText(msg: String) {
+        saidMeText.value = msg
     }
 
     /**
@@ -116,13 +159,12 @@ class MainViewModel @Inject constructor() : ViewModel() {
         sognoraTts.clear()
     }
 
-    var conversationMsgList = arrayListOf<String>()
+    val conversationInfo: MutableStateFlow<Triple<ConversationType, List<String>, MessageProtocol?>> =
+        MutableStateFlow(Triple(ConversationType.GUIDE, emptyList(), null))
 
-    fun changeConversationList(contentList: List<String>) {
-        conversationMsgList.clear()
-        contentList.forEach {
-            conversationMsgList.add(it)
-        }
+    fun changeConversationList(type: ConversationType, contentList: List<String>, msgResponse: MessageProtocol?) {
+        Log.d("changeConversationList", "changeConversationList: $contentList")
+        conversationInfo.value = Triple(type, contentList, msgResponse)
     }
 
     override fun onCleared() {

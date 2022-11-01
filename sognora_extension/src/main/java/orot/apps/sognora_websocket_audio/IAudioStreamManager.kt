@@ -8,4 +8,5 @@ interface IAudioStreamManager {
     suspend fun failedWebSocket()
     suspend fun availableAudioStream()
     suspend fun streamAiTalk(id: String, receivedMsg: MessageProtocol)
+    suspend fun saidMe(id: String, receivedMsg: MessageProtocol)
 }
