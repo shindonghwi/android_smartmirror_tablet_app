@@ -11,6 +11,7 @@ import orot.apps.smartcounselor.presentation.chat_list.ChatListScreen
 import orot.apps.smartcounselor.presentation.conversation.ConversationScreen
 import orot.apps.smartcounselor.presentation.guide.GuideScreen
 import orot.apps.smartcounselor.presentation.home.HomeScreen
+import orot.apps.smartcounselor.presentation.server_connection_fail.ServerConnectionFailScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -33,6 +34,9 @@ fun NavGraph() {
         }
         composable(route = Screens.ChatList.route) {
             ChatListScreen()
+        }
+        composable(route = Screens.ServerConnectionFailScreen.route) {
+            ServerConnectionFailScreen()
         }
     }
 }

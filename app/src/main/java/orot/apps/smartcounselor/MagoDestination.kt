@@ -6,6 +6,7 @@ sealed class Screens(val route: String) {
     object Conversation: Screens("conversation")
     object BloodPressure: Screens("bloodPressure")
     object ChatList: Screens("chatList")
+    object ServerConnectionFailScreen: Screens("serverConnectionFail")
 }
 
 sealed class BottomMenu(val type: String) {
@@ -17,4 +18,5 @@ sealed class BottomMenu(val type: String) {
     object RetryAndChat: BottomMenu("retryAndChat")
     object Retry: BottomMenu("retry")
     object Call: BottomMenu("call")
+    object ServerRetry: BottomMenu("serverRetry")
 }

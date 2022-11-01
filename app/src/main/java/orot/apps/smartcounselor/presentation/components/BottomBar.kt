@@ -2,6 +2,7 @@ package orot.apps.smartcounselor.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.BottomMenu
@@ -25,8 +27,10 @@ import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
+import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Display2
 import orot.apps.smartcounselor.presentation.app_style.Gray20
+import orot.apps.smartcounselor.presentation.app_style.Primary
 import orot.apps.smartcounselor.presentation.components.blood_pressure.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.components.blood_pressure.InputBloodPressure
 import orot.apps.smartcounselor.presentation.components.common.VDivider
@@ -38,6 +42,7 @@ import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
 import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @Composable
 fun MagoBottomBar(
@@ -81,6 +86,9 @@ fun MagoBottomBar(
                 }
                 BottomMenu.Call.type -> {
                     CallBottomBar()
+                }
+                BottomMenu.ServerRetry.type -> {
+                    ServerRetryBottomBar()
                 }
             }
         }
@@ -263,21 +271,33 @@ fun ConversationBottomBar(
             iconDrawable = R.drawable.mago_logo_icon,
             iconSize = 80.dp
         )
-
-//        AnimationText(
-//            modifier = Modifier
-//                .weight(1f)
-//                .padding(horizontal = 50.dp),
-//            initDelay = 1000,
-//            enterTransition = fadeIn(),
-//            isEnded = isEnded,
-//            exitTransition = fadeOut()
-//        ) {
-//            Text(
-//                "",
-//                color = Color.White,
-//                style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
-//            )
-//        }
     }
 }
+
+@Composable
+fun ServerRetryBottomBar(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    val configuration = LocalConfiguration.current
+    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(modifier = Modifier
+            .width(startWidth)
+            .clickBounce {
+                mainViewModel.updateAudioState(AudioStreamData.Idle)
+                navigationKit.clearAndMove(Screens.Guide.route) {
+                    mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                }
+            }
+            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
+            .background(Primary)
+            .padding(vertical = 36.dp),
+            textAlign = TextAlign.Center,
+            text = "재연결",
+            style = MaterialTheme.typography.Display1,
+            color = Color.White
+        )
+    }
+}
+

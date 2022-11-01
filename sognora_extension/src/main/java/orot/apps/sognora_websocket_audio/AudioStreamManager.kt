@@ -81,13 +81,16 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                     super.onFailure(webSocket, t, response)
                     Log.d(TAG, "onFailure: $t || $response")
                     coroutineScopeOnDefault {
-                        audioStreamImpl.disConnectedWebSocket()
+                        audioStreamImpl.failedWebSocket()
                     }
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosed(webSocket, code, reason)
                     Log.d(TAG, "onClosed: $code || $reason")
+                    coroutineScopeOnDefault {
+                        audioStreamImpl.disConnectedWebSocket()
+                    }
                 }
 
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {

@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.guide
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,17 +49,26 @@ fun GuideScreen(
 fun WebSocketState(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    val data = mainViewModel.audioState.collectAsState().value
-    if (data is AudioStreamData.Available) {
+    val state = mainViewModel.audioState.collectAsState().value
+
+    Log.d("Asdasd", "WebSocketState: $state")
+
+    if (state is AudioStreamData.Success) {
         LaunchedEffect(key1 = Unit) {
-            mainViewModel.changeConversationList(listOf(
-                "안녕하세요",
-                "Mago Healthcare 서비스에 오신걸 환영합니다",
-                "AI와 대화를 시작하세요"
-            ))
+            mainViewModel.changeConversationList(
+                listOf(
+                    "안녕하세요",
+                    "Mago Healthcare 서비스에 오신걸 환영합니다",
+                    "AI와 대화를 시작하세요"
+                )
+            )
             navigationKit.clearAndMove(Screens.Conversation.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Conversation)
             }
+        }
+    } else if (state is AudioStreamData.Failed) {
+        navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
+            mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
         }
     }
 }
