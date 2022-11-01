@@ -23,11 +23,11 @@ fun ConversationScreen(
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         AnimationTTSText(
             modifier = Modifier,
-            textList = mainViewModel.guideMsgList,
+            textList = mainViewModel.conversationMsgList,
         ) { content ->
             LaunchedEffect(key1 = Unit) {
                 mainViewModel.run {
-                    playGoogleTts(guideMsgList.filter { it == content }[0])
+                    playGoogleTts(conversationMsgList.filter { it == content }[0])
                 }
             }
 

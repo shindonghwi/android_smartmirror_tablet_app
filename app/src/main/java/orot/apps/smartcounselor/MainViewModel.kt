@@ -29,6 +29,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
      * */
     var userAge: Int = 0 // Default: 0세
     var userSex: Boolean = true // Default: 남
+    var bloodPressureMax: Int = 0 // Default: 최고혈압
+    var bloodPressureMin: Int = 0 // Default: 최저혈압
+    var bloodPressureSugar: Int = 0 // Default: 혈당량
 
     /**
      * ================================================
@@ -127,6 +130,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
             sognoraMediaPlayer.playAudio(url)
         }
     }
+
     fun playMediaPlayerTts(context: Context, rawFile: Int) {
         ttsJob?.let {
             if (it.isActive) {
@@ -138,33 +142,22 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun playGoogleTts(msg: String){
+    fun playGoogleTts(msg: String) {
         sognoraTts.startPlay(msg)
     }
 
-    fun stopGoogleTts(){
+    fun stopGoogleTts() {
         sognoraTts.clear()
     }
 
-    var guideMsgList = listOf(
-        "안녕하세요",
-        "Mago Healthcare 서비스에 오신걸 환영합니다",
-        "AI의 대화를 기다려주세요"
-    )
-    var guideTtsList = arrayListOf<Pair<String, String>>()
+    var conversationMsgList = arrayListOf<String>()
 
-//    suspend fun setGuideTtsUrlList() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            guideMsgList.forEach {
-////                val response = async { ttsService.getConvertTts(msg = it) }
-//                val item = Pair(it, "${TtsService.BASE_URL}/audio/${response.await().body()?.id}")
-//                if (!guideTtsList.contains(item)) {
-//                    guideTtsList.add(item)
-//                }
-//            }
-//        }
-//    }
-
+    fun changeConversationList(contentList: List<String>) {
+        conversationMsgList.clear()
+        contentList.forEach {
+            conversationMsgList.add(it)
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

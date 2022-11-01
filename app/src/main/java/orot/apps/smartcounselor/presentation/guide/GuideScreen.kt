@@ -51,6 +51,11 @@ fun WebSocketState(
     val data = mainViewModel.audioState.collectAsState().value
     if (data is AudioStreamData.Available) {
         LaunchedEffect(key1 = Unit) {
+            mainViewModel.changeConversationList(listOf(
+                "안녕하세요",
+                "Mago Healthcare 서비스에 오신걸 환영합니다",
+                "AI와 대화를 시작하세요"
+            ))
             navigationKit.clearAndMove(Screens.Conversation.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Conversation)
             }

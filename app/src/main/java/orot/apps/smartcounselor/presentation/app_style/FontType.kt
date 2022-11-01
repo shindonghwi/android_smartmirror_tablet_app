@@ -24,52 +24,60 @@ val Pretendard = FontFamily(
     Font(R.font.pretendard_black, FontWeight.W900)
 )
 
+@OptIn(ExperimentalTextApi::class)
 val PretendardTypography = Typography(
 
     h1 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
         fontSize = 28.sp,
-        lineHeight = 34.sp
+        lineHeight = 34.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     h2 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
         fontSize = 24.sp,
-        lineHeight = 32.sp
+        lineHeight = 32.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     h3 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
         fontSize = 20.sp,
-        lineHeight = 26.sp
+        lineHeight = 26.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     h4 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
         fontSize = 18.sp,
-        lineHeight = 22.sp
+        lineHeight = 22.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     subtitle1 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W600,
         fontSize = 18.sp,
         lineHeight = 18.sp,
-        letterSpacing = (-0.02).em
+        letterSpacing = (-0.02).em,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     subtitle2 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W600,
         fontSize = 16.sp,
         lineHeight = 16.sp,
-        letterSpacing = (-0.02).em
+        letterSpacing = (-0.02).em,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     ),
     caption = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = (-0.02).em
+        letterSpacing = (-0.02).em,
+        platformStyle = PlatformTextStyle(includeFontPadding = false)
     )
 )
 
