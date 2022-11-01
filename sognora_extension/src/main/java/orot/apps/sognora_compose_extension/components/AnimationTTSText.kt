@@ -40,13 +40,13 @@ fun AnimationTTSText(
     val context = LocalContext.current
     var currentIdx = remember { 0 }
     val currentText = remember { mutableStateOf(textList.first()) }
-    val sognoraTTS = remember { SognoraTTS() }
 
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
         targetState = true
     }
 
     DisposableEffect(key1 = Unit) {
+        val sognoraTTS = SognoraTTS()
 
         coroutineScopeOnDefault {
             iAnimationTextCallback?.startAnimation()
