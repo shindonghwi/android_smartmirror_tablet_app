@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.guide
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +23,7 @@ import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
+import orot.apps.smartcounselor.presentation.conversation.ConversationType
 import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
@@ -54,10 +54,11 @@ fun WebSocketState(
     if (state is AudioStreamData.Success) {
         LaunchedEffect(key1 = Unit) {
             mainViewModel.changeConversationList(
+                ConversationType.GUIDE,
                 listOf(
                     "안녕하세요",
-                    "Mago Healthcare 서비스에 오신걸 환영합니다",
-                    "AI와 대화를 시작하세요"
+//                    "Mago Healthcare 서비스에 오신걸 환영합니다",
+//                    "AI와 대화를 시작하세요"
                 )
             )
             navigationKit.clearAndMove(Screens.Conversation.route) {
