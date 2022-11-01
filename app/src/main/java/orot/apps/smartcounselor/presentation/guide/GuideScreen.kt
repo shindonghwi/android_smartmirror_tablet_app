@@ -56,10 +56,9 @@ fun WebSocketState(
             mainViewModel.changeConversationList(
                 ConversationType.GUIDE,
                 listOf(
-                    "안녕하세요",
-//                    "Mago Healthcare 서비스에 오신걸 환영합니다",
-//                    "AI와 대화를 시작하세요"
-                )
+                    "안녕하세요\nMago Healthcare 서비스에 오신걸 환영합니다\nAI와 대화를 시작하세요",
+                ),
+                null
             )
             navigationKit.clearAndMove(Screens.Conversation.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Conversation)

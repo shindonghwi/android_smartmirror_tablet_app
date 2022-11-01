@@ -27,10 +27,7 @@ import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.presentation.app_style.Display1
-import orot.apps.smartcounselor.presentation.app_style.Display2
-import orot.apps.smartcounselor.presentation.app_style.Gray20
-import orot.apps.smartcounselor.presentation.app_style.Primary
+import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.components.blood_pressure.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.components.blood_pressure.InputBloodPressure
 import orot.apps.smartcounselor.presentation.components.common.VDivider
@@ -271,7 +268,22 @@ fun ConversationBottomBar(
             iconDrawable = R.drawable.mago_logo_icon,
             iconSize = 80.dp
         )
+
+        SaidMeText()
     }
+}
+
+@Composable
+private fun SaidMeText(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    val text = mainViewModel.saidMeText.collectAsState().value
+    Text(
+        modifier = Modifier.padding(start = 60.dp),
+        text = text,
+        color = Color.White,
+        style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
+    )
 }
 
 @Composable

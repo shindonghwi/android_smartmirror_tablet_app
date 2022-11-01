@@ -8,7 +8,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +29,8 @@ fun AnimationTTSText(
         animationSpec = tween(durationMillis = 1000, easing = FastOutLinearInEasing),
     ),
     exitTransition: ExitTransition = fadeOut(
-        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing),
+        targetAlpha = 0.5f
     ),
     textList: List<String>,
     useSpeakMode: Boolean = true,
@@ -39,13 +39,13 @@ fun AnimationTTSText(
 ) {
     val context = LocalContext.current
     var currentIdx = remember { 0 }
-    val currentText = remember { mutableStateOf(textList.first()) }
+    var currentText = textList.first()
 
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
         targetState = true
     }
 
-    DisposableEffect(key1 = Unit) {
+    DisposableEffect(key1 = currentText) {
         val sognoraTTS = SognoraTTS()
 
         coroutineScopeOnDefault {
@@ -65,9 +65,9 @@ fun AnimationTTSText(
                         delay(termDuration)
                         currentIdx += 1
                         textList.elementAtOrNull(currentIdx)?.let {
-                            currentText.value = it
+                            currentText = it
                             if (useSpeakMode) {
-                                sognoraTTS.startPlay(currentText.value)
+                                sognoraTTS.startPlay(currentText)
                             }
                         } ?: kotlin.run {
                             iAnimationTextCallback?.endAnimation()
@@ -80,7 +80,7 @@ fun AnimationTTSText(
                 coroutineScopeOnDefault {
                     delay(termDuration)
                     if (useSpeakMode) {
-                        sognoraTTS.startPlay(currentText.value)
+                        sognoraTTS.startPlay(currentText)
                     }
                 }
             }
@@ -98,7 +98,7 @@ fun AnimationTTSText(
         enter = enterTransition,
         exit = exitTransition,
     ) {
-        content(currentText.value)
+        content(currentText)
     }
 
 }
