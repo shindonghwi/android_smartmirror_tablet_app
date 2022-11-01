@@ -51,8 +51,6 @@ fun WebSocketState(
 ) {
     val state = mainViewModel.audioState.collectAsState().value
 
-    Log.d("Asdasd", "WebSocketState: $state")
-
     if (state is AudioStreamData.Success) {
         LaunchedEffect(key1 = Unit) {
             mainViewModel.changeConversationList(
