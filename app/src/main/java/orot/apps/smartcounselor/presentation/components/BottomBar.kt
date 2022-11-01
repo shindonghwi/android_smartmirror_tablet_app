@@ -1,25 +1,37 @@
 package orot.apps.smartcounselor.presentation.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
@@ -31,6 +43,8 @@ import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
 import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
 
 @Composable
 fun MagoBottomBar(
@@ -94,27 +108,172 @@ private fun VDivider() {
 private fun StartBottomBar(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
+
 
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
-        Text(modifier = Modifier
-            .width(startWidth)
-            .clickBounce {
-                navigationKit.clearAndMove(Screens.Guide.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.Loading)
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+            Column(
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AgeTextField()
+                Spacer(modifier = Modifier.height(8.dp))
+                SexRadioButton()
+            }
+
+            Text(modifier = Modifier
+                .width(startWidth)
+                .clickBounce {
+                    takeIf { mainViewModel.userAge != 0 }?.run {
+                        navigationKit.clearAndMove(Screens.Guide.route) {
+                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                        }
+                    } ?: run {
+                        Toast
+                            .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+                .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
+                .background(Primary)
+                .padding(vertical = 36.dp),
+                textAlign = TextAlign.Center,
+                text = "시작",
+                style = MaterialTheme.typography.Display1,
+                color = White)
+
+        }
+    }
+}
+
+@Composable
+fun SexRadioButton(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    val configuration = LocalConfiguration.current
+    val radioOptions = listOf("남", "여")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
+    Row(
+        modifier = Modifier
+            .width((configuration.screenWidthDp * 0.3).dp)
+            .background(Gray80),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        radioOptions.forEach { text ->
+            Row(
+                Modifier
+                    .selectable(
+                        selected = (text == selectedOption),
+                        onClick = {
+                            onOptionSelected(text)
+                            mainViewModel.userSex = text == "남"
+                        }
+                    )
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = { onOptionSelected(text) },
+                    colors = RadioButtonDefaults.colors(
+                        unselectedColor = Gray20,
+                        selectedColor = Primary
+                    )
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = text,
+                    style = MaterialTheme.typography.body1,
+                    color = White,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun AgeTextField(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    val configuration = LocalConfiguration.current
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    var text by remember { mutableStateOf("") }
+    var hasFocus by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(key1 = Unit) {
+        coroutineScopeOnDefault {
+            delay(1000)
+            coroutineScopeOnMain {
+                if (!hasFocus) {
+                    focusRequester.requestFocus()
                 }
             }
-            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
-            .background(Primary)
-            .padding(vertical = 36.dp),
-            textAlign = TextAlign.Center,
-            text = "시작",
-            style = MaterialTheme.typography.Display1,
-            color = White)
+        }
     }
+
+    OutlinedTextField(
+        modifier = Modifier
+            .width((configuration.screenWidthDp * 0.3).dp)
+            .focusRequester(focusRequester)
+            .onFocusChanged { hasFocus = it.hasFocus },
+        value = text,
+        onValueChange = { content ->
+            content
+                .takeIf {
+                    content.length < 3
+                }
+                ?.apply {
+                    content
+                        .replace("[^0-9]".toRegex(), "")
+                        .takeIf { it.isNotEmpty() }
+                        ?.apply {
+                            mainViewModel.userAge = this.toInt()
+                        }
+                        ?: apply {
+                            mainViewModel.userAge = 0
+                        }
+                    text = content
+                }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        }),
+        label = {
+            Text(
+                text = if (hasFocus || text.isNotEmpty()) {
+                    "당신의 나이는?"
+                } else {
+                    "나이를 입력해주세요"
+                },
+                color = Gray30,
+                style = MaterialTheme.typography.caption
+            )
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Primary,
+            unfocusedBorderColor = Gray80,
+            backgroundColor = Gray80,
+            textColor = White
+        ),
+        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+    )
 }
 
 /** 로딩 바텀 바 */
