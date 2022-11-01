@@ -2,24 +2,20 @@ package orot.apps.smartcounselor
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import orot.apps.smartcounselor.MagoActivity.Companion.TAG
 import orot.apps.sognora_compose_extension.lifecycle.OnLifecycleEvent
 import orot.apps.sognora_viewmodel_extension.getViewModel
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 
 @Composable
 fun MagoLifecycle(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    val context = LocalContext.current
-    val TAG = "Mago Lifecycle"
     OnLifecycleEvent { owner, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
                 Log.d(TAG, "MagoLifecycle: ON_RESUME")
-                mainViewModel.sognoraTts.createTts(context)
             }
             Lifecycle.Event.ON_CREATE -> {
                 Log.d(TAG, "MagoLifecycle: ON_CREATE")

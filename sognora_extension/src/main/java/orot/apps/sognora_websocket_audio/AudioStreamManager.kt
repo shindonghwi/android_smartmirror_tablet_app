@@ -18,6 +18,7 @@ import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
 
 class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
+    val TAG = "AudioStreamManager"
     var audioSendAvailable = false
     val webSocketURL: String = "ws://172.30.1.65:8080/ws/chat"
 
@@ -48,7 +49,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
             webSocket = client.newWebSocket(this, object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
-                    Log.d("WEBSOCKET", "onOpen: $response")
+                    Log.d(TAG, "onOpen: $response")
                     coroutineScopeOnDefault {
                         audioStreamImpl.connectedWebSocket()
                     }
@@ -57,7 +58,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
-                    Log.d("WEBSOCKET", "onMessage: $text")
+                    Log.d(TAG, "onMessage: $text")
                     coroutineScopeOnIO {
                         when (parsingProtocolFromReceiveMsg(text)) {
                             MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
@@ -78,7 +79,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
-                    Log.d("WEBSOCKET", "onFailure: $t || $response")
+                    Log.d(TAG, "onFailure: $t || $response")
                     coroutineScopeOnDefault {
                         audioStreamImpl.disConnectedWebSocket()
                     }
@@ -86,17 +87,17 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosed(webSocket, code, reason)
-                    Log.d("WEBSOCKET", "onClosed: $code || $reason")
+                    Log.d(TAG, "onClosed: $code || $reason")
                 }
 
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosing(webSocket, code, reason)
-                    Log.d("WEBSOCKET", "onClosing: $code || $reason")
+                    Log.d(TAG, "onClosing: $code || $reason")
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                     super.onMessage(webSocket, bytes)
-                    Log.d("WEBSOCKET", "onMessage: $bytes")
+                    Log.d(TAG, "onMessage: $bytes")
                 }
             })
         }

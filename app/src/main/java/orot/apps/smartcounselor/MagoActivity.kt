@@ -56,6 +56,7 @@ class MagoActivity : ComponentActivity() {
     }
 
     companion object {
+        val TAG = "MagoApplication"
         lateinit var navigationKit: NavigationKit
     }
 }
