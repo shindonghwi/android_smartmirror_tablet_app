@@ -15,10 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.MainViewModel
+import orot.apps.smartcounselor.network.model.ChatData
+import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
 fun ChatListScreen(
-    chatListViewModel: ChatListViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
 ) {
     LazyColumn(
         modifier = Modifier.padding(top = 40.dp),
@@ -27,9 +30,9 @@ fun ChatListScreen(
         contentPadding = PaddingValues(bottom = 20.dp)
     ) {
         items(
-            count = chatListViewModel.chatDataList.size
+            count = mainViewModel.chatList.size
         ) { idx ->
-            ChatContentTypeHolder(chatListViewModel.chatDataList[idx])
+            ChatContentTypeHolder(mainViewModel.chatList[idx])
         }
     }
 }
