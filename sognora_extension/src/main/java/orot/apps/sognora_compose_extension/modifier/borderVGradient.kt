@@ -1,4 +1,4 @@
-package orot.apps.sognora_compose_extension.gradient
+package orot.apps.sognora_compose_extension.modifier
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape

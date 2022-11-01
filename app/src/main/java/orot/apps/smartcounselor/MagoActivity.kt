@@ -19,7 +19,7 @@ import orot.apps.smartcounselor.presentation.app_style.Black80
 import orot.apps.smartcounselor.presentation.app_style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.components.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.MagoBottomBar
-import orot.apps.sognora_compose_extension.gradient.backgroundVGradient
+import orot.apps.sognora_compose_extension.modifier.backgroundVGradient
 import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
 import orot.apps.sognora_compose_extension.permission.CheckPermission
 import orot.apps.systems.hideSystemUI
