@@ -122,6 +122,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                             "measurement" -> ConversationType.MEASUREMENT
                             "end" -> ConversationType.END
                             "doctorcall" -> ConversationType.DOCTORCALL
+                            "exit" -> ConversationType.EXIT
                             else -> ConversationType.CONVERSATION
                         }
 
@@ -140,6 +141,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 chatList.add(ChatData(msg = receivedMsg.body?.ment?.text.toString(), isUser = true))
                 changeSendingStateAudioBuffer(false)
                 changeSaidMeText(receivedMsg.body?.ment?.text.toString())
+
             }
         })
     }
