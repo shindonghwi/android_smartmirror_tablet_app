@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -17,17 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.*
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
-import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.*
 import orot.apps.smartcounselor.presentation.components.blood_pressure.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.components.blood_pressure.InputBloodPressure
@@ -44,9 +41,9 @@ import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @Composable
-fun MagoBottomBar(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
+fun MagoBottomBar() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val configuration = LocalConfiguration.current
     val maxHeight = configuration.screenHeightDp * 0.23f
 
@@ -137,7 +134,7 @@ private fun LoadingBottomBar() {
 fun LoadingText(
     defaultContent: String = "Loading",
     textStyle: TextStyle = MaterialTheme.typography.body1,
-    guideViewModel: GuideViewModel = getViewModel(vm = hiltViewModel())
+    guideViewModel: GuideViewModel = getViewModel(GuideViewModel())
 ) {
     guideViewModel.currentRenderText.collectAsState().value.let { dot ->
         Text(
@@ -152,9 +149,11 @@ fun LoadingText(
 
 /** 권고멘트 바텀 바 */
 @Composable
-private fun RetryAndChatBottomBar(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+private fun RetryAndChatBottomBar() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+    val activity = LocalContext.current as MagoActivity
+
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -166,6 +165,7 @@ private fun RetryAndChatBottomBar(
                     navigationKit.clearAndMove(Screens.Home.route) {
                         mainViewModel.updateBottomMenu(BottomMenu.Start)
                         clearAndNewVMS()
+                        activity.mainViewModel = getViewModel(MainViewModel())
                     }
                 }
                 .clip(RoundedCornerShape(15.dp))
@@ -205,9 +205,11 @@ private fun BloodPressureBottomBar() {
 
 /** 다시하기 */
 @Composable
-fun RetryBottomBar(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun RetryBottomBar() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+    val activity = LocalContext.current as MagoActivity
+
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -219,6 +221,7 @@ fun RetryBottomBar(
                     navigationKit.clearAndMove(Screens.Home.route) {
                         mainViewModel.updateBottomMenu(BottomMenu.Start)
                         clearAndNewVMS()
+                        activity.mainViewModel = getViewModel(MainViewModel())
                     }
                 }
                 .clip(RoundedCornerShape(15.dp))
@@ -261,9 +264,8 @@ fun CallBottomBar() {
 
 /** 상담원 전화 걸려올때 */
 @Composable
-fun ConversationBottomBar(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun ConversationBottomBar() {
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val isPlaying = remember { mainViewModel.micIsAvailable }
 
     Row(
@@ -284,9 +286,8 @@ fun ConversationBottomBar(
 }
 
 @Composable
-private fun SaidMeText(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+private fun SaidMeText() {
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val text = mainViewModel.saidMeText.collectAsState().value
     Text(
         modifier = Modifier.padding(start = 60.dp),
@@ -297,9 +298,9 @@ private fun SaidMeText(
 }
 
 @Composable
-fun ServerRetryBottomBar(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun ServerRetryBottomBar() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
 

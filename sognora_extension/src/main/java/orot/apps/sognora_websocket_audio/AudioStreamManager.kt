@@ -1,3 +1,4 @@
+
 package orot.apps.sognora_websocket_audio
 
 import android.annotation.SuppressLint
@@ -6,6 +7,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
 import okhttp3.*
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
@@ -23,7 +25,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
 
     /** 오디오 */
-    private var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
+    var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
     private val RECORDER_SOURCE = MediaRecorder.AudioSource.MIC // 마이크 ( 보이스 인식만 가능한 마이크도 있음 )
     private val RECORDER_SAMPLERATE = 16000 // 샘플링 속도
     private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO // 모노 ( 스테레오 선택가능 )
@@ -57,6 +59,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
+                    Log.d(TAG, "receiveProtocol: ${parsingProtocolFromReceiveMsg(text)}")
                     Log.d(TAG, "onMessage: $text")
                     coroutineScopeOnIO {
                         when (parsingProtocolFromReceiveMsg(text)) {
@@ -83,7 +86,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
-                    Log.d(TAG, "onFailure: $t || $response")
+                    Log.d(TAG, "onFailure: $t || $response || ${t.message} || ${response?.message}")
                     coroutineScopeOnDefault {
                         audioStreamImpl.failedWebSocket()
                     }
@@ -121,6 +124,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     fun initAudioRecorder() {
         if (audioRecord != null) {
             stopAudioRecord()
+            Log.d(TAG, "initAudioRecorder:")
         }
         audioRecord = AudioRecord(
             RECORDER_SOURCE, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, BUFFER_SIZE_RECORDING
@@ -130,16 +134,34 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     }
 
     /** 웹 소켓으로 이벤트 전달하기 */
+    var lastProtocolNum: Int = -1
     fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
-        Log.d(TAG, "sendProtocol: $protocolNum")
+        if (lastProtocolNum == protocolNum) return
+        else lastProtocolNum = protocolNum
+
         var protocolId = ""
 
         when (protocolNum) {
             1 -> protocolId = MAGO_PROTOCOL.PROTOCOL_1.id
+            2 -> protocolId = MAGO_PROTOCOL.PROTOCOL_2.id
             3 -> protocolId = MAGO_PROTOCOL.PROTOCOL_3.id
+            4 -> protocolId = MAGO_PROTOCOL.PROTOCOL_4.id
+            5 -> protocolId = MAGO_PROTOCOL.PROTOCOL_5.id
+            6 -> protocolId = MAGO_PROTOCOL.PROTOCOL_6.id
+            7 -> protocolId = MAGO_PROTOCOL.PROTOCOL_7.id
+            8 -> protocolId = MAGO_PROTOCOL.PROTOCOL_8.id
+            9 -> protocolId = MAGO_PROTOCOL.PROTOCOL_9.id
+            10 -> protocolId = MAGO_PROTOCOL.PROTOCOL_10.id
+            11 -> protocolId = MAGO_PROTOCOL.PROTOCOL_11.id
+            12 -> protocolId = MAGO_PROTOCOL.PROTOCOL_12.id
             13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
+            14 -> protocolId = MAGO_PROTOCOL.PROTOCOL_14.id
             15 -> protocolId = MAGO_PROTOCOL.PROTOCOL_15.id
+            16 -> protocolId = MAGO_PROTOCOL.PROTOCOL_16.id
+            17 -> protocolId = MAGO_PROTOCOL.PROTOCOL_17.id
+            18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
         }
+        Log.d(TAG, "sendProtocol: protocol: $protocolId / body: $body")
 
         val msg = if (body == null) {
             MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null)
@@ -164,6 +186,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                     }
                 } while (true)
             } catch (e: Exception) {
+                Log.d(TAG, "sendAudioRecord ERROR: ${e.message}")
                 stopAudioRecord()
             }
         }

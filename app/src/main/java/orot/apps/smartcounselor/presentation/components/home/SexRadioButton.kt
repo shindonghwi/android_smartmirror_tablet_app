@@ -17,17 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.app_style.Gray20
 import orot.apps.smartcounselor.presentation.app_style.Primary
-import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
-fun SexRadioButton(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun SexRadioButton() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val configuration = LocalConfiguration.current
     val radioOptions = listOf("남", "여")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }

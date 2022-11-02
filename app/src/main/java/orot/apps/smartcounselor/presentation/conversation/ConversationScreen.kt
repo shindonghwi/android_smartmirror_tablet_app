@@ -11,23 +11,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display2
 import orot.apps.sognora_compose_extension.components.AnimationTTSText
 import orot.apps.sognora_compose_extension.components.IAnimationTextCallback
-import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
 import orot.apps.sognora_websocket_audio.model.protocol.*
 
 @Composable
-fun ConversationScreen(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
+fun ConversationScreen() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -37,17 +36,6 @@ fun ConversationScreen(
                 override suspend fun startAnimation() {
                     Log.d("ASdsadasd", "startAnimation: $conversationInfo")
                     when (conversationInfo.first) {
-                        ConversationType.CONVERSATION -> {
-                            when (conversationInfo.third?.header?.protocol_id) {
-                                MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
-                                    mainViewModel.run {
-                                        audioStreamManager?.sendProtocol(
-                                            3, conversationInfo.third
-                                        )
-                                    }
-                                }
-                            }
-                        }
                         ConversationType.END -> {
                             mainViewModel.run {
                                 updateBottomMenu(BottomMenu.RetryAndChat)
@@ -85,9 +73,6 @@ fun ConversationScreen(
                         ConversationType.MEASUREMENT -> {
                             when (conversationInfo.third?.header?.protocol_id) {
                                 MAGO_PROTOCOL.PROTOCOL_12.id -> {
-                                    mainViewModel.run {
-                                        audioStreamManager?.sendProtocol(13)
-                                    }
                                     coroutineScopeOnMain {
                                         navigationKit.clearAndMove(Screens.BloodPressure.route) {
                                             mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)

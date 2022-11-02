@@ -8,26 +8,28 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
-import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.components.LoadingText
-import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 
 @Composable
-fun BloodPressureScreen(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
+fun BloodPressureScreen() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
 
         DisposableEffect(key1 = Unit, effect = {
@@ -83,9 +85,8 @@ fun BloodPressureScreen(
 }
 
 @Composable
-private fun BloodPressureText(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+private fun BloodPressureText() {
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     if (mainViewModel.heartAnimationState.value) {
         LoadingText(
             defaultContent = "혈압을 측정중입니다", textStyle = MaterialTheme.typography.subtitle1

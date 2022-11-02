@@ -64,6 +64,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
         if (audioStreamManager != null) {
+            Log.d("MAINVIEWMODEL", "createAudioStreamManager: ")
             audioStreamManager?.stopAudioRecord()
             audioStreamManager = null
         }
@@ -95,8 +96,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
             // 오디오 버퍼를 서버로 전송한다.
             override suspend fun availableAudioStream() {
                 coroutineScopeOnDefault {
-                    audioStreamManager?.initAudioRecorder()
-                    sendAudioBuffer()
+                    if (audioStreamManager?.audioRecord == null) {
+                        audioStreamManager?.initAudioRecorder()
+                        sendAudioBuffer()
+                    }
                 }
             }
 
@@ -112,6 +115,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                         )
                     }
                     MAGO_PROTOCOL.PROTOCOL_12.id -> {
+                        audioStreamManager?.sendProtocol(13, conversationInfo.value.third)
                         changeSendingStateAudioBuffer(false)
 
                         val type = when (receivedMsg.body?.action) {
@@ -151,6 +155,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
         audioStreamManager?.audioSendAvailable = flag
         if (audioState.value is AudioStreamData.Success) {
             micIsAvailable.value = flag
+            if (flag) {
+                Log.d("Asdasd", "changeSendingStateAudioBuffer: ${conversationInfo.value.third}")
+                audioStreamManager?.sendProtocol(3, conversationInfo.value.third)
+            }
         }
     }
 
@@ -190,9 +198,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     override fun onCleared() {
         Log.d("MAINVIEWMODEL", "onCleared: $this")
+        super.onCleared()
         audioState.update { AudioStreamData.Idle }
         audioStreamManager?.stopAudioRecord()
         audioStreamManager = null
-        super.onCleared()
     }
 }

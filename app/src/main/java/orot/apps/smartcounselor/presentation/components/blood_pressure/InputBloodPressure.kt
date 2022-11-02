@@ -15,23 +15,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.presentation.components.common.CustomTextField
 import orot.apps.smartcounselor.presentation.components.common.ITextCallback
-import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
-fun InputBloodPressure(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun InputBloodPressure() {
 
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val focusManager = LocalFocusManager.current

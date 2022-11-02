@@ -22,6 +22,7 @@ import orot.apps.smartcounselor.presentation.components.MagoBottomBar
 import orot.apps.sognora_compose_extension.modifier.backgroundVGradient
 import orot.apps.sognora_compose_extension.nav_controller.NavigationKit
 import orot.apps.sognora_compose_extension.permission.CheckPermission
+import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.systems.hideSystemUI
 
 
@@ -29,16 +30,17 @@ import orot.apps.systems.hideSystemUI
 class MagoActivity : ComponentActivity() {
 
     private val PERMISSION_RECODE_AUDIO = 1000
+    var mainViewModel: MainViewModel = getViewModel(MainViewModel())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hideSystemUI()
         setContent {
             navigationKit = NavigationKit(rememberNavController())
 
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()
         }
-        hideSystemUI()
     }
 
     override fun onRequestPermissionsResult(
@@ -64,7 +66,6 @@ class MagoActivity : ComponentActivity() {
 @Composable
 private fun MagoHCApp() {
     SmartCounselorTheme {
-
         MagoLifecycle()
 
         Box(

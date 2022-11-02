@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.guide
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,26 +13,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
-import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
 import orot.apps.smartcounselor.presentation.conversation.ConversationType
-import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @ExperimentalAnimationApi
 @Composable
-fun GuideScreen(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
+fun GuideScreen() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+
     WebSocketState()
 
     LaunchedEffect(key1 = Unit) {
@@ -46,13 +47,15 @@ fun GuideScreen(
 }
 
 @Composable
-fun WebSocketState(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
+fun WebSocketState() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val state = mainViewModel.audioState.collectAsState().value
 
-    if (state is AudioStreamData.Success) {
-        LaunchedEffect(key1 = Unit) {
+    Log.d("ASdasda", "WebSocketState: $state")
+
+    LaunchedEffect(key1 = state) {
+        if (state is AudioStreamData.Success) {
             mainViewModel.changeConversationList(
                 ConversationType.GUIDE,
                 listOf(
@@ -64,10 +67,10 @@ fun WebSocketState(
             navigationKit.clearAndMove(Screens.Conversation.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Conversation)
             }
-        }
-    } else if (state is AudioStreamData.Failed) {
-        navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
-            mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
+        } else if (state is AudioStreamData.Failed) {
+            navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
+                mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
+            }
         }
     }
 }

@@ -5,29 +5,31 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
-import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
-import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
-fun HomeScreen(
-    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
-) {
-
+fun HomeScreen() {
     val configuration = LocalConfiguration.current
     val logoWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.70f }
 
-    Log.d("ASdasdasd", "HomeScreen: ${mainViewModel.bloodPressureMin}")
+    val activity = LocalContext.current as MagoActivity
+
+    LaunchedEffect(key1 = Unit){
+        Log.d("MAINVIEWMODEL", "HomeScreen: ${activity.mainViewModel.bloodPressureMin}")
+    }
 
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(),

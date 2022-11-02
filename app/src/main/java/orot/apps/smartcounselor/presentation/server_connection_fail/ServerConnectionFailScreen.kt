@@ -12,6 +12,6 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun ServerConnectionFailScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("서버 연결을 실패했습니다", style = MaterialTheme.typography.h2, color = Color.White)
+        Text("서버 연결에 실패했습니다", style = MaterialTheme.typography.h2, color = Color.White)
     }
 }

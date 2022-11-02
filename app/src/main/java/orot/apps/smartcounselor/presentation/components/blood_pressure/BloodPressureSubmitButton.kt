@@ -18,8 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
@@ -29,13 +27,11 @@ import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Primary
 import orot.apps.smartcounselor.presentation.conversation.ConversationType
 import orot.apps.sognora_compose_extension.animation.clickBounce
-import orot.apps.sognora_viewmodel_extension.getViewModel
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 
 @Composable
-fun BloodPressureSubmitButton(
-    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
-) {
+fun BloodPressureSubmitButton() {
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
