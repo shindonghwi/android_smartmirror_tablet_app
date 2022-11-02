@@ -40,7 +40,8 @@ data class BodyInfo(
     val code: Int?,
     val message: String?,
     val reason: String?,
-    val measurement: MeasurementInfo?
+    val measurement: MeasurementInfo?,
+    val user: UserInfo?
 )
 
 data class MentInfo(
@@ -53,4 +54,9 @@ data class MentInfo(
 data class MeasurementInfo(
     val blood_pressure: List<Int>,
     val blood_sugar: Int
+)
+
+data class UserInfo(
+    val gender: String,
+    val age: Int
 )

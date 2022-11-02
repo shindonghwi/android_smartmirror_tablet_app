@@ -87,9 +87,14 @@ fun ConversationScreen() {
                                     15, MessageProtocol(
                                         header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
                                         body = BodyInfo(
-                                            null, null, null, null, null, null, measurement = MeasurementInfo(
+                                            null, null, null, null, null, null,
+                                            measurement = MeasurementInfo(
                                                 blood_pressure = listOf(bloodPressureMax, bloodPressureMin),
-                                                blood_sugar = bloodPressureSugar
+                                                blood_sugar = bloodPressureSugar,
+                                            ),
+                                            user = UserInfo(
+                                                gender = if (mainViewModel.userSex) "M" else "F",
+                                                age = mainViewModel.userAge
                                             )
                                         )
                                     )
