@@ -22,7 +22,8 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
     val TAG = "AudioStreamManager"
     var audioSendAvailable = false
-    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
+//    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
+    val webSocketURL: String = "ws://mago-demo-server.orotcode.com:8080/ws/chat"
 
     /** 오디오 */
     var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
