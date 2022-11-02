@@ -15,8 +15,10 @@ enum class MAGO_PROTOCOL(val id: String) {
     PROTOCOL_12("AI_NEXT_QUESTION_DELIVERY"),
     PROTOCOL_13("APP_UTTERANCE_END_REQ"),
     PROTOCOL_14("APP_UTTERANCE_END_ACK"),
-    PROTOCOL_15("APP_DIALOG_END_REQ"),
-    PROTOCOL_16("APP_DIALOG_END_ACK")
+    PROTOCOL_15("APP_MEASUREMENT_ENTRY_REQ"),
+    PROTOCOL_16("APP_MEASUREMENT_ENTRY_ACK"),
+    PROTOCOL_17("APP_DIALOG_END_REQ"),
+    PROTOCOL_18("APP_DIALOG_END_ACK")
 }
 
 
@@ -38,6 +40,7 @@ data class BodyInfo(
     val code: Int,
     val message: String,
     val reason: String,
+    val measurement: MeasurementInfo
 )
 
 data class MentInfo(
@@ -45,4 +48,8 @@ data class MentInfo(
     val text: String,
     val type: String,
     val uri: String,
+)
+
+data class MeasurementInfo(
+    val blood_pressure: List<Int>
 )
