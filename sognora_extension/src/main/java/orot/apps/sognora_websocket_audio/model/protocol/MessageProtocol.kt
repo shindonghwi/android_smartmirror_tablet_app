@@ -34,13 +34,13 @@ data class HeaderInfo(
 )
 
 data class BodyInfo(
-    val ment: MentInfo,
-    val action: String,
-    val turn: Int,
-    val code: Int,
-    val message: String,
-    val reason: String,
-    val measurement: MeasurementInfo
+    val ment: MentInfo?,
+    val action: String?,
+    val turn: Int?,
+    val code: Int?,
+    val message: String?,
+    val reason: String?,
+    val measurement: MeasurementInfo?
 )
 
 data class MentInfo(
@@ -51,5 +51,6 @@ data class MentInfo(
 )
 
 data class MeasurementInfo(
-    val blood_pressure: List<Int>
+    val blood_pressure: List<Int>,
+    val blood_sugar: Int
 )

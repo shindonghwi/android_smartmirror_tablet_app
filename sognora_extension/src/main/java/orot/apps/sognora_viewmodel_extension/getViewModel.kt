@@ -1,5 +1,6 @@
 package orot.apps.sognora_viewmodel_extension
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
@@ -31,6 +32,6 @@ inline fun <reified type : ViewModel> getViewModel(
         })
 }
 
-fun clearVMS(){
+fun clearAndNewVMS(){
     vms.clear()
 }

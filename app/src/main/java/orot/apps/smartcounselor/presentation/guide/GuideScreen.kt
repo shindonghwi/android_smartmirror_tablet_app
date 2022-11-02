@@ -56,7 +56,8 @@ fun WebSocketState(
             mainViewModel.changeConversationList(
                 ConversationType.GUIDE,
                 listOf(
-                    "안녕하세요\n\nMago Healthcare 서비스에 오신걸 환영합니다\n\nAI가 먼저 대화를 시작합니다. \n\n잠시만 기다려주세요",
+                    "안녕하세요"
+//                            "\n\nMago Healthcare 서비스에 오신걸 환영합니다\n\nAI가 먼저 대화를 시작합니다. \n\n잠시만 기다려주세요",
                 ),
                 null
             )

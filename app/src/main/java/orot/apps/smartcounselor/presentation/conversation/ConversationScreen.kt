@@ -13,12 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import orot.apps.smartcounselor.BottomMenu
+import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
+import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display2
 import orot.apps.sognora_compose_extension.components.AnimationTTSText
 import orot.apps.sognora_compose_extension.components.IAnimationTextCallback
 import orot.apps.sognora_viewmodel_extension.getViewModel
-import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
+import orot.apps.sognora_websocket_audio.model.protocol.*
 
 @Composable
 fun ConversationScreen(
@@ -27,20 +31,32 @@ fun ConversationScreen(
     val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimationTTSText(
-            modifier = Modifier,
+        AnimationTTSText(modifier = Modifier,
             textList = conversationInfo.second,
             iAnimationTextCallback = object : IAnimationTextCallback {
                 override suspend fun startAnimation() {
+                    Log.d("ASdsadasd", "startAnimation: $conversationInfo")
                     when (conversationInfo.first) {
                         ConversationType.CONVERSATION -> {
                             when (conversationInfo.third?.header?.protocol_id) {
                                 MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
-                                    mainViewModel.audioStreamManager?.sendProtocol(
-                                        3,
-                                        conversationInfo.third
-                                    ) // APP_UTTERANCE_START_REG
+                                    mainViewModel.run {
+                                        audioStreamManager?.sendProtocol(
+                                            3, conversationInfo.third
+                                        )
+                                    }
                                 }
+                            }
+                        }
+                        ConversationType.END -> {
+                            mainViewModel.run {
+                                updateBottomMenu(BottomMenu.RetryAndChat)
+                            }
+                        }
+                        ConversationType.DOCTORCALL -> {
+                            mainViewModel.run {
+                                saidMeText.value = ""
+                                updateBottomMenu(BottomMenu.Conversation)
                             }
                         }
                         else -> {}
@@ -48,14 +64,16 @@ fun ConversationScreen(
                 }
 
                 override suspend fun endAnimation() {
-                    mainViewModel.changeSendingStateAudioBuffer(true)
+                    Log.d("endAnimation", "endAnimation: $conversationInfo")
                     when (conversationInfo.first) {
                         ConversationType.GUIDE -> {
-                            mainViewModel.audioStreamManager?.sendProtocol(1) // APP_DIALOG_START_REG
+                            mainViewModel.run {
+                                audioStreamManager?.sendProtocol(1) // APP_DIALOG_START_REG
+                            }
                         }
                         ConversationType.CONVERSATION -> {
                             when (conversationInfo.third?.header?.protocol_id) {
-                                MAGO_PROTOCOL.PROTOCOL_4.id -> { // 김철수님 안녕하세요 ~
+                                MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
                                     mainViewModel.changeSendingStateAudioBuffer(true)
                                 }
                                 MAGO_PROTOCOL.PROTOCOL_12.id -> { // AI의 질문이 끝남 ~
@@ -64,12 +82,44 @@ fun ConversationScreen(
                             }
                         }
 
-                        else -> {}
+                        ConversationType.MEASUREMENT -> {
+                            when (conversationInfo.third?.header?.protocol_id) {
+                                MAGO_PROTOCOL.PROTOCOL_12.id -> {
+                                    mainViewModel.run {
+                                        audioStreamManager?.sendProtocol(13)
+                                    }
+                                    coroutineScopeOnMain {
+                                        navigationKit.clearAndMove(Screens.BloodPressure.route) {
+                                            mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        ConversationType.RESULT_WAITING -> {
+                            mainViewModel.run {
+                                audioStreamManager?.sendProtocol(
+                                    15, MessageProtocol(
+                                        header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
+                                        body = BodyInfo(
+                                            null, null, null, null, null, null, measurement = MeasurementInfo(
+                                                blood_pressure = listOf(bloodPressureMax, bloodPressureMin),
+                                                blood_sugar = bloodPressureSugar
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                        ConversationType.END -> {
+                            Log.d("Asadsasd", "endAnimation: END")
+                        }
+                        ConversationType.DOCTORCALL -> {
+                            mainViewModel.changeSendingStateAudioBuffer(true)
+                        }
                     }
                 }
-
-            }
-        ) { content ->
+            }) { content ->
             LaunchedEffect(key1 = conversationInfo) {
                 mainViewModel.run {
                     try {

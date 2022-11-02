@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -38,6 +39,7 @@ import orot.apps.smartcounselor.presentation.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
+import orot.apps.sognora_viewmodel_extension.clearAndNewVMS
 import orot.apps.sognora_viewmodel_extension.getViewModel
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
@@ -135,7 +137,7 @@ private fun LoadingBottomBar() {
 fun LoadingText(
     defaultContent: String = "Loading",
     textStyle: TextStyle = MaterialTheme.typography.body1,
-    guideViewModel: GuideViewModel = hiltViewModel()
+    guideViewModel: GuideViewModel = getViewModel(vm = hiltViewModel())
 ) {
     guideViewModel.currentRenderText.collectAsState().value.let { dot ->
         Text(
@@ -150,7 +152,9 @@ fun LoadingText(
 
 /** 권고멘트 바텀 바 */
 @Composable
-private fun RetryAndChatBottomBar() {
+private fun RetryAndChatBottomBar(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -159,7 +163,10 @@ private fun RetryAndChatBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-
+                    navigationKit.clearAndMove(Screens.Home.route) {
+                        mainViewModel.updateBottomMenu(BottomMenu.Start)
+                        clearAndNewVMS()
+                    }
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
@@ -170,7 +177,9 @@ private fun RetryAndChatBottomBar() {
         Text("대화내역",
             modifier = Modifier
                 .clickBounce {
-
+                    navigationKit.clearAndMove(Screens.ChatList.route) {
+                        mainViewModel.updateBottomMenu(BottomMenu.Retry)
+                    }
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFCFCF))
@@ -197,7 +206,7 @@ private fun BloodPressureBottomBar() {
 /** 다시하기 */
 @Composable
 fun RetryBottomBar(
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
 ) {
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -208,7 +217,8 @@ fun RetryBottomBar(
             modifier = Modifier
                 .clickBounce {
                     navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Empty)
+                        mainViewModel.updateBottomMenu(BottomMenu.Start)
+                        clearAndNewVMS()
                     }
                 }
                 .clip(RoundedCornerShape(15.dp))
@@ -308,8 +318,7 @@ fun ServerRetryBottomBar(
             textAlign = TextAlign.Center,
             text = "재연결",
             style = MaterialTheme.typography.Display1,
-            color = Color.White
-        )
+            color = Color.White)
     }
 }
 

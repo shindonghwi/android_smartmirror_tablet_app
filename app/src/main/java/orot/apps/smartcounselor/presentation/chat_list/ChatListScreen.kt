@@ -80,7 +80,7 @@ private fun AiTextContent(msg: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 40.dp),
+            .padding(start = 40.dp, bottom = 35.dp, top = 35.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Text(

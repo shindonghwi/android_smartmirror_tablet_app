@@ -28,22 +28,18 @@ import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 fun BloodPressureScreen(
     mainViewModel: MainViewModel = getViewModel(hiltViewModel())
 ) {
-    val scaleAnimationIsRunning = remember { mutableStateOf(true) }
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
 
-//        DisposableEffect(key1 = Unit, effect = {
-//            val animationJob = coroutineScopeOnDefault {
-//                delay(1000)
-//                targetState = true
-//                delay(4000)
-//                mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
-//                scaleAnimationIsRunning.value = false
-//            }
-//
-//            onDispose {
-//                animationJob.cancel()
-//            }
-//        })
+        DisposableEffect(key1 = Unit, effect = {
+            val animationJob = coroutineScopeOnDefault {
+                delay(1000)
+                targetState = true
+            }
+
+            onDispose {
+                animationJob.cancel()
+            }
+        })
     }
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -69,7 +65,7 @@ fun BloodPressureScreen(
             Icon(
                 modifier = Modifier
                     .scale(
-                        if (scaleAnimationIsRunning.value) {
+                        if (mainViewModel.heartAnimationState.value) {
                             scale
                         } else {
                             1f
@@ -81,14 +77,16 @@ fun BloodPressureScreen(
                 tint = Color.Unspecified
             )
 
-            BloodPressureText(scaleAnimationIsRunning)
+            BloodPressureText()
         }
     }
 }
 
 @Composable
-private fun BloodPressureText(scaleAnimationIsRunning: MutableState<Boolean>) {
-    if (scaleAnimationIsRunning.value) {
+private fun BloodPressureText(
+    mainViewModel: MainViewModel = getViewModel(vm = hiltViewModel())
+) {
+    if (mainViewModel.heartAnimationState.value) {
         LoadingText(
             defaultContent = "혈압을 측정중입니다", textStyle = MaterialTheme.typography.subtitle1
         )

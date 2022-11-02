@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
@@ -16,13 +17,17 @@ import androidx.constraintlayout.compose.ConstraintSet
 import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.R
-import orot.apps.smartcounselor.presentation.guide.GuideViewModel
+import orot.apps.sognora_viewmodel_extension.getViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    mainViewModel: MainViewModel = getViewModel(hiltViewModel())
+) {
 
     val configuration = LocalConfiguration.current
     val logoWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.70f }
+
+    Log.d("ASdasdasd", "HomeScreen: ${mainViewModel.bloodPressureMin}")
 
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(),

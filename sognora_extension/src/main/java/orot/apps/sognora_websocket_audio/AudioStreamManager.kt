@@ -75,10 +75,9 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
                                 val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
                                 audioStreamImpl.streamAiTalk(MAGO_PROTOCOL.PROTOCOL_12.id, receivedMsg)
                             }
-//                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
-//                                audioStreamImpl.startAudioStream()
-//                            }
+                            else -> {}
                         }
+
                     }
                 }
 
@@ -138,8 +137,8 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
         when (protocolNum) {
             1 -> protocolId = MAGO_PROTOCOL.PROTOCOL_1.id
             3 -> protocolId = MAGO_PROTOCOL.PROTOCOL_3.id
-            11 -> protocolId = MAGO_PROTOCOL.PROTOCOL_11.id
             13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
+            15 -> protocolId = MAGO_PROTOCOL.PROTOCOL_15.id
         }
 
         val msg = if (body == null) {
@@ -176,6 +175,7 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
+        webSocket = null
     }
 
 }

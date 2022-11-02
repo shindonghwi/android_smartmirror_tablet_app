@@ -10,6 +10,7 @@ import orot.apps.smartcounselor.network.model.ChatData
 import orot.apps.smartcounselor.presentation.conversation.ConversationType
 import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
+import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.IAudioStreamManager
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
@@ -39,8 +40,17 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val currentBottomMenu = mutableStateOf(BottomMenu.Start.type) // 바텀 메뉴
 
     fun updateBottomMenu(bottomMenu: BottomMenu) {
-        currentBottomMenu.value = bottomMenu.type
+        coroutineScopeOnMain {
+            currentBottomMenu.value = bottomMenu.type
+        }
     }
+
+    var heartAnimationState = mutableStateOf(true)
+
+    fun updateHeartAnimationState(flag: Boolean) {
+        heartAnimationState.value = flag
+    }
+
 
     /**
      * ================================================
@@ -103,13 +113,20 @@ class MainViewModel @Inject constructor() : ViewModel() {
                     }
                     MAGO_PROTOCOL.PROTOCOL_12.id -> {
                         changeSendingStateAudioBuffer(false)
+
+                        val type = when (receivedMsg.body?.action) {
+                            "measurement" -> ConversationType.MEASUREMENT
+                            "end" -> ConversationType.END
+                            "doctorcall" -> ConversationType.DOCTORCALL
+                            else -> ConversationType.CONVERSATION
+                        }
+
                         changeConversationList(
-                            ConversationType.CONVERSATION,
+                            type,
                             listOf(receivedMsg.body?.ment?.text.toString()),
                             receivedMsg
                         )
                     }
-
                     else -> {
                     }
                 }
@@ -167,11 +184,15 @@ class MainViewModel @Inject constructor() : ViewModel() {
         conversationInfo.value = Triple(type, contentList, msgResponse)
     }
 
+    init {
+        Log.d("MAINVIEWMODEL", "init: $this")
+    }
+
     override fun onCleared() {
+        Log.d("MAINVIEWMODEL", "onCleared: $this")
+        audioState.update { AudioStreamData.Idle }
+        audioStreamManager?.stopAudioRecord()
+        audioStreamManager = null
         super.onCleared()
-        audioStreamManager?.run {
-            stopAudioRecord()
-            null
-        }
     }
 }
