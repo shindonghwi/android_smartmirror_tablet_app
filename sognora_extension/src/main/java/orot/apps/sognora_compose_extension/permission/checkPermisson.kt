@@ -9,18 +9,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 @Composable
-fun CheckPermission(permission: String, requestCode: Int) {
-    (LocalContext.current as? Activity)?.let { checkPermission(permission, requestCode, it) }
+fun CheckPermission(permission: String, requestCode: Int, denyMessage: String? = null) {
+    (LocalContext.current as? Activity)?.let { checkPermission(permission, requestCode, it, denyMessage) }
 }
 
-private fun checkPermission(permission: String, requestCode: Int, activity: Activity) {
+private fun checkPermission(permission: String, requestCode: Int, activity: Activity, denyMessage: String? = null) {
     if (ContextCompat.checkSelfPermission(
             activity, permission
         ) == PackageManager.PERMISSION_DENIED
     ) {
         ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
+    } else {
+        denyMessage?.let { Toast.makeText(activity, it, Toast.LENGTH_SHORT).show() }
     }
-//    else {
-//        Toast.makeText(activity, "Permission already granted..", Toast.LENGTH_SHORT).show()
-//    }
 }
