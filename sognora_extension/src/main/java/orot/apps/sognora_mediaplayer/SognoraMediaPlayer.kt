@@ -6,20 +6,33 @@ import android.media.MediaPlayer
 class SognoraMediaPlayer {
     var player: MediaPlayer? = null
     var position = 0
+    var audioDuration = 0
 
-    suspend fun playAudio(url: String) {
+    suspend fun prepareAudio(url: String) {
         try {
             closePlayer()
             player = MediaPlayer()
             player?.run {
                 setDataSource(url)
                 prepare()
-                start()
+                audioDuration = duration
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
+    suspend fun playAudio() {
+        player?.run {
+            try {
+                start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun getDuration() = audioDuration
 
     suspend fun playRaw(context: Context, rawFile: Int) {
         try {
