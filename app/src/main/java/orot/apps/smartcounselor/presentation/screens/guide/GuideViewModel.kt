@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.guide
+package orot.apps.smartcounselor.presentation.screens.guide
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

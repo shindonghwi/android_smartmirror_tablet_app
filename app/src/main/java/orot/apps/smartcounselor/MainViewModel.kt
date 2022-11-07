@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import orot.apps.smartcounselor.network.model.ChatData
-import orot.apps.smartcounselor.presentation.conversation.ConversationType
+import orot.apps.smartcounselor.presentation.screens.conversation.ConversationType
 import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain

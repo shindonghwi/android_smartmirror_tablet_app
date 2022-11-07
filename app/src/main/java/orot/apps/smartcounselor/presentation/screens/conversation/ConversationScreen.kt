@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.conversation
+package orot.apps.smartcounselor.presentation.screens.conversation
 
 import android.util.Log
 import android.widget.Toast

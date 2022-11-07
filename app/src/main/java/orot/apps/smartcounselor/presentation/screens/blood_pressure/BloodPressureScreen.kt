@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.blood_pressure
+package orot.apps.smartcounselor.presentation.screens.blood_pressure
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*

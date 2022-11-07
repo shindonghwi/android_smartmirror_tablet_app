@@ -25,7 +25,7 @@ import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Primary
-import orot.apps.smartcounselor.presentation.conversation.ConversationType
+import orot.apps.smartcounselor.presentation.screens.conversation.ConversationType
 import orot.apps.sognora_compose_extension.animation.clickBounce
 
 @Composable

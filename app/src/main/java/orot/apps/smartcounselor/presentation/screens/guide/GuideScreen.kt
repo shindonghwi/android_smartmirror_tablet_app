@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.guide
+package orot.apps.smartcounselor.presentation.screens.guide
 
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -24,7 +24,7 @@ import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
-import orot.apps.smartcounselor.presentation.conversation.ConversationType
+import orot.apps.smartcounselor.presentation.screens.conversation.ConversationType
 import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @ExperimentalAnimationApi

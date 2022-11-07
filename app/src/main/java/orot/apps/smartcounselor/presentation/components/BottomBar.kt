@@ -32,7 +32,7 @@ import orot.apps.smartcounselor.presentation.components.common.VDivider
 import orot.apps.smartcounselor.presentation.components.home.AgeTextField
 import orot.apps.smartcounselor.presentation.components.home.SexRadioButton
 import orot.apps.smartcounselor.presentation.components.home.StartButton
-import orot.apps.smartcounselor.presentation.guide.GuideViewModel
+import orot.apps.smartcounselor.presentation.screens.guide.GuideViewModel
 import orot.apps.sognora_compose_extension.animation.clickBounce
 import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation

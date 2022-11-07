@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.server_connection_fail
+package orot.apps.smartcounselor.presentation.screens.server_connection_fail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

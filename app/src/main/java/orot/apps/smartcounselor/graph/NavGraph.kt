@@ -9,12 +9,12 @@ import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.MainViewModel
 import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.presentation.blood_pressure.BloodPressureScreen
-import orot.apps.smartcounselor.presentation.chat_list.ChatListScreen
-import orot.apps.smartcounselor.presentation.conversation.ConversationScreen
-import orot.apps.smartcounselor.presentation.guide.GuideScreen
-import orot.apps.smartcounselor.presentation.home.HomeScreen
-import orot.apps.smartcounselor.presentation.server_connection_fail.ServerConnectionFailScreen
+import orot.apps.smartcounselor.presentation.screens.blood_pressure.BloodPressureScreen
+import orot.apps.smartcounselor.presentation.screens.chat_list.ChatListScreen
+import orot.apps.smartcounselor.presentation.screens.conversation.ConversationScreen
+import orot.apps.smartcounselor.presentation.screens.guide.GuideScreen
+import orot.apps.smartcounselor.presentation.screens.home.HomeScreen
+import orot.apps.smartcounselor.presentation.screens.server_connection_fail.ServerConnectionFailScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
