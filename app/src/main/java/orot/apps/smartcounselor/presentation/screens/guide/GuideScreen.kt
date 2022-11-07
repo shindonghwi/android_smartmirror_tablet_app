@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.screens.guide
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +8,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
@@ -18,22 +16,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
-import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MagoActivity
-import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.Screens
 import orot.apps.smartcounselor.presentation.app_style.Display1
 import orot.apps.smartcounselor.presentation.app_style.Gray10
-import orot.apps.smartcounselor.presentation.screens.conversation.ConversationType
-import orot.apps.sognora_websocket_audio.model.AudioStreamData
 
 @ExperimentalAnimationApi
 @Composable
 fun GuideScreen() {
 
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-
-    WebSocketState()
 
     LaunchedEffect(key1 = Unit) {
         mainViewModel.createAudioStreamManager() // 가이드 화면 진입시 소켓 연결
@@ -43,35 +34,6 @@ fun GuideScreen() {
         modifier = Modifier.fillMaxSize(), constraintSet = guideScreenConstraintSet()
     ) {
         GuideContent(modifier = Modifier.layoutId("description"))
-    }
-}
-
-@Composable
-fun WebSocketState() {
-
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val state = mainViewModel.audioState.collectAsState().value
-
-    Log.d("ASdasda", "WebSocketState: $state")
-
-    LaunchedEffect(key1 = state) {
-        if (state is AudioStreamData.Success) {
-            mainViewModel.changeConversationList(
-                ConversationType.GUIDE,
-                listOf(
-                    "안녕하세요"
-//                            "\n\nMago Healthcare 서비스에 오신걸 환영합니다\n\nAI가 먼저 대화를 시작합니다. \n\n잠시만 기다려주세요",
-                ),
-                null
-            )
-            navigationKit.clearAndMove(Screens.Conversation.route) {
-                mainViewModel.updateBottomMenu(BottomMenu.Conversation)
-            }
-        } else if (state is AudioStreamData.Failed) {
-            navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
-                mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
-            }
-        }
     }
 }
 

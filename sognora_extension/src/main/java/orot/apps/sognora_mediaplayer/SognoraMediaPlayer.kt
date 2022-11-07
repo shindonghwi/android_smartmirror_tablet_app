@@ -1,6 +1,7 @@
 package orot.apps.sognora_mediaplayer
 
 import android.content.Context
+import android.media.AudioManager
 import android.media.MediaPlayer
 
 class SognoraMediaPlayer {
@@ -39,7 +40,8 @@ class SognoraMediaPlayer {
             closePlayer()
             player = MediaPlayer.create(context, rawFile)
             player?.run {
-                start()
+                prepare()
+                audioDuration = this.duration
             }
         } catch (e: Exception) {
             e.printStackTrace()

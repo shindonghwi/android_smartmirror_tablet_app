@@ -1,4 +1,4 @@
-package orot.apps.sognora_websocket_audio.model.protocol
+package orot.apps.smartcounselor.models.mago_protocol
 
 enum class MAGO_PROTOCOL(val id: String) {
     PROTOCOL_1("APP_DIALOG_START_REQ"),

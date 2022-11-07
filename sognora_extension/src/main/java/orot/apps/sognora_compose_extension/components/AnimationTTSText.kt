@@ -1,6 +1,7 @@
 package orot.apps.sognora_compose_extension.components
 
 import android.speech.tts.UtteranceProgressListener
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -15,6 +16,7 @@ import kotlinx.coroutines.delay
 import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
+import kotlin.concurrent.timer
 
 interface IAnimationTextCallback {
     suspend fun startAnimation()
@@ -29,8 +31,7 @@ fun AnimationTTSText(
         animationSpec = tween(durationMillis = 1000, easing = FastOutLinearInEasing),
     ),
     exitTransition: ExitTransition = fadeOut(
-        animationSpec = tween(durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing),
-        targetAlpha = 0.5f
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
     ),
     textList: List<String>,
     useSpeakMode: Boolean = true,
@@ -55,6 +56,11 @@ fun AnimationTTSText(
                     coroutineScopeOnMain {
                         animVisibleState.targetState = true
                     }
+//                    timer(initialDelay = textList[currentIdx].length * 250).toLong())
+//                    {
+//                        second++
+//                        Log.d("Asdasdasd", "second: ${second}")
+//                    }
                 }
 
                 override fun onDone(utteranceId: String?) {

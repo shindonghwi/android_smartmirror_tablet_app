@@ -6,6 +6,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import java.util.*
 
+
 class SognoraTTS {
 
     private val params = Bundle()
@@ -25,14 +26,14 @@ class SognoraTTS {
 
     fun startPlay(msg: String) {
         tts?.let {
-            if (it.isSpeaking){
+            if (it.isSpeaking) {
                 it.stop()
             }
-            it.speak(msg, TextToSpeech.QUEUE_ADD, params, msg);
+            it.speak(msg, TextToSpeech.QUEUE_ADD, params, msg)
         }
     }
 
-    fun clear(){
+    fun clear() {
         tts?.run {
             stop()
             null

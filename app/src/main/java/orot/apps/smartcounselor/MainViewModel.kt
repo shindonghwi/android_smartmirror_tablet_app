@@ -3,19 +3,23 @@ package orot.apps.smartcounselor
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import okio.ByteString
+import orot.apps.smartcounselor.MagoActivity.Companion.TAG
+import orot.apps.smartcounselor.models.ConversationType
+import orot.apps.smartcounselor.models.mago_protocol.HeaderInfo
+import orot.apps.smartcounselor.models.mago_protocol.MAGO_PROTOCOL
+import orot.apps.smartcounselor.models.mago_protocol.MessageProtocol
 import orot.apps.smartcounselor.network.model.ChatData
-import orot.apps.smartcounselor.presentation.screens.conversation.ConversationType
 import orot.apps.sognora_mediaplayer.SognoraTTS
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
+import orot.apps.sognora_websocket_audio.AudioStreamManageable
 import orot.apps.sognora_websocket_audio.AudioStreamManager
-import orot.apps.sognora_websocket_audio.IAudioStreamManager
-import orot.apps.sognora_websocket_audio.model.AudioStreamData
-import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
-import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
+import orot.apps.sognora_websocket_audio.model.WebSocketState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,108 +62,155 @@ class MainViewModel @Inject constructor() : ViewModel() {
      * ================================================
      * */
     var audioStreamManager: AudioStreamManager? = null
-    val audioState: MutableStateFlow<AudioStreamData<String>> = MutableStateFlow(AudioStreamData.Idle)
+    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
     val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
+
+
+    /** 웹 소켓으로 이벤트 전달하기 */
+    var lastProtocolNum: Int = -1
+    fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
+        if (lastProtocolNum == protocolNum) return
+        else lastProtocolNum = protocolNum
+
+        var protocolId = ""
+
+        when (protocolNum) {
+            1 -> protocolId = MAGO_PROTOCOL.PROTOCOL_1.id
+            2 -> protocolId = MAGO_PROTOCOL.PROTOCOL_2.id
+            3 -> protocolId = MAGO_PROTOCOL.PROTOCOL_3.id
+            4 -> protocolId = MAGO_PROTOCOL.PROTOCOL_4.id
+            5 -> protocolId = MAGO_PROTOCOL.PROTOCOL_5.id
+            6 -> protocolId = MAGO_PROTOCOL.PROTOCOL_6.id
+            7 -> protocolId = MAGO_PROTOCOL.PROTOCOL_7.id
+            8 -> protocolId = MAGO_PROTOCOL.PROTOCOL_8.id
+            9 -> protocolId = MAGO_PROTOCOL.PROTOCOL_9.id
+            10 -> protocolId = MAGO_PROTOCOL.PROTOCOL_10.id
+            11 -> protocolId = MAGO_PROTOCOL.PROTOCOL_11.id
+            12 -> protocolId = MAGO_PROTOCOL.PROTOCOL_12.id
+            13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
+            14 -> protocolId = MAGO_PROTOCOL.PROTOCOL_14.id
+            15 -> protocolId = MAGO_PROTOCOL.PROTOCOL_15.id
+            16 -> protocolId = MAGO_PROTOCOL.PROTOCOL_16.id
+            17 -> protocolId = MAGO_PROTOCOL.PROTOCOL_17.id
+            18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
+        }
+        Log.d(TAG, "sendProtocol: protocol: $protocolId / body: $body")
+
+        val msg = if (body == null) {
+            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null)
+        } else {
+            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body.body)
+        }
+
+        val params = Gson().toJson(msg)
+        audioStreamManager?.webSocket?.send(params)
+    }
 
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
         if (audioStreamManager != null) {
-            Log.d("MAINVIEWMODEL", "createAudioStreamManager: ")
             audioStreamManager?.stopAudioRecord()
             audioStreamManager = null
         }
 
-        audioStreamManager = AudioStreamManager(object : IAudioStreamManager {
-            // 웹소켓(챗서버) 연결: 오디오를 사용가능한 상태로 만들고, 서버에 dm 시작을 알린다.
-            override suspend fun connectedWebSocket() {
-                coroutineScopeOnDefault(initDelay = 2000) {
-                    audioState.update { AudioStreamData.Success() }
-                }
-            }
+        audioStreamManager = AudioStreamManager()
 
-            // 웹소켓 해제: 오디오를 사용 불가능한 상태로 만든다.
-            override suspend fun disConnectedWebSocket() {
-                coroutineScopeOnDefault {
-                    audioState.update { AudioStreamData.Closed }
-                    changeSendingStateAudioBuffer(false)
-                }
-            }
+        audioStreamManager?.run {
+            initWebSocket(object : AudioStreamManageable {
+                override suspend fun stateWebSocket(state: WebSocketState) {
 
-            // 웹소켓 연결 실패: 서버가 닫힌 경우
-            override suspend fun failedWebSocket() {
-                coroutineScopeOnDefault {
-                    audioState.update { AudioStreamData.Failed }
-                    changeSendingStateAudioBuffer(false)
-                }
-            }
+                    var initDelay = 0L
 
-            // 오디오 버퍼를 서버로 전송한다.
-            override suspend fun availableAudioStream() {
-                coroutineScopeOnDefault {
-                    if (audioStreamManager?.audioRecord == null) {
-                        audioStreamManager?.initAudioRecorder()
-                        sendAudioBuffer()
+                    when (state) {
+                        is WebSocketState.Idle -> {}
+                        is WebSocketState.Connected -> {
+                            initDelay = 2000
+
+                            if (audioStreamManager?.audioRecord == null) {
+                                audioStreamManager?.initAudioRecorder()
+                                sendAudioBuffer()
+                            }
+
+                        }
+                        is WebSocketState.DisConnected -> {}
+                        is WebSocketState.Closing -> {}
+                        is WebSocketState.Failed -> {}
+                    }
+
+                    coroutineScopeOnDefault(initDelay = initDelay) {
+                        updateWebSocketState(state)
                     }
                 }
-            }
 
-            override suspend fun streamAiTalk(id: String, receivedMsg: MessageProtocol) {
-                chatList.add(ChatData(msg = receivedMsg.body?.ment?.text.toString(), isUser = false))
-                when (id) {
-                    MAGO_PROTOCOL.PROTOCOL_2.id -> {
-                        changeSendingStateAudioBuffer(false)
-                        changeConversationList(
-                            ConversationType.CONVERSATION,
-                            listOf(receivedMsg.body?.ment?.text.toString()),
-                            receivedMsg
-                        )
-                    }
-                    MAGO_PROTOCOL.PROTOCOL_12.id -> {
-                        audioStreamManager?.sendProtocol(13, conversationInfo.value.third)
-                        changeSendingStateAudioBuffer(false)
+                override suspend fun stateAudioStream(isAvailable: Boolean) {
+                }
 
-                        val type = when (receivedMsg.body?.action) {
-                            "measurement" -> ConversationType.MEASUREMENT
-                            "end" -> ConversationType.END
-                            "doctorcall" -> ConversationType.DOCTORCALL
-                            "exit" -> ConversationType.EXIT
-                            else -> ConversationType.CONVERSATION
+                override suspend fun receivedMessageString(msg: String) {
+                    try {
+                        val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
+
+                        val isUser = receivedMsg.header.protocol_id == MAGO_PROTOCOL.PROTOCOL_11.id
+                        receivedMsg.body?.ment?.text?.run {
+                            if (this.isNotEmpty()) {
+                                chatList.add(ChatData(msg = this, isUser = isUser))
+                            }
                         }
 
-                        changeConversationList(
-                            type,
-                            listOf(receivedMsg.body?.ment?.text.toString()),
-                            receivedMsg
-                        )
-                    }
-                    else -> {
+                        when (receivedMsg.header.protocol_id) {
+                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
+                                changeSendingStateAudioBuffer(false)
+                                changeConversationList(
+                                    ConversationType.CONVERSATION,
+                                    listOf(receivedMsg.body?.ment?.text.toString()),
+                                    receivedMsg
+                                )
+                            }
+                            MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
+
+                            }
+                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
+                                changeSendingStateAudioBuffer(false)
+                                changeSaidMeText(receivedMsg.body?.ment?.text.toString())
+                            }
+                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
+                                sendProtocol(13, conversationInfo.value.third)
+                                changeSendingStateAudioBuffer(false)
+
+                                var type = when (receivedMsg.body?.action) {
+                                    "measurement" -> ConversationType.MEASUREMENT
+                                    "end" -> ConversationType.END
+                                    "doctorcall" -> ConversationType.DOCTORCALL
+                                    "exit" -> ConversationType.EXIT
+                                    else -> ConversationType.CONVERSATION
+                                }
+
+                                changeConversationList(
+                                    type, listOf(receivedMsg.body?.ment?.text.toString()), receivedMsg
+                                )
+                            }
+                            else -> {}
+                        }
+
+                    } catch (e: Exception) {
                     }
                 }
-            }
 
-            override suspend fun saidMe(id: String, receivedMsg: MessageProtocol) {
-                chatList.add(ChatData(msg = receivedMsg.body?.ment?.text.toString(), isUser = true))
-                changeSendingStateAudioBuffer(false)
-                changeSaidMeText(receivedMsg.body?.ment?.text.toString())
+                override suspend fun receivedMessageByteString(byte: ByteString) {
+                }
 
-            }
-        })
-    }
-
-    fun updateAudioState(state: AudioStreamData<String>) {
-        coroutineScopeOnDefault {
-            audioState.emit(state)
+            })
         }
     }
+
+    fun updateWebSocketState(state: WebSocketState) = webSocketState.update { state }
 
     fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
     fun changeSendingStateAudioBuffer(flag: Boolean) {
         audioStreamManager?.audioSendAvailable = flag
-        if (audioState.value is AudioStreamData.Success) {
+        if (webSocketState.value is WebSocketState.Connected) {
             micIsAvailable.value = flag
             if (flag) {
-                Log.d("Asdasd", "changeSendingStateAudioBuffer: ${conversationInfo.value.third}")
-                audioStreamManager?.sendProtocol(3, conversationInfo.value.third)
+                sendProtocol(3, conversationInfo.value.third)
             }
         }
     }
@@ -200,9 +251,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     override fun onCleared() {
         Log.d("MAINVIEWMODEL", "onCleared: $this")
-        super.onCleared()
-        audioState.update { AudioStreamData.Idle }
+        updateWebSocketState(WebSocketState.Idle)
         audioStreamManager?.stopAudioRecord()
         audioStreamManager = null
+        super.onCleared()
     }
 }

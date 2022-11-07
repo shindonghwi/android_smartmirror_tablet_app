@@ -1,7 +1,9 @@
 package orot.apps.smartcounselor
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -31,6 +33,7 @@ class MagoActivity : ComponentActivity() {
 
     private val PERMISSION_RECODE_AUDIO = 1000
     var mainViewModel: MainViewModel = getViewModel(MainViewModel())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

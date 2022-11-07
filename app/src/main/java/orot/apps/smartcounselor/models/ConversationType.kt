@@ -1,4 +1,4 @@
-package orot.apps.smartcounselor.presentation.screens.conversation
+package orot.apps.smartcounselor.models
 
 enum class ConversationType {
     GUIDE,

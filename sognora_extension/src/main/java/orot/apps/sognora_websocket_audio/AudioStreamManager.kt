@@ -1,29 +1,28 @@
-
 package orot.apps.sognora_websocket_audio
 
 import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.media.audiofx.AcousticEchoCanceler
+import android.media.audiofx.NoiseSuppressor
 import android.util.Log
-import com.google.gson.Gson
-import kotlinx.coroutines.delay
 import okhttp3.*
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
-import orot.apps.sognora_websocket_audio.model.protocol.HeaderInfo
-import orot.apps.sognora_websocket_audio.model.protocol.MAGO_PROTOCOL
-import orot.apps.sognora_websocket_audio.model.protocol.MessageProtocol
+import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 
-class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
+/** 웹소켓 연결 및 음성 버퍼를 서버에 전달하는 매니저 */
+class AudioStreamManager {
 
     val TAG = "AudioStreamManager"
     var audioSendAvailable = false
-//    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
-    val webSocketURL: String = "ws://mago-demo-server.orotcode.com:8080/ws/chat"
+
+    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
+//    val webSocketURL: String = "ws://mago-demo-server.orotcode.com:8080/ws/chat"
 
     /** 오디오 */
     var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
@@ -41,83 +40,47 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
     private var request: Request? = Request.Builder().url(webSocketURL).build() // 웹 소켓 연결 빌더 생성
     private var client: OkHttpClient = OkHttpClient()
 
-    init {
-        initWebSocket()
-    }
-
-
     /** 웹 소켓 연결하기 */
-    private fun initWebSocket() {
+    fun initWebSocket(manageable: AudioStreamManageable) {
         request?.run {
             webSocket = client.newWebSocket(this, object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
                     Log.d(TAG, "onOpen: $response")
-                    coroutineScopeOnDefault {
-                        audioStreamImpl.connectedWebSocket()
-                    }
+                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Connected) }
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
-                    Log.d(TAG, "receiveProtocol: ${parsingProtocolFromReceiveMsg(text)}")
                     Log.d(TAG, "onMessage: $text")
-                    coroutineScopeOnIO {
-                        when (parsingProtocolFromReceiveMsg(text)) {
-                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK                                 sProtocol(3)
-                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
-                                audioStreamImpl.streamAiTalk(MAGO_PROTOCOL.PROTOCOL_2.id, receivedMsg)
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
-                                audioStreamImpl.availableAudioStream()
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
-                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
-                                audioStreamImpl.saidMe(MAGO_PROTOCOL.PROTOCOL_11.id, receivedMsg)
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
-                                val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
-                                audioStreamImpl.streamAiTalk(MAGO_PROTOCOL.PROTOCOL_12.id, receivedMsg)
-                            }
-                            else -> {}
-                        }
-
-                    }
+                    coroutineScopeOnDefault { manageable.receivedMessageString(text) }
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
                     Log.d(TAG, "onFailure: $t || $response || ${t.message} || ${response?.message}")
-                    coroutineScopeOnDefault {
-                        audioStreamImpl.failedWebSocket()
-                    }
+                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Failed) }
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosed(webSocket, code, reason)
                     Log.d(TAG, "onClosed: $code || $reason")
-                    coroutineScopeOnDefault {
-                        audioStreamImpl.disConnectedWebSocket()
-                    }
+                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.DisConnected) }
                 }
 
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosing(webSocket, code, reason)
                     Log.d(TAG, "onClosing: $code || $reason")
+                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Closing) }
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                     super.onMessage(webSocket, bytes)
                     Log.d(TAG, "onMessage: $bytes")
+                    coroutineScopeOnDefault { manageable.receivedMessageByteString(bytes) }
                 }
             })
         }
-    }
-
-    /** 서버에서 전달받은 메세지 파싱 */
-    private fun parsingProtocolFromReceiveMsg(text: String): String {
-        val receivedMsg: MessageProtocol = Gson().fromJson(text, MessageProtocol::class.java)
-        return receivedMsg.header.protocol_id
     }
 
     /** 오디오 녹음기 초기화 */
@@ -131,47 +94,11 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
             RECORDER_SOURCE, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, BUFFER_SIZE_RECORDING
         )
 
-        audioRecord?.startRecording()
-    }
-
-    /** 웹 소켓으로 이벤트 전달하기 */
-    var lastProtocolNum: Int = -1
-    fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
-        if (lastProtocolNum == protocolNum) return
-        else lastProtocolNum = protocolNum
-
-        var protocolId = ""
-
-        when (protocolNum) {
-            1 -> protocolId = MAGO_PROTOCOL.PROTOCOL_1.id
-            2 -> protocolId = MAGO_PROTOCOL.PROTOCOL_2.id
-            3 -> protocolId = MAGO_PROTOCOL.PROTOCOL_3.id
-            4 -> protocolId = MAGO_PROTOCOL.PROTOCOL_4.id
-            5 -> protocolId = MAGO_PROTOCOL.PROTOCOL_5.id
-            6 -> protocolId = MAGO_PROTOCOL.PROTOCOL_6.id
-            7 -> protocolId = MAGO_PROTOCOL.PROTOCOL_7.id
-            8 -> protocolId = MAGO_PROTOCOL.PROTOCOL_8.id
-            9 -> protocolId = MAGO_PROTOCOL.PROTOCOL_9.id
-            10 -> protocolId = MAGO_PROTOCOL.PROTOCOL_10.id
-            11 -> protocolId = MAGO_PROTOCOL.PROTOCOL_11.id
-            12 -> protocolId = MAGO_PROTOCOL.PROTOCOL_12.id
-            13 -> protocolId = MAGO_PROTOCOL.PROTOCOL_13.id
-            14 -> protocolId = MAGO_PROTOCOL.PROTOCOL_14.id
-            15 -> protocolId = MAGO_PROTOCOL.PROTOCOL_15.id
-            16 -> protocolId = MAGO_PROTOCOL.PROTOCOL_16.id
-            17 -> protocolId = MAGO_PROTOCOL.PROTOCOL_17.id
-            18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
+        audioRecord?.run {
+            NoiseSuppressor.create(audioSessionId).enabled = true
+            AcousticEchoCanceler.create(audioSessionId).enabled = true
+            startRecording()
         }
-        Log.d(TAG, "sendProtocol: protocol: $protocolId / body: $body")
-
-        val msg = if (body == null) {
-            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null)
-        } else {
-            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body.body)
-        }
-
-        val params = Gson().toJson(msg)
-        webSocket?.send(params)
     }
 
     /** 녹음한 오디오 버퍼 전송하기 */
@@ -195,10 +122,10 @@ class AudioStreamManager(private val audioStreamImpl: IAudioStreamManager) {
 
     /** 오디오 버퍼 전송 중단하기 */
     fun stopAudioRecord() {
-        webSocket?.cancel()
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
+        webSocket?.cancel()
         webSocket = null
     }
 

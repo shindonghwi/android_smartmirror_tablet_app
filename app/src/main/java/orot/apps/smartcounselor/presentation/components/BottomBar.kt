@@ -38,7 +38,7 @@ import orot.apps.sognora_compose_extension.components.RotationAnimation
 import orot.apps.sognora_compose_extension.components.WavesAnimation
 import orot.apps.sognora_viewmodel_extension.clearAndNewVMS
 import orot.apps.sognora_viewmodel_extension.getViewModel
-import orot.apps.sognora_websocket_audio.model.AudioStreamData
+import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 @Composable
 fun MagoBottomBar() {
@@ -308,7 +308,7 @@ fun ServerRetryBottomBar() {
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                mainViewModel.updateAudioState(AudioStreamData.Idle)
+                mainViewModel.updateWebSocketState(WebSocketState.Idle)
                 navigationKit.clearAndMove(Screens.Guide.route) {
                     mainViewModel.updateBottomMenu(BottomMenu.Loading)
                 }

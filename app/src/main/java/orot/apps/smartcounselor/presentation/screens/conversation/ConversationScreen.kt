@@ -19,12 +19,13 @@ import orot.apps.smartcounselor.BottomMenu
 import orot.apps.smartcounselor.MagoActivity
 import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.Screens
+import orot.apps.smartcounselor.models.ConversationType
+import orot.apps.smartcounselor.models.mago_protocol.*
 import orot.apps.smartcounselor.presentation.app_style.Display2
 import orot.apps.sognora_compose_extension.components.AnimationTTSText
 import orot.apps.sognora_compose_extension.components.IAnimationTextCallback
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
 import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
-import orot.apps.sognora_websocket_audio.model.protocol.*
 
 @Composable
 fun ConversationScreen() {
@@ -38,10 +39,8 @@ fun ConversationScreen() {
             textList = conversationInfo.second,
             iAnimationTextCallback = object : IAnimationTextCallback {
                 override suspend fun startAnimation() {
-                    Log.d("ASdsadasd", "startAnimation: $conversationInfo")
                     when (conversationInfo.first) {
-                        ConversationType.END -> {
-
+                        ConversationType.CONVERSATION -> {
                             mainViewModel.run {
                                 if (conversationInfo.third?.body?.ment?.id.toString().contains("doctorcall")) {
                                     coroutineScopeOnDefault {
@@ -63,10 +62,10 @@ fun ConversationScreen() {
                                             changeSendingStateAudioBuffer(true)
                                         }
                                     }
-
-                                } else {
-                                    updateBottomMenu(BottomMenu.RetryAndChat)
                                 }
+//                                else {
+//                                    updateBottomMenu(BottomMenu.RetryAndChat)
+//                                }
                             }
                         }
                         ConversationType.DOCTORCALL -> {
@@ -77,7 +76,7 @@ fun ConversationScreen() {
                         }
                         ConversationType.EXIT -> {
                             mainViewModel.run {
-                                audioStreamManager?.sendProtocol(17) // 종료
+                                sendProtocol(17) // 종료
                             }
                         }
                         else -> {}
@@ -89,7 +88,7 @@ fun ConversationScreen() {
                     when (conversationInfo.first) {
                         ConversationType.GUIDE -> {
                             mainViewModel.run {
-                                audioStreamManager?.sendProtocol(1) // APP_DIALOG_START_REG
+                                sendProtocol(1)
                             }
                         }
                         ConversationType.CONVERSATION -> {
@@ -102,7 +101,7 @@ fun ConversationScreen() {
                                 }
                             }
                         }
-
+//
                         ConversationType.MEASUREMENT -> {
                             when (conversationInfo.third?.header?.protocol_id) {
                                 MAGO_PROTOCOL.PROTOCOL_12.id -> {
@@ -116,7 +115,7 @@ fun ConversationScreen() {
                         }
                         ConversationType.RESULT_WAITING -> {
                             mainViewModel.run {
-                                audioStreamManager?.sendProtocol(
+                                sendProtocol(
                                     15, MessageProtocol(
                                         header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
                                         body = BodyInfo(
@@ -135,7 +134,15 @@ fun ConversationScreen() {
                             }
                         }
                         ConversationType.END -> {
-                            Log.d("Asadsasd", "endAnimation: END")
+                            coroutineScopeOnMain {
+                                if (conversationInfo.third?.body?.ment?.uri?.contains("doctorcall") == true) {
+                                    mainViewModel.updateBottomMenu(BottomMenu.Call)
+                                } else {
+                                    navigationKit.clearAndMove(Screens.Home.route) {
+                                        mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
+                                    }
+                                }
+                            }
                         }
                         ConversationType.DOCTORCALL -> {
                             mainViewModel.changeSendingStateAudioBuffer(true)
@@ -148,6 +155,7 @@ fun ConversationScreen() {
                                 mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
                             }
                         }
+                        else -> {}
                     }
                 }
             }) { content ->

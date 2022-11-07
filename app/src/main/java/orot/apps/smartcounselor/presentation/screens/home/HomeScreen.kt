@@ -25,12 +25,6 @@ fun HomeScreen() {
     val configuration = LocalConfiguration.current
     val logoWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.70f }
 
-    val activity = LocalContext.current as MagoActivity
-
-    LaunchedEffect(key1 = Unit){
-        Log.d("MAINVIEWMODEL", "HomeScreen: ${activity.mainViewModel.bloodPressureMin}")
-    }
-
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(),
         constraintSet = homeScreenConstraintSet(),
