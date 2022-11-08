@@ -30,9 +30,9 @@ class AudioStreamManager {
     private val RECORDER_SAMPLERATE = 16000 // 샘플링 속도
     private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO // 모노 ( 스테레오 선택가능 )
     private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT // 오디오 인코딩 타입
-    private val BUFFER_SIZE_RECORDING = AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
+    private val BUFFER_SIZE_RECORDING = (AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
         RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING
-    ) * 12
+    ) * 3)
 
 
     /** 웹 소켓 */

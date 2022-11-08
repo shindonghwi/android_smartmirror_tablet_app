@@ -7,5 +7,6 @@ enum class ConversationType {
     RESULT_WAITING,
     END,
     DOCTORCALL,
-    EXIT
+    EXIT,
+    MANUAL_OPERATION
 }

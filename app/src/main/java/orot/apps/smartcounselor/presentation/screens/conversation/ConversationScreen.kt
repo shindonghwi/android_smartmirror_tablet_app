@@ -138,12 +138,10 @@ fun ConversationScreen() {
                                                     changeSaidMeText("")
                                                     updateBottomMenu(BottomMenu.Conversation)
                                                     changeConversationList(
-                                                        ConversationType.CONVERSATION,
+                                                        ConversationType.MANUAL_OPERATION,
                                                         listOf("상담은 잘 진행되셨나요?"),
                                                         conversationInfo.third
                                                     )
-                                                    delay(1000)
-                                                    changeSendingStateAudioBuffer(true)
                                                 }
                                             }
                                     }
@@ -161,11 +159,13 @@ fun ConversationScreen() {
                             coroutineScopeOnDefault {
                                 mainViewModel.changeSendingStateAudioBuffer(false)
                                 mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                                delay(3000)
+                                delay(2000)
                                 mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
                             }
                         }
-                        else -> {}
+                        ConversationType.MANUAL_OPERATION -> {
+                            mainViewModel.changeSendingStateAudioBuffer(true)
+                        }
                     }
                 }
             }) { content ->
