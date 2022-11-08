@@ -26,7 +26,7 @@ interface IAnimationTextCallback {
 @Composable
 fun AnimationTTSText(
     modifier: Modifier = Modifier,
-    termDuration: Long = 1000,
+    termDuration: Long = 300,
     enterTransition: EnterTransition = fadeIn(
         animationSpec = tween(durationMillis = 1000, easing = FastOutLinearInEasing),
     ),
@@ -56,11 +56,6 @@ fun AnimationTTSText(
                     coroutineScopeOnMain {
                         animVisibleState.targetState = true
                     }
-//                    timer(initialDelay = textList[currentIdx].length * 250).toLong())
-//                    {
-//                        second++
-//                        Log.d("Asdasdasd", "second: ${second}")
-//                    }
                 }
 
                 override fun onDone(utteranceId: String?) {
