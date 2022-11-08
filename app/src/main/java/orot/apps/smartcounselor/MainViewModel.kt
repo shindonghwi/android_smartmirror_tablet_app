@@ -249,11 +249,16 @@ class MainViewModel @Inject constructor() : ViewModel() {
         Log.d("MAINVIEWMODEL", "init: $this")
     }
 
-    override fun onCleared() {
-        Log.d("MAINVIEWMODEL", "onCleared: $this")
+    fun clear(){
+        updateBottomMenu(BottomMenu.Start)
         updateWebSocketState(WebSocketState.Idle)
         audioStreamManager?.stopAudioRecord()
         audioStreamManager = null
+    }
+
+    override fun onCleared() {
         super.onCleared()
+        Log.d("MAINVIEWMODEL", "onCleared: $this")
+        clear()
     }
 }

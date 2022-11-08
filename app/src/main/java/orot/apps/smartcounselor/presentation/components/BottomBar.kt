@@ -163,7 +163,7 @@ private fun RetryAndChatBottomBar() {
             modifier = Modifier
                 .clickBounce {
                     navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Start)
+                        mainViewModel.clear()
                         clearAndNewVMS()
                         activity.mainViewModel = getViewModel(MainViewModel())
                     }
@@ -219,7 +219,7 @@ fun RetryBottomBar() {
             modifier = Modifier
                 .clickBounce {
                     navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Start)
+                        mainViewModel.clear()
                         clearAndNewVMS()
                         activity.mainViewModel = getViewModel(MainViewModel())
                     }

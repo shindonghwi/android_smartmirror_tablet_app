@@ -44,7 +44,7 @@ fun MagoLifecycle() {
 private fun WebSocketState() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val state = mainViewModel.webSocketState.collectAsState().value
-
+    Log.d(TAG, "WebSocketState: $state")
     LaunchedEffect(key1 = state) {
         if (state is WebSocketState.Connected) {
             mainViewModel.changeConversationList(
@@ -60,6 +60,10 @@ private fun WebSocketState() {
         } else if (state is WebSocketState.Failed) {
             navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
+            }
+        }else if (state is WebSocketState.Idle){
+            navigationKit.clearAndMove(Screens.Home.route) {
+                mainViewModel.updateBottomMenu(BottomMenu.Start)
             }
         }
     }

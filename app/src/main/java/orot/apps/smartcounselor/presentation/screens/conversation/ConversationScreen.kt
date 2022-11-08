@@ -2,6 +2,9 @@ package orot.apps.smartcounselor.presentation.screens.conversation
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -37,37 +40,19 @@ fun ConversationScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         AnimationTTSText(modifier = Modifier,
             textList = conversationInfo.second,
+            exitTransition = if (conversationInfo.first.name == ConversationType.END.name) {
+                fadeOut(
+                    animationSpec = tween(durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing),
+                )
+            } else {
+                fadeOut(
+                    animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                )
+            },
             iAnimationTextCallback = object : IAnimationTextCallback {
                 override suspend fun startAnimation() {
                     when (conversationInfo.first) {
-                        ConversationType.CONVERSATION -> {
-                            mainViewModel.run {
-                                if (conversationInfo.third?.body?.ment?.id.toString().contains("doctorcall")) {
-                                    coroutineScopeOnDefault {
-                                        updateBottomMenu(BottomMenu.Call)
-                                        delay(1000)
-                                        coroutineScopeOnMain {
-                                            Toast.makeText(context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT).show()
-                                        }
-                                        delay(5000)
-                                        coroutineScopeOnMain {
-                                            Toast.makeText(context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT).show()
-                                        }
-                                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                                        delay(1000)
-                                        mainViewModel.run {
-                                            changeSaidMeText("")
-                                            updateBottomMenu(BottomMenu.Conversation)
-                                            delay(1000)
-                                            changeSendingStateAudioBuffer(true)
-                                        }
-                                    }
-                                }
-//                                else {
-//                                    updateBottomMenu(BottomMenu.RetryAndChat)
-//                                }
-                            }
-                        }
+                        ConversationType.CONVERSATION -> {}
                         ConversationType.DOCTORCALL -> {
                             mainViewModel.run {
                                 changeSaidMeText("")
@@ -136,7 +121,32 @@ fun ConversationScreen() {
                         ConversationType.END -> {
                             coroutineScopeOnMain {
                                 if (conversationInfo.third?.body?.ment?.uri?.contains("doctorcall") == true) {
-                                    mainViewModel.updateBottomMenu(BottomMenu.Call)
+                                    mainViewModel.run {
+                                            coroutineScopeOnDefault {
+                                                updateBottomMenu(BottomMenu.Call)
+                                                delay(1000)
+                                                coroutineScopeOnMain {
+                                                    Toast.makeText(context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT).show()
+                                                }
+                                                delay(5000)
+                                                coroutineScopeOnMain {
+                                                    Toast.makeText(context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT).show()
+                                                }
+                                                mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                                                delay(1000)
+                                                mainViewModel.run {
+                                                    changeSaidMeText("")
+                                                    updateBottomMenu(BottomMenu.Conversation)
+                                                    changeConversationList(
+                                                        ConversationType.CONVERSATION,
+                                                        listOf("상담은 잘 진행되셨나요?"),
+                                                        conversationInfo.third
+                                                    )
+                                                    delay(1000)
+                                                    changeSendingStateAudioBuffer(true)
+                                                }
+                                            }
+                                    }
                                 } else {
                                     navigationKit.clearAndMove(Screens.Home.route) {
                                         mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
@@ -163,7 +173,7 @@ fun ConversationScreen() {
                 mainViewModel.run {
                     try {
                         playGoogleTts(conversationInfo.second.filter { it == content }[0])
-                    } catch (e: java.lang.Exception) {
+                    } catch (e: Exception) {
                         Log.d("ASdasdas", "ConversationScreen: $e")
                     }
                 }
