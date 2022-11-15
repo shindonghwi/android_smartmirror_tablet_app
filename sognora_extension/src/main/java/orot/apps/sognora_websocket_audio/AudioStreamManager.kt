@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.media.audiofx.AcousticEchoCanceler
-import android.media.audiofx.NoiseSuppressor
 import android.util.Log
 import okhttp3.*
 import okio.ByteString
@@ -24,16 +22,16 @@ class AudioStreamManager {
     val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
 //    val webSocketURL: String = "ws://mago-demo-server.orotcode.com:8080/ws/chat"
 
-    /** 오디오 */
+    /** 오디오 레코드 */
     var audioRecord: AudioRecord? = null // 오디오 녹음을 위함.
-    private val RECORDER_SOURCE = MediaRecorder.AudioSource.MIC // 마이크 ( 보이스 인식만 가능한 마이크도 있음 )
-    private val RECORDER_SAMPLERATE = 16000 // 샘플링 속도
-    private val RECORDER_CHANNELS: Int = AudioFormat.CHANNEL_IN_MONO // 모노 ( 스테레오 선택가능 )
-    private val RECORDER_AUDIO_ENCODING: Int = AudioFormat.ENCODING_PCM_16BIT // 오디오 인코딩 타입
-    private val BUFFER_SIZE_RECORDING = (AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
-        RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING
-    ) * 3)
-
+    private val recordSource = MediaRecorder.AudioSource.MIC // VOICE_COMMUNICATION (에코캔슬레이션 적용)
+//    private val recordSource = MediaRecorder.AudioSource.VOICE_COMMUNICATION // VOICE_COMMUNICATION (에코캔슬레이션 적용)
+    private val recordSampleRate = 16000 // 샘플링 속도
+    private val recordChannels: Int = AudioFormat.CHANNEL_IN_MONO // 모노 ( 스테레오 선택가능 )
+    private val recordAudioEncoding: Int = AudioFormat.ENCODING_PCM_16BIT // 오디오 인코딩 타입
+    private val recordBufferSize = (AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
+        recordSampleRate, recordChannels, recordAudioEncoding
+    )) * 5
 
     /** 웹 소켓 */
     var webSocket: WebSocket? = null
@@ -91,19 +89,17 @@ class AudioStreamManager {
             Log.d(TAG, "initAudioRecorder:")
         }
         audioRecord = AudioRecord(
-            RECORDER_SOURCE, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, BUFFER_SIZE_RECORDING
+            recordSource, recordSampleRate, recordChannels, recordAudioEncoding, recordBufferSize
         )
 
         audioRecord?.run {
-            NoiseSuppressor.create(audioSessionId).enabled = true
-            AcousticEchoCanceler.create(audioSessionId).enabled = true
             startRecording()
         }
     }
 
     /** 녹음한 오디오 버퍼 전송하기 */
     fun sendAudioRecord() {
-        val buf = ByteArray(BUFFER_SIZE_RECORDING)
+        val buf = ByteArray(recordBufferSize)
         coroutineScopeOnIO {
             try {
                 do {
