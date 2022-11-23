@@ -38,11 +38,8 @@ class MagoActivity : ComponentActivity() {
         hideSystemUI()
         setContent {
             navigationKit = NavigationKit(rememberNavController())
-
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()
-            var mV: MainViewModel = hiltViewModel<MainViewModel>()
-            Log.w(TAG, "onCreate: $mV", )
         }
     }
 
@@ -68,7 +65,6 @@ class MagoActivity : ComponentActivity() {
 private fun MagoHCApp() {
     SmartCounselorTheme {
         MagoLifecycle()
-
         Box(
             modifier = Modifier
                 .fillMaxSize()

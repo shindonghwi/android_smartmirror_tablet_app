@@ -1,13 +1,18 @@
 package orot.apps.smartcounselor.presentation.ui
 
+//import orot.apps.sognora_mediaplayer.SognoraTTS
+//import orot.apps.sognora_websocket_audio.AudioStreamManageable
+//import orot.apps.sognora_websocket_audio.AudioStreamManager
+//import orot.apps.sognora_websocket_audio.model.WebSocketState
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import mago.apps.sognorawebsocket.websocket.SognoraWebSocket
+import mago.apps.sognorawebsocket.websocket.SognoraWebSocketListener
+import okhttp3.Response
 import okio.ByteString
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.model.local.ChatData
@@ -16,22 +21,36 @@ import orot.apps.smartcounselor.model.remote.HeaderInfo
 import orot.apps.smartcounselor.model.remote.MAGO_PROTOCOL
 import orot.apps.smartcounselor.model.remote.MessageProtocol
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
-//import orot.apps.sognora_mediaplayer.SognoraTTS
-//import orot.apps.sognora_websocket_audio.AudioStreamManageable
-//import orot.apps.sognora_websocket_audio.AudioStreamManager
-//import orot.apps.sognora_websocket_audio.model.WebSocketState
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    sognoraWebSocket: SognoraWebSocket
+    private val sognoraWebSocket: SognoraWebSocket
 ) : ViewModel() {
 
-    init {
-        Log.w(TAG, "asdasdasdsadasd: ", )
-        sognoraWebSocket.initWebSocket("ws://172.30.1.15:8080/ws/chat")
+    /**
+     * ================================================
+     *     Web Sokcet
+     * ================================================
+     * */
+    fun connectWebSocket(){
+        sognoraWebSocket
+            .apply {
+                setWebSocketListener(object : SognoraWebSocketListener{
+                    override fun open(response: Response) {
+                        Log.w(TAG, "open: ", )
+                    }
+                    override fun onMessageText(msg: String) { }
+                    override fun onMessageByteString(byteString: ByteString) {}
+                    override fun fail(response: Response?, t: Throwable) {}
+                    override fun close(code: Int, reason: String) {}
+                    override fun onClosing(code: Int, reason: String) {}
+                })
+            }
+            .run {
+                initWebSocket("ws://172.30.1.15:8080/ws/chat")
+            }
     }
 
     /**
@@ -71,6 +90,8 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
 //    var audioStreamManager: AudioStreamManager? = null
+    fun getWebSocketState() = sognoraWebSocket.getWebSocketState()
+
 //    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
 //    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
 

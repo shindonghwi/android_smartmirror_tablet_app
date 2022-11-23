@@ -18,42 +18,44 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.style.Display1
+import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.MainViewModel
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
 fun StartButton() {
 
-//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-//    val context = LocalContext.current
-//    val configuration = LocalConfiguration.current
-//    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
-//
-//    Box {
-//        Text(modifier = Modifier
-//            .width(startWidth)
-//            .clickBounce {
-//                takeIf { mainViewModel.userAge != 0 }?.run {
-//                    navigationKit.clearAndMove(Screens.Guide.route) {
-//                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
-//                    }
-//                } ?: run {
-//                    Toast
-//                        .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)
-//                        .show()
-//                }
-//            }
-//            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
-//            .background(Primary)
-//            .padding(vertical = 36.dp),
-//            textAlign = TextAlign.Center,
-//            text = "시작",
-//            style = MaterialTheme.typography.Display1,
-//            color = Color.White)
-//    }
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }
+
+    Box {
+        Text(modifier = Modifier
+            .width(startWidth)
+            .clickBounce {
+                takeIf { mainViewModel.userAge != 0 }?.run {
+                    navigationKit.clearAndMove(Screens.Guide.route) {
+                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                    }
+                } ?: run {
+                    Toast
+                        .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
+            .background(Primary)
+            .padding(vertical = 8.dp),
+            textAlign = TextAlign.Center,
+            text = "시작",
+            style = MaterialTheme.typography.Display3,
+            color = Color.White)
+    }
 }

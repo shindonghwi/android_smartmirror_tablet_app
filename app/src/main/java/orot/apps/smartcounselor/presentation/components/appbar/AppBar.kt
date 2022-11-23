@@ -8,8 +8,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 
 @Composable
 fun MagoAppBar() {

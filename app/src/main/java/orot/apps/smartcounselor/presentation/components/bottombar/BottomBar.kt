@@ -2,36 +2,26 @@ package orot.apps.smartcounselor.presentation.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
 import orot.apps.smartcounselor.presentation.components.common.VDivider
-import orot.apps.smartcounselor.presentation.style.*
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.style.Gray20
 import orot.apps.smartcounselor.presentation.ui.MainViewModel
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.InputBloodPressure
@@ -39,81 +29,90 @@ import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideViewModel
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.AgeTextField
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.SexRadioButton
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.StartButton
-import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.clearAndNewVMS
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
-//import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 @Composable
 fun MagoBottomBar() {
 
-//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-//    val configuration = LocalConfiguration.current
-//    val maxHeight = configuration.screenHeightDp * 0.23f
-//
-//    mainViewModel.currentBottomMenu.value.let { route ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(bottom = 20.dp)
-//                .height(maxHeight.dp),
-//        ) {
-//            when (route) {
-//                BottomMenu.Start.type -> {
-//                    StartBottomBar()
-//                }
-//                BottomMenu.Loading.type -> {
-//                    LoadingBottomBar()
-//                }
-//                BottomMenu.Empty.type -> {
-//
-//                }
-//                BottomMenu.Conversation.type -> {
-//                    VDivider()
-//                    ConversationBottomBar()
-//                }
-//                BottomMenu.BloodPressure.type -> {
-//                    VDivider()
-//                    BloodPressureBottomBar()
-//                }
-//                BottomMenu.Retry.type -> {
-//                    VDivider()
-//                    RetryBottomBar()
-//                }
-//                BottomMenu.RetryAndChat.type -> {
-//                    VDivider()
-//                    RetryAndChatBottomBar()
-//                }
-//                BottomMenu.Call.type -> {
-//                    CallBottomBar()
-//                }
-//                BottomMenu.ServerRetry.type -> {
-//                    ServerRetryBottomBar()
-//                }
-//            }
-//        }
-//    }
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val configuration = LocalConfiguration.current
+
+    mainViewModel.currentBottomMenu.value.let { route ->
+        val maxHeight = configuration.screenHeightDp * getBottomBarHeight(route)
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+                .height(maxHeight.dp),
+        ) {
+            when (route) {
+                BottomMenu.Start.type -> {
+                    StartBottomBar()
+                }
+                BottomMenu.Loading.type -> {
+                    LoadingBottomBar()
+                }
+                BottomMenu.Empty.type -> {
+
+                }
+                BottomMenu.Conversation.type -> {
+                    VDivider()
+                    ConversationBottomBar()
+                }
+                BottomMenu.BloodPressure.type -> {
+                    VDivider()
+                    BloodPressureBottomBar()
+                }
+                BottomMenu.Retry.type -> {
+                    VDivider()
+                    RetryBottomBar()
+                }
+                BottomMenu.RetryAndChat.type -> {
+                    VDivider()
+                    RetryAndChatBottomBar()
+                }
+                BottomMenu.Call.type -> {
+                    CallBottomBar()
+                }
+                BottomMenu.ServerRetry.type -> {
+                    ServerRetryBottomBar()
+                }
+            }
+        }
+    }
 }
 
 
 /** 홈(시작하기) 화면 바텀 바 */
 @Composable
 private fun StartBottomBar() {
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
     ) {
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            text = "회원님의 정보를 입력해주세요",
+            color = Color.White,
+            style = MaterialTheme.typography.h3,
+            textAlign = TextAlign.Center
+        )
+
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Column(
-                verticalArrangement = Arrangement.SpaceAround, horizontalAlignment = Alignment.Start
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("회원님의 정보를 입력해주세요", color = Color.White, style = MaterialTheme.typography.h4)
-                Spacer(modifier = Modifier.height(8.dp))
                 AgeTextField()
-                Spacer(modifier = Modifier.height(8.dp))
                 SexRadioButton()
             }
             StartButton()
@@ -328,3 +327,17 @@ fun ServerRetryBottomBar() {
 //    }
 }
 
+fun getBottomBarHeight(route: String): Float {
+    return when (route) {
+        BottomMenu.Start.type -> 0.23f
+        BottomMenu.Loading.type -> 0.33f
+        BottomMenu.Empty.type -> 0f
+        BottomMenu.Conversation.type -> 0.33f
+        BottomMenu.BloodPressure.type -> 0.33f
+        BottomMenu.Retry.type -> 0.33f
+        BottomMenu.RetryAndChat.type -> 0.33f
+        BottomMenu.Call.type -> 0.33f
+        BottomMenu.ServerRetry.type -> 0.33f
+        else -> 0f
+    }
+}

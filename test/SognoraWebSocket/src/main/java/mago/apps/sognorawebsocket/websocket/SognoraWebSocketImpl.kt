@@ -3,22 +3,25 @@ package mago.apps.sognorawebsocket.websocket
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import mago.apps.sognorawebsocket.websocket.model.WebSocketState
 import okhttp3.*
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import javax.inject.Inject
 
-class SognoraWebSocketImpl @Inject constructor(
-    private val listener: SognoraWebSocketListener
-) : SognoraWebSocket {
+class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
 
     val TAG = "SognoraWebSocket"
 
-    //    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
     var webSocket: WebSocket? = null
     private var request: Request? = null
     private var client: OkHttpClient? = null
+    lateinit var listener: SognoraWebSocketListener
+    var webSocketState = MutableStateFlow<WebSocketState>(WebSocketState.Idle)
 
     /** 웹 소켓 연결하기 */
     override fun initWebSocket(url: String) {
@@ -36,34 +39,38 @@ class SognoraWebSocketImpl @Inject constructor(
                 webSocket = client!!.newWebSocket(this, object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         super.onOpen(webSocket, response)
-//                        listener.open(response)
+                        listener.open(response)
+                        webSocketState.value = WebSocketState.Connected
                     }
 
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         super.onMessage(webSocket, text)
-//                        listener.onMessageText(text)
+                        listener.onMessageText(text)
                     }
 
                     override fun onFailure(
                         webSocket: WebSocket, t: Throwable, response: Response?
                     ) {
                         super.onFailure(webSocket, t, response)
-//                        listener.fail(response, t)
+                        listener.fail(response, t)
+                        webSocketState.value = WebSocketState.Failed
                     }
 
                     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                         super.onClosed(webSocket, code, reason)
-//                        listener.close(code, reason)
+                        listener.close(code, reason)
+                        webSocketState.value = WebSocketState.DisConnected
                     }
 
                     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                         super.onClosing(webSocket, code, reason)
-//                        listener.onClosing(code, reason)
+                        listener.onClosing(code, reason)
+                        webSocketState.value = WebSocketState.Closing
                     }
 
                     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                         super.onMessage(webSocket, bytes)
-//                        listener.onMessageByteString(bytes)
+                        listener.onMessageByteString(bytes)
                     }
                 })
             } catch (e: Exception) {
@@ -80,6 +87,14 @@ class SognoraWebSocketImpl @Inject constructor(
                 Log.e(TAG, "sendBuffer Error: ${e.message}")
             }
         }
+    }
+
+    override fun setWebSocketListener(listener: SognoraWebSocketListener) {
+        this.listener = listener
+    }
+
+    override fun getWebSocketState(): StateFlow<WebSocketState> {
+        return webSocketState
     }
 
     override fun close() {

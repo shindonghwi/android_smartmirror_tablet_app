@@ -4,8 +4,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.graph.model.Screens
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.BloodPressureScreen
 import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatListScreen
 import orot.apps.smartcounselor.presentation.ui.screens.conversation.ConversationScreen
