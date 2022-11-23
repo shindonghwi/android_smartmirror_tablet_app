@@ -46,8 +46,7 @@ android {
 
 dependencies {
 
-    implementation(project(":sognora_extension"))
-
+    implementation(project(":core"))
     Libraries.apply {
 
         Libraries.KTX.apply {
