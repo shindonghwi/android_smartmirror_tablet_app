@@ -31,7 +31,7 @@ class AudioStreamManager {
     private val recordAudioEncoding: Int = AudioFormat.ENCODING_PCM_16BIT // 오디오 인코딩 타입
     private val recordBufferSize = (AudioRecord.getMinBufferSize( // 오디오 버퍼 설정 , 대략 0.48 ~ 0.5초임
         recordSampleRate, recordChannels, recordAudioEncoding
-    )) * 5
+    )) * 6
 
     /** 웹 소켓 */
     var webSocket: WebSocket? = null
