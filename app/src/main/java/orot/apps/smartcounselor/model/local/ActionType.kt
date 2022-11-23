@@ -1,7 +1,8 @@
 package orot.apps.smartcounselor.model.local
 
-enum class ConversationType {
-    GUIDE,
+enum class ActionType {
+    IDLE,
+    GREETING_END,
     CONVERSATION,
     MEASUREMENT,
     RESULT_WAITING,

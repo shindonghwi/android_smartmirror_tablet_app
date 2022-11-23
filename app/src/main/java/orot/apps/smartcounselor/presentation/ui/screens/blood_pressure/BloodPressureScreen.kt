@@ -28,75 +28,75 @@ import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineS
 @Composable
 fun BloodPressureScreen() {
 
-//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-//    val animVisibleState = remember { MutableTransitionState(false) }.apply {
-//
-//        DisposableEffect(key1 = Unit, effect = {
-//            val animationJob = coroutineScopeOnDefault {
-//                delay(1000)
-//                targetState = true
-//            }
-//
-//            onDispose {
-//                animationJob.cancel()
-//            }
-//        })
-//    }
-//
-//    val infiniteTransition = rememberInfiniteTransition()
-//
-//    val scale by infiniteTransition.animateFloat(
-//        initialValue = 1f, targetValue = 1.2f, animationSpec = infiniteRepeatable(
-//            animation = tween(1000), repeatMode = RepeatMode.Reverse
-//        )
-//    )
-//
-//    AnimatedVisibility(
-//        visibleState = animVisibleState, enter = fadeIn(
-//            animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
-//        ), exit = fadeOut(
-//            animationSpec = tween(durationMillis = 2500, easing = LinearOutSlowInEasing)
-//        )
-//    ) {
-//        Column(
-//            modifier = Modifier.fillMaxSize(),
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Icon(
-//                modifier = Modifier
-//                    .scale(
-//                        if (mainViewModel.heartAnimationState.value) {
-//                            scale
-//                        } else {
-//                            1f
-//                        }
-//                    )
-//                    .size(350.dp),
-//                painter = painterResource(id = R.drawable.heartbeat),
-//                contentDescription = null,
-//                tint = Color.Unspecified
-//            )
-//
-//            BloodPressureText()
-//        }
-//    }
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
+    val animVisibleState = remember { MutableTransitionState(false) }.apply {
+
+        DisposableEffect(key1 = Unit, effect = {
+            val animationJob = coroutineScopeOnDefault {
+                delay(1000)
+                targetState = true
+            }
+
+            onDispose {
+                animationJob.cancel()
+            }
+        })
+    }
+
+    val infiniteTransition = rememberInfiniteTransition()
+
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f, targetValue = 1.2f, animationSpec = infiniteRepeatable(
+            animation = tween(1000), repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    AnimatedVisibility(
+        visibleState = animVisibleState, enter = fadeIn(
+            animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
+        ), exit = fadeOut(
+            animationSpec = tween(durationMillis = 2500, easing = LinearOutSlowInEasing)
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                modifier = Modifier
+                    .scale(
+                        if (mainViewModel.heartAnimationState.value) {
+                            scale
+                        } else {
+                            1f
+                        }
+                    )
+                    .size(350.dp),
+                painter = painterResource(id = R.drawable.heartbeat),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+
+            BloodPressureText()
+        }
+    }
 }
 
 @Composable
 private fun BloodPressureText() {
-//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-//    if (mainViewModel.heartAnimationState.value) {
-//        LoadingText(
-//            defaultContent = "혈압을 측정중입니다", textStyle = MaterialTheme.typography.subtitle1
-//        )
-//    } else {
-//        Text(
-//            text = "혈압 측정이 완료되었습니다",
-//            modifier = Modifier.padding(top = 16.dp),
-//            style = MaterialTheme.typography.subtitle1,
-//            color = Color.White
-//        )
-//    }
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
+    if (mainViewModel.heartAnimationState.value) {
+        LoadingText(
+            defaultContent = "혈압을 측정중입니다", textStyle = MaterialTheme.typography.subtitle1
+        )
+    } else {
+        Text(
+            text = "혈압 측정이 완료되었습니다",
+            modifier = Modifier.padding(top = 16.dp),
+            style = MaterialTheme.typography.subtitle1,
+            color = Color.White
+        )
+    }
 
 }

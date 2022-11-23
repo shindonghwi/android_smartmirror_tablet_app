@@ -31,20 +31,19 @@ fun TextAnimationTTS(
     exitTransition: ExitTransition = fadeOut(
         animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
     ),
-    textList: List<String>,
+    text: String,
     useSpeakMode: Boolean = true,
     iTextAnimationTTSCallback: ITextAnimationTTSCallback? = null,
     content: @Composable (String) -> Unit,
 ) {
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
-    var currentIdx = remember { 0 }
-    var currentText = textList.first()
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    var isCreatedTts = remember { false }
 
     val animVisibleState = remember { MutableTransitionState(false) }.apply {
         targetState = true
     }
 
-    DisposableEffect(key1 = currentText) {
+    DisposableEffect(key1 = text) {
         coroutineScopeOnDefault {
             iTextAnimationTTSCallback?.startAnimation()
             mainViewModel.sognoraGoogleTTS.createTts(object : UtteranceProgressListener() {
@@ -55,33 +54,26 @@ fun TextAnimationTTS(
                 }
 
                 override fun onDone(utteranceId: String?) {
-                    coroutineScopeOnDefault {
-                        coroutineScopeOnMain {
-                            animVisibleState.targetState = false
-                        }
-                        delay(termDuration)
-                        currentIdx += 1
-                        textList.elementAtOrNull(currentIdx)?.let {
-                            currentText = it
-                            if (useSpeakMode) {
-                                mainViewModel.sognoraGoogleTTS.startPlay(currentText)
-                            }
-                        } ?: kotlin.run {
-                            iTextAnimationTTSCallback?.endAnimation()
-                        }
+                    coroutineScopeOnMain {
+                        animVisibleState.targetState = false
+                        iTextAnimationTTSCallback?.endAnimation()
                     }
                 }
 
                 override fun onError(utteranceId: String?) {}
             }).run {
                 coroutineScopeOnDefault {
-                    delay(termDuration)
+                    if (isCreatedTts) {
+                        delay(termDuration)
+                    } else {
+                        delay(1500)
+                        isCreatedTts = true
+                    }
                     if (useSpeakMode) {
-                        mainViewModel.sognoraGoogleTTS.startPlay(currentText)
+                        mainViewModel.sognoraGoogleTTS.startPlay(text)
                     }
                 }
             }
-
         }
 
         onDispose {
@@ -95,7 +87,7 @@ fun TextAnimationTTS(
         enter = enterTransition,
         exit = exitTransition,
     ) {
-        content(currentText)
+        content(text)
     }
 
 }

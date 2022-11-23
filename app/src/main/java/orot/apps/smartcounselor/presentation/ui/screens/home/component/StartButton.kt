@@ -29,7 +29,7 @@ import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 @Composable
 fun StartButton() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }

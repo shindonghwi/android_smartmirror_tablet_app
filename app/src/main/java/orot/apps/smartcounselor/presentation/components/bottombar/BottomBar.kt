@@ -48,7 +48,7 @@ import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
 @Composable
 fun MagoBottomBar() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val configuration = LocalConfiguration.current
 
     mainViewModel.currentBottomMenu.value.let { route ->
@@ -168,8 +168,8 @@ fun LoadingText(
 @Composable
 private fun RetryAndChatBottomBar() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
     val activity = LocalContext.current as MagoActivity
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
 
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -180,9 +180,7 @@ private fun RetryAndChatBottomBar() {
             modifier = Modifier
                 .clickBounce {
                     navigationKit.clearAndMove(Screens.Home.route) {
-//                        mainViewModel.clear()
-//                        clearAndNewVMS()
-//                        activity.mainViewModel = getViewModel(MainViewModel())
+                        mainViewModel.updateBottomMenu(BottomMenu.Start)
                     }
                 }
                 .clip(RoundedCornerShape(15.dp))
@@ -223,8 +221,8 @@ private fun BloodPressureBottomBar() {
 /** 다시하기 */
 @Composable
 fun RetryBottomBar() {
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val activity = LocalContext.current as MagoActivity
+
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
 
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -235,9 +233,7 @@ fun RetryBottomBar() {
             modifier = Modifier
                 .clickBounce {
                     navigationKit.clearAndMove(Screens.Home.route) {
-//                        mainViewModel.clear()
-//                        clearAndNewVMS()
-//                        activity.mainViewModel = getViewModel(MainViewModel())
+                        mainViewModel.updateBottomMenu(BottomMenu.Start)
                     }
                 }
                 .clip(RoundedCornerShape(15.dp))
@@ -281,7 +277,7 @@ fun CallBottomBar() {
 /** 상담원 전화 걸려올때 */
 @Composable
 fun ConversationBottomBar() {
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     val isPlaying = remember { mainViewModel.micIsAvailable }
 
     Row(
@@ -303,7 +299,7 @@ fun ConversationBottomBar() {
 
 @Composable
 private fun SaidMeText() {
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     val text = mainViewModel.saidMeText.collectAsState().value
     Text(
         modifier = Modifier.padding(start = 60.dp),
@@ -316,7 +312,7 @@ private fun SaidMeText() {
 @Composable
 fun ServerRetryBottomBar() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     val configuration = LocalConfiguration.current
     val startWidth: Dp = configuration.screenWidthDp.dp * 0.35f
 

@@ -109,6 +109,7 @@ class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
     }
 
     override fun close() {
+        webSocketState.value = WebSocketState.Idle
         webSocket?.cancel()
         request = null
         webSocket = null

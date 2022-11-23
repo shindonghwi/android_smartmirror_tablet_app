@@ -7,19 +7,16 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import kotlinx.coroutines.delay
 import mago.apps.sognorawebsocket.websocket.model.WebSocketState
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.model.local.ConversationType
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 
 @Composable
 fun MagoLifecycle() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Log.w("VIEWMODEL", "MagoLifecycle: $mainViewModel")
     WebSocketState()
 
@@ -36,8 +33,8 @@ fun MagoLifecycle() {
             Lifecycle.Event.ON_STOP -> Log.d(TAG, "MagoLifecycle: ON_STOP")
             Lifecycle.Event.ON_PAUSE -> {
                 Log.d(TAG, "MagoLifecycle: ON_PAUSE")
-//                mainViewModel.changeSendingStateAudioBuffer(false)
-//                mainViewModel.stopGoogleTts()
+                mainViewModel.changeSendingStateAudioBuffer(false)
+                mainViewModel.stopGoogleTts()
             }
             else -> Log.d(TAG, "MagoLifecycle: ON_ANY")
         }
@@ -66,7 +63,7 @@ private fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.E
 @Composable
 private fun WebSocketState() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val state = mainViewModel.getWebSocketState().collectAsState().value
 
     Log.w("VIEWMODEL", "WebSocketState: $mainViewModel")
@@ -80,7 +77,6 @@ private fun WebSocketState() {
                         Log.w("@@@@@@@@@@", "WebSocketState mainViewModel: ${mainViewModel}")
                         updateBottomMenu(BottomMenu.Conversation)
                         startAudioRecorder()
-                        changeConversationList(ConversationType.GUIDE, listOf("안녕하세요"), null)
                     }
                 }
             }
@@ -94,7 +90,9 @@ private fun WebSocketState() {
                     mainViewModel.updateBottomMenu(BottomMenu.Start)
                 }
             }
-            else -> {}
+            else -> {
+                Log.d(TAG, "WebSocketState ELSE: $state")
+            }
         }
     }
 }

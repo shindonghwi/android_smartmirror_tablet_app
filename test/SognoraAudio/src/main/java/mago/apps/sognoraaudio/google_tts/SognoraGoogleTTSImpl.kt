@@ -31,6 +31,7 @@ class SognoraGoogleTTSImpl @Inject constructor(private val context: Context) : S
                 it.stop()
             }
             it.speak(msg, TextToSpeech.QUEUE_ADD, params, msg)
+            return@let
         }
     }
 

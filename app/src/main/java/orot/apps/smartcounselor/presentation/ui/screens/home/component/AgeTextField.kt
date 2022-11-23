@@ -30,7 +30,7 @@ import orot.apps.smartcounselor.presentation.ui.MagoActivity
 @Composable
 fun AgeTextField() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val configuration = LocalConfiguration.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current

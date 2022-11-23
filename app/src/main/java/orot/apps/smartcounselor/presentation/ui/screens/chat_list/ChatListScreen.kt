@@ -15,26 +15,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.model.local.ChatData
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 @Composable
 fun ChatListScreen() {
 
-//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-//
-//    LazyColumn(
-//        modifier = Modifier.padding(top = 40.dp),
-//        state = rememberLazyListState(),
-//        reverseLayout = false,
-//        contentPadding = PaddingValues(bottom = 20.dp)
-//    ) {
-//        items(
-//            count = mainViewModel.chatList.size
-//        ) { idx ->
-//            ChatContentTypeHolder(mainViewModel.chatList[idx])
-//        }
-//    }
+    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
+
+    LazyColumn(
+        modifier = Modifier.padding(top = 40.dp),
+        state = rememberLazyListState(),
+        reverseLayout = false,
+        contentPadding = PaddingValues(bottom = 20.dp)
+    ) {
+        items(
+            count = mainViewModel.chatList.size
+        ) { idx ->
+            ChatContentTypeHolder(mainViewModel.chatList[idx])
+        }
+    }
 }
 
 

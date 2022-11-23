@@ -24,7 +24,7 @@ import orot.apps.smartcounselor.presentation.ui.MagoActivity
 @Composable
 fun SexRadioButton() {
 
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val configuration = LocalConfiguration.current
     val radioOptions = listOf("남", "여")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }

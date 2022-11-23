@@ -1,8 +1,6 @@
 package orot.apps.smartcounselor.presentation.ui.screens.conversation
 
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -18,31 +16,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.model.local.ConversationType
-import orot.apps.smartcounselor.model.remote.*
+import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.presentation.components.animation.ITextAnimationTTSCallback
 import orot.apps.smartcounselor.presentation.components.animation.TextAnimationTTS
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ConversationScreen() {
 
-    val context = LocalContext.current
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
-    Log.w("ConversationScreen", "ConversationScreen: ${conversationInfo.second}")
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        TextAnimationTTS(modifier = Modifier,
-            textList = conversationInfo.second,
-            exitTransition = if (conversationInfo.first.name == ConversationType.END.name) {
+        TextAnimationTTS(
+            modifier = Modifier,
+            text = conversationInfo.second,
+            exitTransition = if (conversationInfo.first.name == ActionType.END.name) {
                 fadeOut(
                     animationSpec = tween(
                         durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing
@@ -55,141 +48,154 @@ fun ConversationScreen() {
             },
             iTextAnimationTTSCallback = object : ITextAnimationTTSCallback {
                 override suspend fun startAnimation() {
-                    Log.w("ConversationScreen", "startAnimation: ${conversationInfo.second}")
+                    Log.e("ConversationScreen", "startAnimation: ${conversationInfo}")
+//                    when (conversationInfo.first) {
+//                        ConversationType.CONVERSATION -> {}
+//                        ConversationType.DOCTORCALL -> {
+//                            mainViewModel.run {
+//                                changeSaidMeText("")
+//                                updateBottomMenu(BottomMenu.Conversation)
+//                            }
+//                        }
+//                        ConversationType.EXIT -> {
+//                            mainViewModel.run {
+//                                sendProtocol(17) // 종료
+//                            }
+//                        }
+//                        else -> {}
+//                    }
+                }
+
+                override suspend fun endAnimation() {
+                    Log.e("ConversationScreen", "endAnimation: ${conversationInfo}")
                     when (conversationInfo.first) {
-                        ConversationType.CONVERSATION -> {}
-                        ConversationType.DOCTORCALL -> {
-                            mainViewModel.run {
-                                changeSaidMeText("")
-                                updateBottomMenu(BottomMenu.Conversation)
-                            }
+                        ActionType.GREETING_END -> { // AI의 첫 인사 끝
+                            mainViewModel.changeSendingStateAudioBuffer(true)
                         }
-                        ConversationType.EXIT -> {
-                            mainViewModel.run {
-                                sendProtocol(17) // 종료
+                        ActionType.MEASUREMENT -> { // 혈압 측정화면으로 넘어가기
+                            navigationKit.clearAndMove(Screens.BloodPressure.route) {
+                                mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
                             }
                         }
                         else -> {}
                     }
-                }
-
-                override suspend fun endAnimation() {
-                    Log.w("ConversationScreen", "endAnimation: ${conversationInfo.second}")
-                    when (conversationInfo.first) {
-                        ConversationType.GUIDE -> {
-                            mainViewModel.run {
-                                sendProtocol(1)
-                            }
-                        }
-                        ConversationType.CONVERSATION -> {
-                            when (conversationInfo.third?.header?.protocol_id) {
-                                MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
-                                    mainViewModel.changeSendingStateAudioBuffer(true)
-                                }
-                                MAGO_PROTOCOL.PROTOCOL_12.id -> { // AI의 질문이 끝남 ~
-                                    mainViewModel.changeSendingStateAudioBuffer(true)
-                                }
-                            }
-                        }
+//                        ConversationType.IDLE -> {
+//                            when (conversationInfo.third?.header?.protocol_id) {
+//                                MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
+//                                    mainViewModel.changeSendingStateAudioBuffer(true)
+//                                }
+//                            }
+//                        }
+//                        ConversationType.CONVERSATION -> {
+//                            when (conversationInfo.third?.header?.protocol_id) {
+////                                MAGO_PROTOCOL.PROTOCOL_2.id -> { // 김철수님 안녕하세요 ~
+////                                    mainViewModel.changeSendingStateAudioBuffer(true)
+////                                }
+//                                MAGO_PROTOCOL.PROTOCOL_12.id -> { // AI의 질문이 끝남 ~
+//                                    mainViewModel.changeSendingStateAudioBuffer(true)
+//                                }
+//                            }
+//                        }
 //
-                        ConversationType.MEASUREMENT -> {
-                            when (conversationInfo.third?.header?.protocol_id) {
-                                MAGO_PROTOCOL.PROTOCOL_12.id -> {
-                                    coroutineScopeOnMain {
-                                        MagoActivity.navigationKit.clearAndMove(Screens.BloodPressure.route) {
-                                            mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        ConversationType.RESULT_WAITING -> {
-                            mainViewModel.run {
-                                sendProtocol(
-                                    15, MessageProtocol(
-                                        header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
-                                        body = BodyInfo(
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            measurement = MeasurementInfo(
-                                                blood_pressure = listOf(
-                                                    bloodPressureMax, bloodPressureMin
-                                                ),
-                                                blood_sugar = bloodPressureSugar,
-                                            ),
-                                            user = UserInfo(
-                                                gender = if (mainViewModel.userSex) "M" else "F",
-                                                age = mainViewModel.userAge
-                                            )
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                        ConversationType.END -> {
-                            coroutineScopeOnMain {
-                                if (conversationInfo.third?.body?.ment?.uri?.contains("doctorcall") == true) {
-                                    mainViewModel.run {
-                                        coroutineScopeOnDefault {
-                                            updateBottomMenu(BottomMenu.Call)
-                                            delay(1000)
-                                            coroutineScopeOnMain {
-                                                Toast.makeText(
-                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                            delay(5000)
-                                            coroutineScopeOnMain {
-                                                Toast.makeText(
-                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                                            delay(1000)
-                                            mainViewModel.run {
-                                                changeSaidMeText("")
-                                                updateBottomMenu(BottomMenu.Conversation)
-                                                changeConversationList(
-                                                    ConversationType.MANUAL_OPERATION,
-                                                    listOf("상담은 잘 진행되셨나요?"),
-                                                    conversationInfo.third
-                                                )
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    MagoActivity.navigationKit.clearAndMove(Screens.Home.route) {
-                                        mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
-                                    }
-                                }
-                            }
-                        }
-                        ConversationType.DOCTORCALL -> {
+//                        ConversationType.MEASUREMENT -> {
+//                            when (conversationInfo.third?.header?.protocol_id) {
+//                                MAGO_PROTOCOL.PROTOCOL_12.id -> {
+//                                    coroutineScopeOnMain {
+//                                        MagoActivity.navigationKit.clearAndMove(Screens.BloodPressure.route) {
+//                                            mainViewModel.updateBottomMenu(BottomMenu.BloodPressure)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        ConversationType.RESULT_WAITING -> {
+//                            mainViewModel.run {
+//                                sendProtocol(
+//                                    15, MessageProtocol(
+//                                        header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
+//                                        body = BodyInfo(
+//                                            null,
+//                                            null,
+//                                            null,
+//                                            null,
+//                                            null,
+//                                            null,
+//                                            measurement = MeasurementInfo(
+//                                                blood_pressure = listOf(
+//                                                    bloodPressureMax, bloodPressureMin
+//                                                ),
+//                                                blood_sugar = bloodPressureSugar,
+//                                            ),
+//                                            user = UserInfo(
+//                                                gender = if (mainViewModel.userSex) "M" else "F",
+//                                                age = mainViewModel.userAge
+//                                            )
+//                                        )
+//                                    )
+//                                )
+//                            }
+//                        }
+//                        ConversationType.END -> {
+//                            coroutineScopeOnMain {
+//                                if (conversationInfo.third?.body?.ment?.uri?.contains("doctorcall") == true) {
+//                                    mainViewModel.run {
+//                                        coroutineScopeOnDefault {
+//                                            updateBottomMenu(BottomMenu.Call)
+//                                            delay(1000)
+//                                            coroutineScopeOnMain {
+//                                                Toast.makeText(
+//                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
+//                                                ).show()
+//                                            }
+//                                            delay(5000)
+//                                            coroutineScopeOnMain {
+//                                                Toast.makeText(
+//                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
+//                                                ).show()
+//                                            }
+//                                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                                            delay(1000)
+//                                            mainViewModel.run {
+//                                                changeSaidMeText("")
+//                                                updateBottomMenu(BottomMenu.Conversation)
+//                                                changeConversationList(
+//                                                    ConversationType.MANUAL_OPERATION,
+//                                                    listOf("상담은 잘 진행되셨나요?"),
+//                                                    conversationInfo.third
+//                                                )
+//                                            }
+//                                        }
+//                                    }
+//                                } else {
+//                                    MagoActivity.navigationKit.clearAndMove(Screens.Home.route) {
+//                                        mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        ConversationType.DOCTORCALL -> {
 //                            mainViewModel.changeSendingStateAudioBuffer(true)
-                        }
-                        ConversationType.EXIT -> {
-                            coroutineScopeOnDefault {
+//                        }
+//                        ConversationType.EXIT -> {
+//                            coroutineScopeOnDefault {
 //                                mainViewModel.changeSendingStateAudioBuffer(false)
-                                mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                                delay(2000)
-                                mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
-                            }
-                        }
-                        ConversationType.MANUAL_OPERATION -> {
+//                                mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                                delay(2000)
+//                                mainViewModel.updateBottomMenu(BottomMenu.RetryAndChat)
+//                            }
+//                        }
+//                        ConversationType.MANUAL_OPERATION -> {
 //                            mainViewModel.changeSendingStateAudioBuffer(true)
-                        }
-                    }
+//                        }
+//                    }
                 }
-            }) { content ->
+            },
+        ) { content ->
             Log.w("ConversationScreen", "ConversationScreen: $content")
             LaunchedEffect(key1 = conversationInfo) {
                 mainViewModel.run {
                     try {
-                        playGoogleTts(conversationInfo.second.filter { it == content }[0])
+                        playGoogleTts(conversationInfo.second)
                     } catch (e: Exception) {
                         Log.d("ASdasdas", "ConversationScreen: $e")
                     }
