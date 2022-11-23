@@ -9,10 +9,11 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import javax.inject.Inject
 
-class SognoraAudioRecorderImpl @Inject constructor(private val context: Context):
-    SognoraAudioRecorder() {
+class SognoraAudioRecorderImpl @Inject constructor(private val context: Context) :
+    SognoraAudioRecorder {
 
     val TAG = "SognoraAudioRecorder"
+    var minBufferSize: Int = 0
 
     /** 오디오 레코드 */
     var sognoraAudioRecorder: AudioRecord? = null // 오디오 녹음을 위함.
@@ -29,12 +30,13 @@ class SognoraAudioRecorderImpl @Inject constructor(private val context: Context)
                 Log.d(TAG, "Audio Start Failed: Not Allowed Audio Record Permission")
                 return
             } else {
+                minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, encoding) * 6
                 sognoraAudioRecorder = AudioRecord(
                     source,
                     sampleRate,
                     channel,
                     encoding,
-                    AudioRecord.getMinBufferSize(sampleRate, channel, encoding) * 6
+                    minBufferSize,
                 )
 
                 sognoraAudioRecorder?.run {
@@ -51,4 +53,14 @@ class SognoraAudioRecorderImpl @Inject constructor(private val context: Context)
         sognoraAudioRecorder?.release()
         sognoraAudioRecorder = null
     }
+
+    override fun frameBuffer(byteRead: Int): Pair<ByteArray, Int> {
+        val buf = ByteArray(minBufferSize)
+        return Pair(
+            buf,
+            sognoraAudioRecorder?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: -1
+        )
+    }
+
+    override fun getMinBuffer() = minBufferSize
 }

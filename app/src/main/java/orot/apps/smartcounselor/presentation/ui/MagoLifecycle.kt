@@ -2,22 +2,24 @@ package orot.apps.smartcounselor.presentation.ui
 
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.delay
 import mago.apps.sognorawebsocket.websocket.model.WebSocketState
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ConversationType
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 
 @Composable
 fun MagoLifecycle() {
 
-    val mainViewModel = hiltViewModel<MainViewModel>()
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
     Log.w("VIEWMODEL", "MagoLifecycle: $mainViewModel")
     WebSocketState()
 
@@ -64,7 +66,7 @@ private fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.E
 @Composable
 private fun WebSocketState() {
 
-    val mainViewModel = hiltViewModel<MainViewModel>()
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
     val state = mainViewModel.getWebSocketState().collectAsState().value
 
     Log.w("VIEWMODEL", "WebSocketState: $mainViewModel")
@@ -73,13 +75,13 @@ private fun WebSocketState() {
     LaunchedEffect(key1 = state) {
         when (state) {
             is WebSocketState.Connected -> {
-                mainViewModel.changeConversationList(
-                    ConversationType.GUIDE, listOf(
-                        "안녕하세요"
-                    ), null
-                )
                 navigationKit.clearAndMove(Screens.Conversation.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.Conversation)
+                    mainViewModel.run {
+                        Log.w("@@@@@@@@@@", "WebSocketState mainViewModel: ${mainViewModel}")
+                        updateBottomMenu(BottomMenu.Conversation)
+                        startAudioRecorder()
+                        changeConversationList(ConversationType.GUIDE, listOf("안녕하세요"), null)
+                    }
                 }
             }
             is WebSocketState.Failed -> {

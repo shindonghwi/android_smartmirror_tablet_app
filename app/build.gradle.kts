@@ -47,6 +47,8 @@ android {
 dependencies {
 
     implementation(project(":test:SognoraWebSocket"))
+    implementation(project(":test:SognoraAudio"))
+
     Libraries.apply {
 
         Libraries.KTX.apply {

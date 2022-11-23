@@ -6,9 +6,6 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import okhttp3.*
-import okio.ByteString
-import okio.ByteString.Companion.toByteString
-import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 
 /** 웹소켓 연결 및 음성 버퍼를 서버에 전달하는 매니저 */
@@ -37,47 +34,47 @@ class AudioStreamManager {
     private var client: OkHttpClient = OkHttpClient()
 
     /** 웹 소켓 연결하기 */
-    fun initWebSocket(manageable: AudioStreamManageable) {
-        request?.run {
-            webSocket = client.newWebSocket(this, object : WebSocketListener() {
-                override fun onOpen(webSocket: WebSocket, response: Response) {
-                    super.onOpen(webSocket, response)
-                    Log.d(TAG, "onOpen: $response")
-//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Connected) }
-                }
-
-                override fun onMessage(webSocket: WebSocket, text: String) {
-                    super.onMessage(webSocket, text)
-                    Log.d(TAG, "onMessage: $text")
-//                    coroutineScopeOnDefault { manageable.receivedMessageString(text) }
-                }
-
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    super.onFailure(webSocket, t, response)
-                    Log.d(TAG, "onFailure: $t || $response || ${t.message} || ${response?.message}")
-//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Failed) }
-                }
-
-                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                    super.onClosed(webSocket, code, reason)
-                    Log.d(TAG, "onClosed: $code || $reason")
-//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.DisConnected) }
-                }
-
-                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                    super.onClosing(webSocket, code, reason)
-                    Log.d(TAG, "onClosing: $code || $reason")
-//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Closing) }
-                }
-
-                override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                    super.onMessage(webSocket, bytes)
-                    Log.d(TAG, "onMessage: $bytes")
-//                    coroutineScopeOnDefault { manageable.receivedMessageByteString(bytes) }
-                }
-            })
-        }
-    }
+//    fun initWebSocket(manageable: AudioStreamManageable) {
+//        request?.run {
+//            webSocket = client.newWebSocket(this, object : WebSocketListener() {
+//                override fun onOpen(webSocket: WebSocket, response: Response) {
+//                    super.onOpen(webSocket, response)
+//                    Log.d(TAG, "onOpen: $response")
+////                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Connected) }
+//                }
+//
+//                override fun onMessage(webSocket: WebSocket, text: String) {
+//                    super.onMessage(webSocket, text)
+//                    Log.d(TAG, "onMessage: $text")
+////                    coroutineScopeOnDefault { manageable.receivedMessageString(text) }
+//                }
+//
+//                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+//                    super.onFailure(webSocket, t, response)
+//                    Log.d(TAG, "onFailure: $t || $response || ${t.message} || ${response?.message}")
+////                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Failed) }
+//                }
+//
+//                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+//                    super.onClosed(webSocket, code, reason)
+//                    Log.d(TAG, "onClosed: $code || $reason")
+////                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.DisConnected) }
+//                }
+//
+//                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+//                    super.onClosing(webSocket, code, reason)
+//                    Log.d(TAG, "onClosing: $code || $reason")
+////                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Closing) }
+//                }
+//
+//                override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+//                    super.onMessage(webSocket, bytes)
+//                    Log.d(TAG, "onMessage: $bytes")
+////                    coroutineScopeOnDefault { manageable.receivedMessageByteString(bytes) }
+//                }
+//            })
+//        }
+//    }
 
     /** 오디오 녹음기 초기화 */
     @SuppressLint("MissingPermission")

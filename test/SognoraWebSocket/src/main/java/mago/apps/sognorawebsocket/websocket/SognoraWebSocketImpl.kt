@@ -41,11 +41,13 @@ class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
                         super.onOpen(webSocket, response)
                         listener.open(response)
                         webSocketState.value = WebSocketState.Connected
+                        Log.e(TAG, "initWebSocket onOpen: ")
                     }
 
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         super.onMessage(webSocket, text)
                         listener.onMessageText(text)
+                        Log.e(TAG, "initWebSocket text: ${text}")
                     }
 
                     override fun onFailure(
@@ -71,6 +73,7 @@ class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
                     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                         super.onMessage(webSocket, bytes)
                         listener.onMessageByteString(bytes)
+                        Log.e(TAG, "initWebSocket bytes: ${bytes}")
                     }
                 })
             } catch (e: Exception) {
@@ -86,6 +89,14 @@ class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
             } catch (e: Exception) {
                 Log.e(TAG, "sendBuffer Error: ${e.message}")
             }
+        }
+    }
+
+    override fun sendMsg(msg: String) {
+        try {
+            webSocket?.send(msg)
+        } catch (e: Exception) {
+            Log.e(TAG, "sendMsg Error: ${e.message}")
         }
     }
 

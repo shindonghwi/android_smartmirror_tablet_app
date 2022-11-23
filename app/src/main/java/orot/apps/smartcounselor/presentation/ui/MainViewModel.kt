@@ -1,17 +1,16 @@
 package orot.apps.smartcounselor.presentation.ui
 
-//import orot.apps.sognora_mediaplayer.SognoraTTS
-//import orot.apps.sognora_websocket_audio.AudioStreamManageable
-//import orot.apps.sognora_websocket_audio.AudioStreamManager
-//import orot.apps.sognora_websocket_audio.model.WebSocketState
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorder
+import mago.apps.sognoraaudio.google_tts.SognoraGoogleTTS
 import mago.apps.sognorawebsocket.websocket.SognoraWebSocket
 import mago.apps.sognorawebsocket.websocket.SognoraWebSocketListener
+import mago.apps.sognorawebsocket.websocket.model.WebSocketState
 import okhttp3.Response
 import okio.ByteString
 import orot.apps.smartcounselor.graph.model.BottomMenu
@@ -22,11 +21,14 @@ import orot.apps.smartcounselor.model.remote.MAGO_PROTOCOL
 import orot.apps.smartcounselor.model.remote.MessageProtocol
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val sognoraWebSocket: SognoraWebSocket
+    val sognoraWebSocket: SognoraWebSocket,
+    private val sognoraAudioRecorder: SognoraAudioRecorder,
+    val sognoraGoogleTTS: SognoraGoogleTTS
 ) : ViewModel() {
 
     /**
@@ -34,14 +36,14 @@ class MainViewModel @Inject constructor(
      *     Web Sokcet
      * ================================================
      * */
-    fun connectWebSocket(){
+    fun connectWebSocket() {
         sognoraWebSocket
             .apply {
-                setWebSocketListener(object : SognoraWebSocketListener{
-                    override fun open(response: Response) {
-                        Log.w(TAG, "open: ", )
+                setWebSocketListener(object : SognoraWebSocketListener {
+                    override fun open(response: Response) {}
+                    override fun onMessageText(msg: String) {
+                        Log.w(TAG, "onMessageText: $msg", )
                     }
-                    override fun onMessageText(msg: String) { }
                     override fun onMessageByteString(byteString: ByteString) {}
                     override fun fail(response: Response?, t: Throwable) {}
                     override fun close(code: Int, reason: String) {}
@@ -51,6 +53,26 @@ class MainViewModel @Inject constructor(
             .run {
                 initWebSocket("ws://172.30.1.15:8080/ws/chat")
             }
+    }
+
+    private var isAvailableAudioBuffer: Boolean = false
+    fun startAudioRecorder() {
+        sognoraAudioRecorder.startAudioRecorder()
+        onIO {
+            try {
+                do {
+                    if (isAvailableAudioBuffer) {
+                        val bufferSize = sognoraAudioRecorder.getMinBuffer()
+                        val bufferInfo = sognoraAudioRecorder.frameBuffer(bufferSize)
+                        if (bufferInfo.second < -1) break
+                        sognoraWebSocket.sendBuffer(bufferInfo.first, bufferSize)
+                    }
+                } while (true)
+            } catch (e: Exception) {
+                Log.d(TAG, "sendAudioRecord ERROR: ${e.message}")
+                sognoraAudioRecorder.stopAudioRecorder()
+            }
+        }
     }
 
     /**
@@ -92,8 +114,8 @@ class MainViewModel @Inject constructor(
 //    var audioStreamManager: AudioStreamManager? = null
     fun getWebSocketState() = sognoraWebSocket.getWebSocketState()
 
-//    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
-//    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
+    //    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
+    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
 
 
     /** 웹 소켓으로 이벤트 전달하기 */
@@ -133,16 +155,12 @@ class MainViewModel @Inject constructor(
         }
 
         val params = Gson().toJson(msg)
-//        audioStreamManager?.webSocket?.send(params)
+        sognoraWebSocket.sendMsg(params)
     }
 
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
-//        if (audioStreamManager != null) {
-//            audioStreamManager?.stopAudioRecord()
-//            audioStreamManager = null
-//        }
-//
+        connectWebSocket()
 //        audioStreamManager = AudioStreamManager()
 //
 //        audioStreamManager?.run {
@@ -235,18 +253,18 @@ class MainViewModel @Inject constructor(
 //        }
     }
 
-//    fun updateWebSocketState(state: WebSocketState) = webSocketState.update { state }
+    //    fun updateWebSocketState(state: WebSocketState) = webSocketState.update { state }
 //
 //    fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
-//    fun changeSendingStateAudioBuffer(flag: Boolean) {
-//        audioStreamManager?.audioSendAvailable = flag
-//        if (webSocketState.value is WebSocketState.Connected) {
-//            micIsAvailable.value = flag
-//            if (flag) {
-//                sendProtocol(3, conversationInfo.value.third)
-//            }
-//        }
-//    }
+    fun changeSendingStateAudioBuffer(flag: Boolean) {
+        isAvailableAudioBuffer = flag
+        if (getWebSocketState().value is WebSocketState.Connected) {
+            micIsAvailable.value = flag
+            if (flag) {
+                sendProtocol(3, conversationInfo.value.third)
+            }
+        }
+    }
 
     val saidMeText = MutableStateFlow("")
     val chatList = arrayListOf<ChatData>()
@@ -271,7 +289,7 @@ class MainViewModel @Inject constructor(
     }
 
     val conversationInfo: MutableStateFlow<Triple<ConversationType, List<String>, MessageProtocol?>> =
-        MutableStateFlow(Triple(ConversationType.GUIDE, emptyList(), null))
+        MutableStateFlow(Triple(ConversationType.GUIDE, listOf(""), null))
 
     fun changeConversationList(
         type: ConversationType, contentList: List<String>, msgResponse: MessageProtocol?

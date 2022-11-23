@@ -7,12 +7,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import orot.apps.smartcounselor.graph.NavGraph
@@ -30,6 +30,8 @@ import orot.apps.systems.hideSystemUI
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
+
+    val mainViewModel by viewModels<MainViewModel>()
 
     private val PERMISSION_RECODE_AUDIO = 1000
 

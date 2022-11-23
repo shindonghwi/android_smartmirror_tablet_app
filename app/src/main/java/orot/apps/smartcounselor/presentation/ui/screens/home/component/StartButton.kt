@@ -18,20 +18,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.presentation.style.Display1
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.presentation.ui.MainViewModel
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
 fun StartButton() {
 
-    val mainViewModel = hiltViewModel<MainViewModel>()
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }

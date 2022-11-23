@@ -17,20 +17,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
-import orot.apps.smartcounselor.presentation.ui.MainViewModel
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 @Composable
 fun AgeTextField() {
 
-    val mainViewModel = hiltViewModel<MainViewModel>()
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
     val configuration = LocalConfiguration.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current

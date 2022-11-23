@@ -12,9 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
-//import orot.apps.sognora_mediaplayer.SognoraTTS
 
 interface ITextAnimationTTSCallback {
     suspend fun startAnimation()
@@ -36,7 +36,7 @@ fun TextAnimationTTS(
     iTextAnimationTTSCallback: ITextAnimationTTSCallback? = null,
     content: @Composable (String) -> Unit,
 ) {
-    val context = LocalContext.current
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel
     var currentIdx = remember { 0 }
     var currentText = textList.first()
 
@@ -44,60 +44,58 @@ fun TextAnimationTTS(
         targetState = true
     }
 
-//    DisposableEffect(key1 = currentText) {
-//        val sognoraTTS = SognoraTTS()
+    DisposableEffect(key1 = currentText) {
+        coroutineScopeOnDefault {
+            iTextAnimationTTSCallback?.startAnimation()
+            mainViewModel.sognoraGoogleTTS.createTts(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {
+                    coroutineScopeOnMain {
+                        animVisibleState.targetState = true
+                    }
+                }
 
-//        coroutineScopeOnDefault {
-//            iTextAnimationTTSCallback?.startAnimation()
-//            sognoraTTS.createTts(context, object : UtteranceProgressListener() {
-//                override fun onStart(utteranceId: String?) {
-//                    coroutineScopeOnMain {
-//                        animVisibleState.targetState = true
-//                    }
-//                }
-//
-//                override fun onDone(utteranceId: String?) {
-//                    coroutineScopeOnDefault {
-//                        coroutineScopeOnMain {
-//                            animVisibleState.targetState = false
-//                        }
-//                        delay(termDuration)
-//                        currentIdx += 1
-//                        textList.elementAtOrNull(currentIdx)?.let {
-//                            currentText = it
-//                            if (useSpeakMode) {
-//                                sognoraTTS.startPlay(currentText)
-//                            }
-//                        } ?: kotlin.run {
-//                            iTextAnimationTTSCallback?.endAnimation()
-//                        }
-//                    }
-//                }
-//
-//                override fun onError(utteranceId: String?) {}
-//            }).run {
-//                coroutineScopeOnDefault {
-//                    delay(termDuration)
-//                    if (useSpeakMode) {
-//                        sognoraTTS.startPlay(currentText)
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        onDispose {
-//            sognoraTTS.clear()
-//        }
-//    }
+                override fun onDone(utteranceId: String?) {
+                    coroutineScopeOnDefault {
+                        coroutineScopeOnMain {
+                            animVisibleState.targetState = false
+                        }
+                        delay(termDuration)
+                        currentIdx += 1
+                        textList.elementAtOrNull(currentIdx)?.let {
+                            currentText = it
+                            if (useSpeakMode) {
+                                mainViewModel.sognoraGoogleTTS.startPlay(currentText)
+                            }
+                        } ?: kotlin.run {
+                            iTextAnimationTTSCallback?.endAnimation()
+                        }
+                    }
+                }
 
-//    AnimatedVisibility(
-//        modifier = modifier,
-//        visibleState = animVisibleState,
-//        enter = enterTransition,
-//        exit = exitTransition,
-//    ) {
-//        content(currentText)
-//    }
+                override fun onError(utteranceId: String?) {}
+            }).run {
+                coroutineScopeOnDefault {
+                    delay(termDuration)
+                    if (useSpeakMode) {
+                        mainViewModel.sognoraGoogleTTS.startPlay(currentText)
+                    }
+                }
+            }
+
+        }
+
+        onDispose {
+            mainViewModel.sognoraGoogleTTS.stop()
+        }
+    }
+
+    AnimatedVisibility(
+        modifier = modifier,
+        visibleState = animVisibleState,
+        enter = enterTransition,
+        exit = exitTransition,
+    ) {
+        content(currentText)
+    }
 
 }

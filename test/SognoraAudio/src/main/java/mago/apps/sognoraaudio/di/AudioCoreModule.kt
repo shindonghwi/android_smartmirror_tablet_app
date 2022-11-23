@@ -4,20 +4,23 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorder
 import mago.apps.sognoraaudio.google_tts.SognoraGoogleTTSImpl
 import mago.apps.sognoraaudio.media_player.SognoraMediaPlayerImpl
 import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorderImpl
 import mago.apps.sognoraaudio.google_tts.SognoraGoogleTTS
 import mago.apps.sognoraaudio.media_player.SognoraMediaPlayer
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 object AudioCoreModule{
 
+    @Singleton
     @Provides
-    fun provideSognoraAudioRecorder(context: Context): SognoraAudioRecorder {
+    fun provideSognoraAudioRecorder(@ApplicationContext context: Context): SognoraAudioRecorder {
         return SognoraAudioRecorderImpl(context)
     }
 
@@ -26,8 +29,9 @@ object AudioCoreModule{
         return SognoraMediaPlayerImpl()
     }
 
+    @Singleton
     @Provides
-    fun provideSognoraGoogleTTS(context: Context): SognoraGoogleTTS {
+    fun provideSognoraGoogleTTS(@ApplicationContext context: Context): SognoraGoogleTTS {
         return SognoraGoogleTTSImpl(context)
     }
 }

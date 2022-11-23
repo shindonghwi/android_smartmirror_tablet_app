@@ -1,14 +1,11 @@
 package orot.apps.smartcounselor.presentation.ui.screens.guide
 
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
-import javax.inject.Inject
 
-@HiltViewModel
-class GuideViewModel @Inject constructor() : ViewModel() {
+class GuideViewModel : ViewModel() {
     val currentRenderText: MutableStateFlow<String> = MutableStateFlow("")
 
     init {
