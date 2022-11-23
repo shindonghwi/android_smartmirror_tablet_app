@@ -52,7 +52,7 @@ fun StartButton() {
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
             .background(Primary)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 16.dp),
             textAlign = TextAlign.Center,
             text = "시작",
             style = MaterialTheme.typography.Display3,
