@@ -1,6 +1,7 @@
 rootProject.name = "SmartCounselor"
 include(
     ":app",
-//    ":resources",
+    ":test",
     ":core"
 )
+include(":test:SognoraAudioRecorder")

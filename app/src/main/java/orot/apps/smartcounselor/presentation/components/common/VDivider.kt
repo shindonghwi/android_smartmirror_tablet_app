@@ -6,7 +6,7 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.presentation.app_style.GrayDivider
+import orot.apps.smartcounselor.presentation.style.GrayDivider
 
 @Composable
 fun VDivider() {

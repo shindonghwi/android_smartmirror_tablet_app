@@ -18,7 +18,7 @@
         android:theme="@style/Theme.SmartCounselor"
         tools:targetApi="31">
         <activity
-            android:name=".MagoActivity"
+            android:name=".presentation.ui.MagoActivity"
             android:exported="true"
             android:theme="@style/Theme.SmartCounselor">
             <intent-filter>

@@ -2,19 +2,16 @@ package orot.apps.smartcounselor.graph
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import orot.apps.smartcounselor.MagoActivity
-import orot.apps.smartcounselor.MagoActivity.Companion.navigationKit
-import orot.apps.smartcounselor.MainViewModel
-import orot.apps.smartcounselor.Screens
-import orot.apps.smartcounselor.presentation.screens.blood_pressure.BloodPressureScreen
-import orot.apps.smartcounselor.presentation.screens.chat_list.ChatListScreen
-import orot.apps.smartcounselor.presentation.screens.conversation.ConversationScreen
-import orot.apps.smartcounselor.presentation.screens.guide.GuideScreen
-import orot.apps.smartcounselor.presentation.screens.home.HomeScreen
-import orot.apps.smartcounselor.presentation.screens.server_connection_fail.ServerConnectionFailScreen
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.graph.model.Screens
+import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.BloodPressureScreen
+import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatListScreen
+import orot.apps.smartcounselor.presentation.ui.screens.conversation.ConversationScreen
+import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideScreen
+import orot.apps.smartcounselor.presentation.ui.screens.home.HomeScreen
+import orot.apps.smartcounselor.presentation.ui.screens.server_connection_fail.ServerConnectionFailScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
