@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import mago.apps.sognorawebsocket.websocket.SognoraWebSocket
 import okio.ByteString
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.model.local.ChatData
@@ -17,14 +18,21 @@ import orot.apps.smartcounselor.model.remote.MessageProtocol
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
-import orot.apps.sognora_mediaplayer.SognoraTTS
-import orot.apps.sognora_websocket_audio.AudioStreamManageable
-import orot.apps.sognora_websocket_audio.AudioStreamManager
-import orot.apps.sognora_websocket_audio.model.WebSocketState
+//import orot.apps.sognora_mediaplayer.SognoraTTS
+//import orot.apps.sognora_websocket_audio.AudioStreamManageable
+//import orot.apps.sognora_websocket_audio.AudioStreamManager
+//import orot.apps.sognora_websocket_audio.model.WebSocketState
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor(
+    sognoraWebSocket: SognoraWebSocket
+) : ViewModel() {
+
+    init {
+        Log.w(TAG, "asdasdasdsadasd: ", )
+        sognoraWebSocket.initWebSocket("ws://172.30.1.15:8080/ws/chat")
+    }
 
     /**
      * ================================================
@@ -62,9 +70,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
      *     Audio Stream
      * ================================================
      * */
-    var audioStreamManager: AudioStreamManager? = null
-    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
-    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
+//    var audioStreamManager: AudioStreamManager? = null
+//    val webSocketState: MutableStateFlow<WebSocketState> = MutableStateFlow(WebSocketState.Idle)
+//    val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
 
 
     /** 웹 소켓으로 이벤트 전달하기 */
@@ -104,120 +112,120 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
 
         val params = Gson().toJson(msg)
-        audioStreamManager?.webSocket?.send(params)
+//        audioStreamManager?.webSocket?.send(params)
     }
 
     /** 오디오스트림 생성*/
     fun createAudioStreamManager() {
-        if (audioStreamManager != null) {
-            audioStreamManager?.stopAudioRecord()
-            audioStreamManager = null
-        }
-
-        audioStreamManager = AudioStreamManager()
-
-        audioStreamManager?.run {
-            initWebSocket(object : AudioStreamManageable {
-                override suspend fun stateWebSocket(state: WebSocketState) {
-
-                    var initDelay = 0L
-
-                    when (state) {
-                        is WebSocketState.Idle -> {}
-                        is WebSocketState.Connected -> {
-                            initDelay = 2000
-
-                            if (audioStreamManager?.audioRecord == null) {
-                                audioStreamManager?.initAudioRecorder()
-                                sendAudioBuffer()
-                            }
-
-                        }
-                        is WebSocketState.DisConnected -> {}
-                        is WebSocketState.Closing -> {}
-                        is WebSocketState.Failed -> {}
-                    }
-
-                    coroutineScopeOnDefault(initDelay = initDelay) {
-                        updateWebSocketState(state)
-                    }
-                }
-
-                override suspend fun stateAudioStream(isAvailable: Boolean) {
-                }
-
-                override suspend fun receivedMessageString(msg: String) {
-                    try {
-                        val receivedMsg: MessageProtocol =
-                            Gson().fromJson(msg, MessageProtocol::class.java)
-
-                        val isUser = receivedMsg.header.protocol_id == MAGO_PROTOCOL.PROTOCOL_11.id
-                        receivedMsg.body?.ment?.text?.run {
-                            if (this.isNotEmpty()) {
-                                chatList.add(ChatData(msg = this, isUser = isUser))
-                            }
-                        }
-
-                        when (receivedMsg.header.protocol_id) {
-                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
-                                changeSendingStateAudioBuffer(false)
-                                changeConversationList(
-                                    ConversationType.CONVERSATION,
-                                    listOf(receivedMsg.body?.ment?.text.toString()),
-                                    receivedMsg
-                                )
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
-
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
-                                changeSendingStateAudioBuffer(false)
-                                changeSaidMeText(receivedMsg.body?.ment?.text.toString())
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
-                                sendProtocol(13, conversationInfo.value.third)
-                                changeSendingStateAudioBuffer(false)
-
-                                var type = when (receivedMsg.body?.action) {
-                                    "measurement" -> ConversationType.MEASUREMENT
-                                    "end" -> ConversationType.END
-                                    "doctorcall" -> ConversationType.DOCTORCALL
-                                    "exit" -> ConversationType.EXIT
-                                    else -> ConversationType.CONVERSATION
-                                }
-
-                                changeConversationList(
-                                    type,
-                                    listOf(receivedMsg.body?.ment?.text.toString()),
-                                    receivedMsg
-                                )
-                            }
-                            else -> {}
-                        }
-
-                    } catch (e: Exception) {
-                    }
-                }
-
-                override suspend fun receivedMessageByteString(byte: ByteString) {
-                }
-
-            })
-        }
+//        if (audioStreamManager != null) {
+//            audioStreamManager?.stopAudioRecord()
+//            audioStreamManager = null
+//        }
+//
+//        audioStreamManager = AudioStreamManager()
+//
+//        audioStreamManager?.run {
+//            initWebSocket(object : AudioStreamManageable {
+//                override suspend fun stateWebSocket(state: WebSocketState) {
+//
+//                    var initDelay = 0L
+//
+//                    when (state) {
+//                        is WebSocketState.Idle -> {}
+//                        is WebSocketState.Connected -> {
+//                            initDelay = 2000
+//
+//                            if (audioStreamManager?.audioRecord == null) {
+//                                audioStreamManager?.initAudioRecorder()
+//                                sendAudioBuffer()
+//                            }
+//
+//                        }
+//                        is WebSocketState.DisConnected -> {}
+//                        is WebSocketState.Closing -> {}
+//                        is WebSocketState.Failed -> {}
+//                    }
+//
+//                    coroutineScopeOnDefault(initDelay = initDelay) {
+//                        updateWebSocketState(state)
+//                    }
+//                }
+//
+//                override suspend fun stateAudioStream(isAvailable: Boolean) {
+//                }
+//
+//                override suspend fun receivedMessageString(msg: String) {
+//                    try {
+//                        val receivedMsg: MessageProtocol =
+//                            Gson().fromJson(msg, MessageProtocol::class.java)
+//
+//                        val isUser = receivedMsg.header.protocol_id == MAGO_PROTOCOL.PROTOCOL_11.id
+//                        receivedMsg.body?.ment?.text?.run {
+//                            if (this.isNotEmpty()) {
+//                                chatList.add(ChatData(msg = this, isUser = isUser))
+//                            }
+//                        }
+//
+//                        when (receivedMsg.header.protocol_id) {
+//                            MAGO_PROTOCOL.PROTOCOL_2.id -> { // 클라이언트 연결 요청 후 응답 ACK
+//                                changeSendingStateAudioBuffer(false)
+//                                changeConversationList(
+//                                    ConversationType.CONVERSATION,
+//                                    listOf(receivedMsg.body?.ment?.text.toString()),
+//                                    receivedMsg
+//                                )
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_4.id -> { // 클라이언트 UTTERANCE 요청 후 응답 ACK -> audio stream start
+//
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
+//                                changeSendingStateAudioBuffer(false)
+//                                changeSaidMeText(receivedMsg.body?.ment?.text.toString())
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_12.id -> { // -> audio stream start
+//                                sendProtocol(13, conversationInfo.value.third)
+//                                changeSendingStateAudioBuffer(false)
+//
+//                                var type = when (receivedMsg.body?.action) {
+//                                    "measurement" -> ConversationType.MEASUREMENT
+//                                    "end" -> ConversationType.END
+//                                    "doctorcall" -> ConversationType.DOCTORCALL
+//                                    "exit" -> ConversationType.EXIT
+//                                    else -> ConversationType.CONVERSATION
+//                                }
+//
+//                                changeConversationList(
+//                                    type,
+//                                    listOf(receivedMsg.body?.ment?.text.toString()),
+//                                    receivedMsg
+//                                )
+//                            }
+//                            else -> {}
+//                        }
+//
+//                    } catch (e: Exception) {
+//                    }
+//                }
+//
+//                override suspend fun receivedMessageByteString(byte: ByteString) {
+//                }
+//
+//            })
+//        }
     }
 
-    fun updateWebSocketState(state: WebSocketState) = webSocketState.update { state }
-
-    fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
-    fun changeSendingStateAudioBuffer(flag: Boolean) {
-        audioStreamManager?.audioSendAvailable = flag
-        if (webSocketState.value is WebSocketState.Connected) {
-            micIsAvailable.value = flag
-            if (flag) {
-                sendProtocol(3, conversationInfo.value.third)
-            }
-        }
-    }
+//    fun updateWebSocketState(state: WebSocketState) = webSocketState.update { state }
+//
+//    fun sendAudioBuffer() = audioStreamManager?.sendAudioRecord()
+//    fun changeSendingStateAudioBuffer(flag: Boolean) {
+//        audioStreamManager?.audioSendAvailable = flag
+//        if (webSocketState.value is WebSocketState.Connected) {
+//            micIsAvailable.value = flag
+//            if (flag) {
+//                sendProtocol(3, conversationInfo.value.third)
+//            }
+//        }
+//    }
 
     val saidMeText = MutableStateFlow("")
     val chatList = arrayListOf<ChatData>()
@@ -231,14 +239,14 @@ class MainViewModel @Inject constructor() : ViewModel() {
      * ================================================
      * */
 
-    val sognoraTts = SognoraTTS() // tts media player
+//    val sognoraTts = SognoraTTS() // tts media player
 
     fun playGoogleTts(msg: String) {
-        sognoraTts.startPlay(msg)
+//        sognoraTts.startPlay(msg)
     }
 
     fun stopGoogleTts() {
-        sognoraTts.clear()
+//        sognoraTts.clear()
     }
 
     val conversationInfo: MutableStateFlow<Triple<ConversationType, List<String>, MessageProtocol?>> =
@@ -255,16 +263,16 @@ class MainViewModel @Inject constructor() : ViewModel() {
         Log.d("MAINVIEWMODEL", "init: $this")
     }
 
-    fun clear() {
-        updateBottomMenu(BottomMenu.Start)
-        updateWebSocketState(WebSocketState.Idle)
-        audioStreamManager?.stopAudioRecord()
-        audioStreamManager = null
-    }
+//    fun clear() {
+//        updateBottomMenu(BottomMenu.Start)
+//        updateWebSocketState(WebSocketState.Idle)
+//        audioStreamManager?.stopAudioRecord()
+//        audioStreamManager = null
+//    }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("MAINVIEWMODEL", "onCleared: $this")
-        clear()
+//        clear()
     }
 }

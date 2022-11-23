@@ -28,40 +28,40 @@ import orot.apps.smartcounselor.presentation.components.input.ITextCallback
 @Composable
 fun AgeTextField() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val configuration = LocalConfiguration.current
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-
-    CustomTextField(
-        modifier = Modifier
-            .width((configuration.screenWidthDp * 0.2).dp)
-            .height(50.dp)
-            .border(1.dp, White, RoundedCornerShape(16.dp))
-//            .onFocusChanged { hasFocus = it.hasFocus }
-            .focusRequester(focusRequester),
-        textLimit = 2,
-        textStyle = MaterialTheme.typography.h3.copy(
-            color = White,
-            textAlign = TextAlign.Center
-        ),
-        contentAlignment = Alignment.Center,
-        placeholderText = "나이",
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(onDone = {
-            focusManager.clearFocus()
-        }),
-        iTextCallback = object : ITextCallback {
-            override fun renderText(content: String) {
-                content.replace("[^0-9]".toRegex(), "").takeIf { it.isNotEmpty() }?.apply {
-                    mainViewModel.userAge = this.toInt()
-                } ?: apply {
-                    mainViewModel.userAge = 0
-                }
-            }
-        }
-    )
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val configuration = LocalConfiguration.current
+//    val focusRequester = remember { FocusRequester() }
+//    val focusManager = LocalFocusManager.current
+//
+//    CustomTextField(
+//        modifier = Modifier
+//            .width((configuration.screenWidthDp * 0.2).dp)
+//            .height(50.dp)
+//            .border(1.dp, White, RoundedCornerShape(16.dp))
+////            .onFocusChanged { hasFocus = it.hasFocus }
+//            .focusRequester(focusRequester),
+//        textLimit = 2,
+//        textStyle = MaterialTheme.typography.h3.copy(
+//            color = White,
+//            textAlign = TextAlign.Center
+//        ),
+//        contentAlignment = Alignment.Center,
+//        placeholderText = "나이",
+//        keyboardOptions = KeyboardOptions.Default.copy(
+//            keyboardType = KeyboardType.Number,
+//            imeAction = ImeAction.Done
+//        ),
+//        keyboardActions = KeyboardActions(onDone = {
+//            focusManager.clearFocus()
+//        }),
+//        iTextCallback = object : ITextCallback {
+//            override fun renderText(content: String) {
+//                content.replace("[^0-9]".toRegex(), "").takeIf { it.isNotEmpty() }?.apply {
+//                    mainViewModel.userAge = this.toInt()
+//                } ?: apply {
+//                    mainViewModel.userAge = 0
+//                }
+//            }
+//        }
+//    )
 }

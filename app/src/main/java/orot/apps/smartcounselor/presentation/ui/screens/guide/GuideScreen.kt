@@ -24,17 +24,17 @@ import orot.apps.smartcounselor.presentation.style.Gray10
 @Composable
 fun GuideScreen() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-
-    LaunchedEffect(key1 = Unit) {
-        mainViewModel.createAudioStreamManager() // 가이드 화면 진입시 소켓 연결
-    }
-
-    ConstraintLayout(
-        modifier = Modifier.fillMaxSize(), constraintSet = guideScreenConstraintSet()
-    ) {
-        GuideContent(modifier = Modifier.layoutId("description"))
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//
+//    LaunchedEffect(key1 = Unit) {
+//        mainViewModel.createAudioStreamManager() // 가이드 화면 진입시 소켓 연결
+//    }
+//
+//    ConstraintLayout(
+//        modifier = Modifier.fillMaxSize(), constraintSet = guideScreenConstraintSet()
+//    ) {
+//        GuideContent(modifier = Modifier.layoutId("description"))
+//    }
 }
 
 @Composable

@@ -46,11 +46,20 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
+    implementation(project(":test:SognoraWebSocket"))
     Libraries.apply {
 
         Libraries.KTX.apply {
             implementation(core)
+        }
+
+        Libraries.Compose.apply {
+            implementation(material)
+            implementation(activity)
+            implementation(ui)
+            implementation(uiTooling)
+            implementation(navigation)
+            implementation(constraintLayout)
         }
 
         Libraries.Hilt.apply {

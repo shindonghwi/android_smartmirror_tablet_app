@@ -9,19 +9,20 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import javax.inject.Inject
 
-class SognoraWebSocketImpl @Inject constructor(private val listener: SognoraWebSocketListener) :
-    SognoraWebSocket() {
+class SognoraWebSocketImpl @Inject constructor(
+    private val listener: SognoraWebSocketListener
+) : SognoraWebSocket {
 
     val TAG = "SognoraWebSocket"
 
-//    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
+    //    val webSocketURL: String = "ws://172.30.1.15:8080/ws/chat"
     var webSocket: WebSocket? = null
     private var request: Request? = null
     private var client: OkHttpClient? = null
 
     /** 웹 소켓 연결하기 */
     override fun initWebSocket(url: String) {
-
+        Log.w(TAG, "initWebSocket: $url")
         try {
             request = Request.Builder().url(url).build()
             client = OkHttpClient()
@@ -35,34 +36,34 @@ class SognoraWebSocketImpl @Inject constructor(private val listener: SognoraWebS
                 webSocket = client!!.newWebSocket(this, object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         super.onOpen(webSocket, response)
-                        listener.open(response)
+//                        listener.open(response)
                     }
 
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         super.onMessage(webSocket, text)
-                        listener.onMessageText(text)
+//                        listener.onMessageText(text)
                     }
 
                     override fun onFailure(
                         webSocket: WebSocket, t: Throwable, response: Response?
                     ) {
                         super.onFailure(webSocket, t, response)
-                        listener.fail(response, t)
+//                        listener.fail(response, t)
                     }
 
                     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                         super.onClosed(webSocket, code, reason)
-                        listener.close(code, reason)
+//                        listener.close(code, reason)
                     }
 
                     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                         super.onClosing(webSocket, code, reason)
-                        listener.onClosing(code, reason)
+//                        listener.onClosing(code, reason)
                     }
 
                     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                         super.onMessage(webSocket, bytes)
-                        listener.onMessageByteString(bytes)
+//                        listener.onMessageByteString(bytes)
                     }
                 })
             } catch (e: Exception) {

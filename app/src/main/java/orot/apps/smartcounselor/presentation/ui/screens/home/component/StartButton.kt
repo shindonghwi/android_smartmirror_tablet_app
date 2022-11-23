@@ -29,31 +29,31 @@ import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 @Composable
 fun StartButton() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val context = LocalContext.current
-    val configuration = LocalConfiguration.current
-    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
-
-    Box {
-        Text(modifier = Modifier
-            .width(startWidth)
-            .clickBounce {
-                takeIf { mainViewModel.userAge != 0 }?.run {
-                    navigationKit.clearAndMove(Screens.Guide.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                    }
-                } ?: run {
-                    Toast
-                        .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
-            .background(Primary)
-            .padding(vertical = 36.dp),
-            textAlign = TextAlign.Center,
-            text = "시작",
-            style = MaterialTheme.typography.Display1,
-            color = Color.White)
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val context = LocalContext.current
+//    val configuration = LocalConfiguration.current
+//    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
+//
+//    Box {
+//        Text(modifier = Modifier
+//            .width(startWidth)
+//            .clickBounce {
+//                takeIf { mainViewModel.userAge != 0 }?.run {
+//                    navigationKit.clearAndMove(Screens.Guide.route) {
+//                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                    }
+//                } ?: run {
+//                    Toast
+//                        .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)
+//                        .show()
+//                }
+//            }
+//            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
+//            .background(Primary)
+//            .padding(vertical = 36.dp),
+//            textAlign = TextAlign.Center,
+//            text = "시작",
+//            style = MaterialTheme.typography.Display1,
+//            color = Color.White)
+//    }
 }

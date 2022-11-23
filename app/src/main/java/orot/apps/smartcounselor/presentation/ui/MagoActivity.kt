@@ -3,6 +3,7 @@ package orot.apps.smartcounselor.presentation.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import orot.apps.smartcounselor.graph.NavGraph
@@ -30,8 +32,6 @@ import orot.apps.systems.hideSystemUI
 class MagoActivity : ComponentActivity() {
 
     private val PERMISSION_RECODE_AUDIO = 1000
-    var mainViewModel: MainViewModel = getViewModel(MainViewModel())
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +41,8 @@ class MagoActivity : ComponentActivity() {
 
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()
+            var mV: MainViewModel = hiltViewModel<MainViewModel>()
+            Log.w(TAG, "onCreate: $mV", )
         }
     }
 

@@ -26,45 +26,45 @@ import orot.apps.smartcounselor.presentation.style.Primary
 @Composable
 fun SexRadioButton() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val configuration = LocalConfiguration.current
-    val radioOptions = listOf("남", "여")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
-
-    Row(
-        modifier = Modifier
-            .width((configuration.screenWidthDp * 0.3).dp)
-            .border(1.dp, White, RoundedCornerShape(16.dp)),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        radioOptions.forEach { text ->
-            Row(
-                Modifier
-                    .selectable(
-                        selected = (text == selectedOption),
-                        onClick = {
-                            onOptionSelected(text)
-                            mainViewModel.userSex = text == "남"
-                        }
-                    )
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) },
-                    colors = RadioButtonDefaults.colors(
-                        unselectedColor = Gray20,
-                        selectedColor = Primary
-                    )
-                )
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = text,
-                    style = MaterialTheme.typography.body1,
-                    color = White,
-                )
-            }
-        }
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val configuration = LocalConfiguration.current
+//    val radioOptions = listOf("남", "여")
+//    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+//
+//    Row(
+//        modifier = Modifier
+//            .width((configuration.screenWidthDp * 0.3).dp)
+//            .border(1.dp, White, RoundedCornerShape(16.dp)),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        radioOptions.forEach { text ->
+//            Row(
+//                Modifier
+//                    .selectable(
+//                        selected = (text == selectedOption),
+//                        onClick = {
+//                            onOptionSelected(text)
+//                            mainViewModel.userSex = text == "남"
+//                        }
+//                    )
+//                    .padding(horizontal = 16.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                RadioButton(
+//                    selected = (text == selectedOption),
+//                    onClick = { onOptionSelected(text) },
+//                    colors = RadioButtonDefaults.colors(
+//                        unselectedColor = Gray20,
+//                        selectedColor = Primary
+//                    )
+//                )
+//                Text(
+//                    modifier = Modifier.padding(start = 16.dp),
+//                    text = text,
+//                    style = MaterialTheme.typography.body1,
+//                    color = White,
+//                )
+//            }
+//        }
+//    }
 }

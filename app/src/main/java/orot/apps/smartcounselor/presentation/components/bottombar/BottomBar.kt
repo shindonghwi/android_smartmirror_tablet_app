@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,57 +42,57 @@ import orot.apps.smartcounselor.presentation.ui.screens.home.component.StartButt
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.clearAndNewVMS
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
-import orot.apps.sognora_websocket_audio.model.WebSocketState
+//import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 @Composable
 fun MagoBottomBar() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val configuration = LocalConfiguration.current
-    val maxHeight = configuration.screenHeightDp * 0.23f
-
-    mainViewModel.currentBottomMenu.value.let { route ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp)
-                .height(maxHeight.dp),
-        ) {
-            when (route) {
-                BottomMenu.Start.type -> {
-                    StartBottomBar()
-                }
-                BottomMenu.Loading.type -> {
-                    LoadingBottomBar()
-                }
-                BottomMenu.Empty.type -> {
-
-                }
-                BottomMenu.Conversation.type -> {
-                    VDivider()
-                    ConversationBottomBar()
-                }
-                BottomMenu.BloodPressure.type -> {
-                    VDivider()
-                    BloodPressureBottomBar()
-                }
-                BottomMenu.Retry.type -> {
-                    VDivider()
-                    RetryBottomBar()
-                }
-                BottomMenu.RetryAndChat.type -> {
-                    VDivider()
-                    RetryAndChatBottomBar()
-                }
-                BottomMenu.Call.type -> {
-                    CallBottomBar()
-                }
-                BottomMenu.ServerRetry.type -> {
-                    ServerRetryBottomBar()
-                }
-            }
-        }
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val configuration = LocalConfiguration.current
+//    val maxHeight = configuration.screenHeightDp * 0.23f
+//
+//    mainViewModel.currentBottomMenu.value.let { route ->
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(bottom = 20.dp)
+//                .height(maxHeight.dp),
+//        ) {
+//            when (route) {
+//                BottomMenu.Start.type -> {
+//                    StartBottomBar()
+//                }
+//                BottomMenu.Loading.type -> {
+//                    LoadingBottomBar()
+//                }
+//                BottomMenu.Empty.type -> {
+//
+//                }
+//                BottomMenu.Conversation.type -> {
+//                    VDivider()
+//                    ConversationBottomBar()
+//                }
+//                BottomMenu.BloodPressure.type -> {
+//                    VDivider()
+//                    BloodPressureBottomBar()
+//                }
+//                BottomMenu.Retry.type -> {
+//                    VDivider()
+//                    RetryBottomBar()
+//                }
+//                BottomMenu.RetryAndChat.type -> {
+//                    VDivider()
+//                    RetryAndChatBottomBar()
+//                }
+//                BottomMenu.Call.type -> {
+//                    CallBottomBar()
+//                }
+//                BottomMenu.ServerRetry.type -> {
+//                    ServerRetryBottomBar()
+//                }
+//            }
+//        }
+//    }
 }
 
 
@@ -154,43 +155,43 @@ fun LoadingText(
 @Composable
 private fun RetryAndChatBottomBar() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val activity = LocalContext.current as MagoActivity
-
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("다시하기",
-            modifier = Modifier
-                .clickBounce {
-                    navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.clear()
-                        clearAndNewVMS()
-                        activity.mainViewModel = getViewModel(MainViewModel())
-                    }
-                }
-                .clip(RoundedCornerShape(15.dp))
-                .background(Color(0xFFCFFFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
-            color = Color.Black,
-            textAlign = TextAlign.Center)
-        Text("대화내역",
-            modifier = Modifier
-                .clickBounce {
-                    navigationKit.clearAndMove(Screens.ChatList.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Retry)
-                    }
-                }
-                .clip(RoundedCornerShape(15.dp))
-                .background(Color(0xFFFFCFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
-            color = Color.Black,
-            textAlign = TextAlign.Center)
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val activity = LocalContext.current as MagoActivity
+//
+//    Row(
+//        modifier = Modifier.fillMaxSize(),
+//        horizontalArrangement = Arrangement.SpaceAround,
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Text("다시하기",
+//            modifier = Modifier
+//                .clickBounce {
+//                    navigationKit.clearAndMove(Screens.Home.route) {
+////                        mainViewModel.clear()
+//                        clearAndNewVMS()
+////                        activity.mainViewModel = getViewModel(MainViewModel())
+//                    }
+//                }
+//                .clip(RoundedCornerShape(15.dp))
+//                .background(Color(0xFFCFFFCF))
+//                .padding(vertical = 35.dp, horizontal = 75.dp),
+//            style = MaterialTheme.typography.Display2,
+//            color = Color.Black,
+//            textAlign = TextAlign.Center)
+//        Text("대화내역",
+//            modifier = Modifier
+//                .clickBounce {
+//                    navigationKit.clearAndMove(Screens.ChatList.route) {
+//                        mainViewModel.updateBottomMenu(BottomMenu.Retry)
+//                    }
+//                }
+//                .clip(RoundedCornerShape(15.dp))
+//                .background(Color(0xFFFFCFCF))
+//                .padding(vertical = 35.dp, horizontal = 75.dp),
+//            style = MaterialTheme.typography.Display2,
+//            color = Color.Black,
+//            textAlign = TextAlign.Center)
+//    }
 }
 
 /** 혈압측정 바텀 바 */
@@ -210,30 +211,30 @@ private fun BloodPressureBottomBar() {
 @Composable
 fun RetryBottomBar() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val activity = LocalContext.current as MagoActivity
-
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("다시하기",
-            modifier = Modifier
-                .clickBounce {
-                    navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.clear()
-                        clearAndNewVMS()
-                        activity.mainViewModel = getViewModel(MainViewModel())
-                    }
-                }
-                .clip(RoundedCornerShape(15.dp))
-                .background(Color(0xFFCFFFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
-            color = Color.Black,
-            textAlign = TextAlign.Center)
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val activity = LocalContext.current as MagoActivity
+//
+//    Row(
+//        modifier = Modifier.fillMaxSize(),
+//        horizontalArrangement = Arrangement.SpaceAround,
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Text("다시하기",
+//            modifier = Modifier
+//                .clickBounce {
+//                    navigationKit.clearAndMove(Screens.Home.route) {
+////                        mainViewModel.clear()
+//                        clearAndNewVMS()
+////                        activity.mainViewModel = getViewModel(MainViewModel())
+//                    }
+//                }
+//                .clip(RoundedCornerShape(15.dp))
+//                .background(Color(0xFFCFFFCF))
+//                .padding(vertical = 35.dp, horizontal = 75.dp),
+//            style = MaterialTheme.typography.Display2,
+//            color = Color.Black,
+//            textAlign = TextAlign.Center)
+//    }
 }
 
 /** 상담원 전화 걸려올때 */
@@ -268,61 +269,62 @@ fun CallBottomBar() {
 /** 상담원 전화 걸려올때 */
 @Composable
 fun ConversationBottomBar() {
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val isPlaying = remember { mainViewModel.micIsAvailable }
-
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 40.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RotationAnimation(
-            modifier = Modifier.padding(start = 60.dp),
-            isPlaying = isPlaying,
-            iconDrawable = R.drawable.mago_logo_icon,
-            iconSize = 80.dp
-        )
-
-        SaidMeText()
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+////    val isPlaying = remember { mainViewModel.micIsAvailable }
+//    val isPlaying = remember { mutableStateOf(true) }
+//
+//    Row(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(horizontal = 40.dp),
+//        verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//        RotationAnimation(
+//            modifier = Modifier.padding(start = 60.dp),
+//            isPlaying = isPlaying,
+//            iconDrawable = R.drawable.mago_logo_icon,
+//            iconSize = 80.dp
+//        )
+//
+//        SaidMeText()
+//    }
 }
 
 @Composable
 private fun SaidMeText() {
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val text = mainViewModel.saidMeText.collectAsState().value
-    Text(
-        modifier = Modifier.padding(start = 60.dp),
-        text = text,
-        color = Color.White,
-        style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
-    )
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val text = mainViewModel.saidMeText.collectAsState().value
+//    Text(
+//        modifier = Modifier.padding(start = 60.dp),
+//        text = text,
+//        color = Color.White,
+//        style = MaterialTheme.typography.Display3.copy(textAlign = TextAlign.Center)
+//    )
 }
 
 @Composable
 fun ServerRetryBottomBar() {
-
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-    val configuration = LocalConfiguration.current
-    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(modifier = Modifier
-            .width(startWidth)
-            .clickBounce {
-                mainViewModel.updateWebSocketState(WebSocketState.Idle)
-                navigationKit.clearAndMove(Screens.Guide.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                }
-            }
-            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
-            .background(Primary)
-            .padding(vertical = 36.dp),
-            textAlign = TextAlign.Center,
-            text = "재연결",
-            style = MaterialTheme.typography.Display1,
-            color = Color.White)
-    }
+//
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//    val configuration = LocalConfiguration.current
+//    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
+//
+//    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//        Text(modifier = Modifier
+//            .width(startWidth)
+//            .clickBounce {
+////                mainViewModel.updateWebSocketState(WebSocketState.Idle)
+//                navigationKit.clearAndMove(Screens.Guide.route) {
+//                    mainViewModel.updateBottomMenu(BottomMenu.Loading)
+//                }
+//            }
+//            .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
+//            .background(Primary)
+//            .padding(vertical = 36.dp),
+//            textAlign = TextAlign.Center,
+//            text = "재연결",
+//            style = MaterialTheme.typography.Display1,
+//            color = Color.White)
+//    }
 }
 

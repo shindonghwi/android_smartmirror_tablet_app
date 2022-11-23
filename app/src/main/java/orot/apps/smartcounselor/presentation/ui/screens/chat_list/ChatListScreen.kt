@@ -21,20 +21,20 @@ import orot.apps.smartcounselor.model.local.ChatData
 @Composable
 fun ChatListScreen() {
 
-    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
-
-    LazyColumn(
-        modifier = Modifier.padding(top = 40.dp),
-        state = rememberLazyListState(),
-        reverseLayout = false,
-        contentPadding = PaddingValues(bottom = 20.dp)
-    ) {
-        items(
-            count = mainViewModel.chatList.size
-        ) { idx ->
-            ChatContentTypeHolder(mainViewModel.chatList[idx])
-        }
-    }
+//    val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel
+//
+//    LazyColumn(
+//        modifier = Modifier.padding(top = 40.dp),
+//        state = rememberLazyListState(),
+//        reverseLayout = false,
+//        contentPadding = PaddingValues(bottom = 20.dp)
+//    ) {
+//        items(
+//            count = mainViewModel.chatList.size
+//        ) { idx ->
+//            ChatContentTypeHolder(mainViewModel.chatList[idx])
+//        }
+//    }
 }
 
 
