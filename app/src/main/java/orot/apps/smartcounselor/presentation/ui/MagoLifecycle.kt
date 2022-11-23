@@ -1,17 +1,17 @@
 package orot.apps.smartcounselor.presentation.ui
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ConversationType
-import orot.apps.sognora_compose_extension.lifecycle.OnLifecycleEvent
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 @Composable
@@ -41,6 +41,24 @@ fun MagoLifecycle() {
     }
 }
 
+@Composable
+private fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
+    val eventHandler = rememberUpdatedState(onEvent)
+    val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
+
+    DisposableEffect(lifecycleOwner.value) {
+        val lifecycle = lifecycleOwner.value.lifecycle
+        val observer = LifecycleEventObserver { owner, event ->
+            eventHandler.value(owner, event)
+        }
+
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+}
+
 
 @Composable
 private fun WebSocketState() {
@@ -63,7 +81,7 @@ private fun WebSocketState() {
             navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
             }
-        }else if (state is WebSocketState.Idle){
+        } else if (state is WebSocketState.Idle) {
             navigationKit.clearAndMove(Screens.Home.route) {
                 mainViewModel.updateBottomMenu(BottomMenu.Start)
             }

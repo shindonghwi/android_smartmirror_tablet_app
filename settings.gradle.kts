@@ -4,4 +4,5 @@ include(
     ":test",
     ":core"
 )
-include(":test:SognoraAudioRecorder")
+include(":test:SognoraAudio")
+include(":test:SognoraWebSocket")

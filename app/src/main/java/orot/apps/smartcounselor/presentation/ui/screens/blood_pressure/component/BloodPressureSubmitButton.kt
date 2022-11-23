@@ -19,13 +19,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ConversationType
 import orot.apps.smartcounselor.presentation.style.Display1
 import orot.apps.smartcounselor.presentation.style.Primary
-import orot.apps.sognora_compose_extension.animation.clickBounce
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
 fun BloodPressureSubmitButton() {
@@ -40,18 +40,14 @@ fun BloodPressureSubmitButton() {
             .width(startWidth)
             .clickBounce {
                 takeIf {
-                    mainViewModel.bloodPressureMin != 0 &&
-                            mainViewModel.bloodPressureMax != 0 &&
-                            mainViewModel.bloodPressureSugar != 0
+                    mainViewModel.bloodPressureMin != 0 && mainViewModel.bloodPressureMax != 0 && mainViewModel.bloodPressureSugar != 0
                 }?.run {
                     mainViewModel.run {
                         updateHeartAnimationState(false)
                         changeConversationList(
-                            ConversationType.RESULT_WAITING,
-                            listOf(
+                            ConversationType.RESULT_WAITING, listOf(
                                 "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
-                            ),
-                            null
+                            ), null
                         )
                     }
                     navigationKit.clearAndMove(Screens.Conversation.route) {
@@ -69,7 +65,6 @@ fun BloodPressureSubmitButton() {
             textAlign = TextAlign.Center,
             text = "제출",
             style = MaterialTheme.typography.Display1,
-            color = Color.White
-        )
+            color = Color.White)
     }
 }

@@ -19,16 +19,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ConversationType
 import orot.apps.smartcounselor.model.remote.*
+import orot.apps.smartcounselor.presentation.components.animation.ITextAnimationTTSCallback
+import orot.apps.smartcounselor.presentation.components.animation.TextAnimationTTS
 import orot.apps.smartcounselor.presentation.style.Display2
-import orot.apps.sognora_compose_extension.components.AnimationTTSText
-import orot.apps.sognora_compose_extension.components.IAnimationTextCallback
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
 
 @Composable
 fun ConversationScreen() {
@@ -38,18 +38,20 @@ fun ConversationScreen() {
     val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimationTTSText(modifier = Modifier,
+        TextAnimationTTS(modifier = Modifier,
             textList = conversationInfo.second,
             exitTransition = if (conversationInfo.first.name == ConversationType.END.name) {
                 fadeOut(
-                    animationSpec = tween(durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing),
+                    animationSpec = tween(
+                        durationMillis = Int.MAX_VALUE, easing = FastOutSlowInEasing
+                    ),
                 )
             } else {
                 fadeOut(
                     animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
                 )
             },
-            iAnimationTextCallback = object : IAnimationTextCallback {
+            iTextAnimationTTSCallback = object : ITextAnimationTTSCallback {
                 override suspend fun startAnimation() {
                     when (conversationInfo.first) {
                         ConversationType.CONVERSATION -> {}
@@ -104,9 +106,16 @@ fun ConversationScreen() {
                                     15, MessageProtocol(
                                         header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
                                         body = BodyInfo(
-                                            null, null, null, null, null, null,
+                                            null,
+                                            null,
+                                            null,
+                                            null,
+                                            null,
+                                            null,
                                             measurement = MeasurementInfo(
-                                                blood_pressure = listOf(bloodPressureMax, bloodPressureMin),
+                                                blood_pressure = listOf(
+                                                    bloodPressureMax, bloodPressureMin
+                                                ),
                                                 blood_sugar = bloodPressureSugar,
                                             ),
                                             user = UserInfo(
@@ -122,28 +131,32 @@ fun ConversationScreen() {
                             coroutineScopeOnMain {
                                 if (conversationInfo.third?.body?.ment?.uri?.contains("doctorcall") == true) {
                                     mainViewModel.run {
-                                            coroutineScopeOnDefault {
-                                                updateBottomMenu(BottomMenu.Call)
-                                                delay(1000)
-                                                coroutineScopeOnMain {
-                                                    Toast.makeText(context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT).show()
-                                                }
-                                                delay(5000)
-                                                coroutineScopeOnMain {
-                                                    Toast.makeText(context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT).show()
-                                                }
-                                                mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                                                delay(1000)
-                                                mainViewModel.run {
-                                                    changeSaidMeText("")
-                                                    updateBottomMenu(BottomMenu.Conversation)
-                                                    changeConversationList(
-                                                        ConversationType.MANUAL_OPERATION,
-                                                        listOf("상담은 잘 진행되셨나요?"),
-                                                        conversationInfo.third
-                                                    )
-                                                }
+                                        coroutineScopeOnDefault {
+                                            updateBottomMenu(BottomMenu.Call)
+                                            delay(1000)
+                                            coroutineScopeOnMain {
+                                                Toast.makeText(
+                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
+                                                ).show()
                                             }
+                                            delay(5000)
+                                            coroutineScopeOnMain {
+                                                Toast.makeText(
+                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                                            delay(1000)
+                                            mainViewModel.run {
+                                                changeSaidMeText("")
+                                                updateBottomMenu(BottomMenu.Conversation)
+                                                changeConversationList(
+                                                    ConversationType.MANUAL_OPERATION,
+                                                    listOf("상담은 잘 진행되셨나요?"),
+                                                    conversationInfo.third
+                                                )
+                                            }
+                                        }
                                     }
                                 } else {
                                     navigationKit.clearAndMove(Screens.Home.route) {

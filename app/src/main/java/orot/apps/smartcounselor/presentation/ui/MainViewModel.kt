@@ -8,16 +8,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import okio.ByteString
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.graph.model.BottomMenu
+import orot.apps.smartcounselor.model.local.ChatData
 import orot.apps.smartcounselor.model.local.ConversationType
 import orot.apps.smartcounselor.model.remote.HeaderInfo
 import orot.apps.smartcounselor.model.remote.MAGO_PROTOCOL
 import orot.apps.smartcounselor.model.remote.MessageProtocol
-import orot.apps.smartcounselor.model.local.ChatData
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
 import orot.apps.sognora_mediaplayer.SognoraTTS
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnMain
 import orot.apps.sognora_websocket_audio.AudioStreamManageable
 import orot.apps.sognora_websocket_audio.AudioStreamManager
 import orot.apps.sognora_websocket_audio.model.WebSocketState
@@ -148,7 +148,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
                 override suspend fun receivedMessageString(msg: String) {
                     try {
-                        val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
+                        val receivedMsg: MessageProtocol =
+                            Gson().fromJson(msg, MessageProtocol::class.java)
 
                         val isUser = receivedMsg.header.protocol_id == MAGO_PROTOCOL.PROTOCOL_11.id
                         receivedMsg.body?.ment?.text?.run {
@@ -186,7 +187,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
                                 }
 
                                 changeConversationList(
-                                    type, listOf(receivedMsg.body?.ment?.text.toString()), receivedMsg
+                                    type,
+                                    listOf(receivedMsg.body?.ment?.text.toString()),
+                                    receivedMsg
                                 )
                             }
                             else -> {}
@@ -241,7 +244,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val conversationInfo: MutableStateFlow<Triple<ConversationType, List<String>, MessageProtocol?>> =
         MutableStateFlow(Triple(ConversationType.GUIDE, emptyList(), null))
 
-    fun changeConversationList(type: ConversationType, contentList: List<String>, msgResponse: MessageProtocol?) {
+    fun changeConversationList(
+        type: ConversationType, contentList: List<String>, msgResponse: MessageProtocol?
+    ) {
         Log.d("changeConversationList", "changeConversationList: $contentList")
         conversationInfo.value = Triple(type, contentList, msgResponse)
     }
@@ -250,7 +255,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
         Log.d("MAINVIEWMODEL", "init: $this")
     }
 
-    fun clear(){
+    fun clear() {
         updateBottomMenu(BottomMenu.Start)
         updateWebSocketState(WebSocketState.Idle)
         audioStreamManager?.stopAudioRecord()

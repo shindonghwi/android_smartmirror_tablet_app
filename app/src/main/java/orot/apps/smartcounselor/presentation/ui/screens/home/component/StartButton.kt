@@ -19,12 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.style.Display1
 import orot.apps.smartcounselor.presentation.style.Primary
-import orot.apps.sognora_compose_extension.animation.clickBounce
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
 fun StartButton() {
@@ -54,7 +54,6 @@ fun StartButton() {
             textAlign = TextAlign.Center,
             text = "시작",
             style = MaterialTheme.typography.Display1,
-            color = Color.White
-        )
+            color = Color.White)
     }
 }

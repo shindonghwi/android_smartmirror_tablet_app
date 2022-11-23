@@ -8,8 +8,6 @@ import android.util.Log
 import okhttp3.*
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnIO
 import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 
@@ -45,37 +43,37 @@ class AudioStreamManager {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     super.onOpen(webSocket, response)
                     Log.d(TAG, "onOpen: $response")
-                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Connected) }
+//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Connected) }
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     super.onMessage(webSocket, text)
                     Log.d(TAG, "onMessage: $text")
-                    coroutineScopeOnDefault { manageable.receivedMessageString(text) }
+//                    coroutineScopeOnDefault { manageable.receivedMessageString(text) }
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
                     Log.d(TAG, "onFailure: $t || $response || ${t.message} || ${response?.message}")
-                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Failed) }
+//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Failed) }
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosed(webSocket, code, reason)
                     Log.d(TAG, "onClosed: $code || $reason")
-                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.DisConnected) }
+//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.DisConnected) }
                 }
 
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                     super.onClosing(webSocket, code, reason)
                     Log.d(TAG, "onClosing: $code || $reason")
-                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Closing) }
+//                    coroutineScopeOnDefault { manageable.stateWebSocket(state = WebSocketState.Closing) }
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                     super.onMessage(webSocket, bytes)
                     Log.d(TAG, "onMessage: $bytes")
-                    coroutineScopeOnDefault { manageable.receivedMessageByteString(bytes) }
+//                    coroutineScopeOnDefault { manageable.receivedMessageByteString(bytes) }
                 }
             })
         }
@@ -99,21 +97,21 @@ class AudioStreamManager {
 
     /** 녹음한 오디오 버퍼 전송하기 */
     fun sendAudioRecord() {
-        val buf = ByteArray(recordBufferSize)
-        coroutineScopeOnIO {
-            try {
-                do {
-                    if (audioSendAvailable) {
-                        val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
-                        if (byteRead < -1) break
-                        webSocket?.send(buf.toByteString(0, byteRead))
-                    }
-                } while (true)
-            } catch (e: Exception) {
-                Log.d(TAG, "sendAudioRecord ERROR: ${e.message}")
-                stopAudioRecord()
-            }
-        }
+//        val buf = ByteArray(recordBufferSize)
+////        coroutineScopeOnIO {
+//            try {
+//                do {
+//                    if (audioSendAvailable) {
+//                        val byteRead = audioRecord?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: break
+//                        if (byteRead < -1) break
+//                        webSocket?.send(buf.toByteString(0, byteRead))
+//                    }
+//                } while (true)
+//            } catch (e: Exception) {
+//                Log.d(TAG, "sendAudioRecord ERROR: ${e.message}")
+//                stopAudioRecord()
+//            }
+////        }
     }
 
     /** 오디오 버퍼 전송 중단하기 */

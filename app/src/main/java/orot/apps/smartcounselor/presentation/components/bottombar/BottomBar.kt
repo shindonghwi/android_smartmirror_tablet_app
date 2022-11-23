@@ -22,25 +22,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
+import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
+import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
+import orot.apps.smartcounselor.presentation.components.common.VDivider
 import orot.apps.smartcounselor.presentation.style.*
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.MainViewModel
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.InputBloodPressure
-import orot.apps.smartcounselor.presentation.components.common.VDivider
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MainViewModel
+import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideViewModel
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.AgeTextField
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.SexRadioButton
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.StartButton
-import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideViewModel
-import orot.apps.sognora_compose_extension.animation.clickBounce
-import orot.apps.sognora_compose_extension.components.RotationAnimation
-import orot.apps.sognora_compose_extension.components.WavesAnimation
-import orot.apps.sognora_viewmodel_extension.clearAndNewVMS
-import orot.apps.sognora_viewmodel_extension.getViewModel
+import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.clearAndNewVMS
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
 import orot.apps.sognora_websocket_audio.model.WebSocketState
 
 @Composable

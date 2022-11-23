@@ -20,10 +20,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.components.bottombar.LoadingText
-import orot.apps.sognora_viewmodel_extension.scope.coroutineScopeOnDefault
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 
 @Composable
 fun BloodPressureScreen() {
