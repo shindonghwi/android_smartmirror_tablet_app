@@ -282,9 +282,9 @@ class MainViewModel @Inject constructor(
                         }
 
                         override fun onDone(utteranceId: String?) {
+                            changeSendingStateAudioBuffer(true)
                             conversationVisibleState.targetState = false
                             ttsState.value = TTSCallback.DONE
-                            changeSendingStateAudioBuffer(true)
 
                             when (conversationInfo.value.first) {
                                 ActionType.MEASUREMENT -> {
