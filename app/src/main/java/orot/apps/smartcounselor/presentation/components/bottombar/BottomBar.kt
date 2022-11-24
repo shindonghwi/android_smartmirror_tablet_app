@@ -295,7 +295,7 @@ private fun SaidMeText() {
         modifier = Modifier.padding(start = 60.dp),
         text = text,
         color = Color.White,
-        style = MaterialTheme.typography.Display2.copy(textAlign = TextAlign.Center)
+        style = MaterialTheme.typography.h1.copy(textAlign = TextAlign.Center)
     )
 }
 

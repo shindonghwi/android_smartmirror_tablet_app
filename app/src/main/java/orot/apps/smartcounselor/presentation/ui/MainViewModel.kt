@@ -90,6 +90,8 @@ class MainViewModel @Inject constructor(
 
                             /** AI의 다음 질문 */
                             MAGO_PROTOCOL.PROTOCOL_12.id -> {
+                                sendProtocol(13, conversationInfo.value.third)
+
                                 val type = when (receivedMsg.body?.action) {
                                     "measurement" -> ActionType.MEASUREMENT
                                     "end" -> ActionType.END
@@ -104,8 +106,8 @@ class MainViewModel @Inject constructor(
                                     changeSaidMeText("")
                                     moveScreen(null, BottomMenu.Conversation)
                                 }
-                                if (type == ActionType.END) {
-
+                                else if (type == ActionType.EXIT) {
+                                    changeSaidMeText("")
                                 }
                             }
                             MAGO_PROTOCOL.PROTOCOL_16.id -> {
