@@ -125,7 +125,8 @@ class MainViewModel @Inject constructor(
                 override fun onClosing(code: Int, reason: String) {}
             })
         }.run {
-            initWebSocket("ws://172.30.1.15:8080/ws/chat")
+//            initWebSocket("ws://172.30.1.15:8080/ws/chat")
+            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
         }
     }
 
