@@ -30,7 +30,7 @@ class SognoraAudioRecorderImpl @Inject constructor(private val context: Context)
                 Log.d(TAG, "Audio Start Failed: Not Allowed Audio Record Permission")
                 return
             } else {
-                minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, encoding) * 6
+                minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channel, encoding) * 2
                 sognoraAudioRecorder = AudioRecord(
                     source,
                     sampleRate,

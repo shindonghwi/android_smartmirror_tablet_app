@@ -9,5 +9,6 @@ enum class ActionType {
     END,
     DOCTORCALL,
     EXIT,
-    MANUAL_OPERATION
+    MANUAL_OPERATION,
+    MANUAL_DOCTORCALL_END
 }

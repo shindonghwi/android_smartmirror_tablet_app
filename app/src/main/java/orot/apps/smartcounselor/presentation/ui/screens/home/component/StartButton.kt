@@ -23,7 +23,6 @@ import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
@@ -39,9 +38,7 @@ fun StartButton() {
             .width(startWidth)
             .clickBounce {
                 takeIf { mainViewModel.userAge != 0 }?.run {
-                    navigationKit.clearAndMove(Screens.Guide.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                    }
+                    mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
                 } ?: run {
                     Toast
                         .makeText(context, "나이를 입력해주세요", Toast.LENGTH_SHORT)

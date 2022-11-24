@@ -7,18 +7,14 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import mago.apps.sognorawebsocket.websocket.model.WebSocketState
-import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 
 @Composable
 fun MagoLifecycle() {
 
+    val context = LocalContext.current
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Log.w("VIEWMODEL", "MagoLifecycle: $mainViewModel")
-    WebSocketState()
 
     OnLifecycleEvent { owner, event ->
         when (event) {
@@ -26,6 +22,7 @@ fun MagoLifecycle() {
                 Log.d(TAG, "MagoLifecycle: ON_RESUME")
             }
             Lifecycle.Event.ON_CREATE -> {
+                mainViewModel.initTTS(context)
                 Log.d(TAG, "MagoLifecycle: ON_CREATE")
             }
             Lifecycle.Event.ON_DESTROY -> Log.d(TAG, "MagoLifecycle: ON_DESTROY")
@@ -59,40 +56,40 @@ private fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.E
     }
 }
 
-
-@Composable
-private fun WebSocketState() {
-
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val state = mainViewModel.getWebSocketState().collectAsState().value
-
-    Log.w("VIEWMODEL", "WebSocketState: $mainViewModel")
-    Log.d(TAG, "WebSocketState: $state")
-
-    LaunchedEffect(key1 = state) {
-        when (state) {
-            is WebSocketState.Connected -> {
-                navigationKit.clearAndMove(Screens.Conversation.route) {
-                    mainViewModel.run {
-                        Log.w("@@@@@@@@@@", "WebSocketState mainViewModel: ${mainViewModel}")
-                        updateBottomMenu(BottomMenu.Conversation)
-                        startAudioRecorder()
-                    }
-                }
-            }
-            is WebSocketState.Failed -> {
-                navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
-                }
-            }
-            is WebSocketState.Idle -> {
-                navigationKit.clearAndMove(Screens.Home.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.Start)
-                }
-            }
-            else -> {
-                Log.d(TAG, "WebSocketState ELSE: $state")
-            }
-        }
-    }
-}
+//
+//@Composable
+//private fun WebSocketState() {
+//
+//    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+//    val state = mainViewModel.getWebSocketState().collectAsState().value
+//
+//    Log.w("VIEWMODEL", "WebSocketState: $mainViewModel")
+//    Log.d(TAG, "WebSocketState: $state")
+//
+//    LaunchedEffect(key1 = state) {
+//        when (state) {
+//            is WebSocketState.Connected -> {
+//                navigationKit.clearAndMove(Screens.Conversation.route) {
+//                    mainViewModel.run {
+//                        Log.w("@@@@@@@@@@", "WebSocketState mainViewModel: ${mainViewModel}")
+//                        updateBottomMenu(BottomMenu.Conversation)
+////                        startAudioRecorder()
+//                    }
+//                }
+//            }
+//            is WebSocketState.Failed -> {
+//                navigationKit.clearAndMove(Screens.ServerConnectionFailScreen.route) {
+//                    mainViewModel.updateBottomMenu(BottomMenu.ServerRetry)
+//                }
+//            }
+//            is WebSocketState.Idle -> {
+//                navigationKit.clearAndMove(Screens.Home.route) {
+//                    mainViewModel.updateBottomMenu(BottomMenu.Start)
+//                }
+//            }
+//            else -> {
+//                Log.d(TAG, "WebSocketState ELSE: $state")
+//            }
+//        }
+//    }
+//}

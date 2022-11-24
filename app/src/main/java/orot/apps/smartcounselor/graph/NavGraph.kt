@@ -2,10 +2,11 @@ package orot.apps.smartcounselor.graph
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.BloodPressureScreen
 import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatListScreen
 import orot.apps.smartcounselor.presentation.ui.screens.conversation.ConversationScreen
@@ -16,7 +17,9 @@ import orot.apps.smartcounselor.presentation.ui.screens.server_connection_fail.S
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavGraph() {
-    val navController = navigationKit.navHostController
+
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    val navController = mainViewModel.navigationKit.navHostController
 
     NavHost(
         navController = navController,

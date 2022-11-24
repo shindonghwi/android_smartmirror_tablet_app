@@ -34,14 +34,14 @@ data class HeaderInfo(
 )
 
 data class BodyInfo(
-    val ment: MentInfo?,
-    val action: String?,
-    val turn: Int?,
-    val code: Int?,
-    val message: String?,
-    val reason: String?,
-    val measurement: MeasurementInfo?,
-    val user: UserInfo?
+    val ment: MentInfo? = null,
+    val action: String? = null,
+    val turn: Int? = null,
+    val code: Int? = null,
+    val message: String? = null,
+    val reason: String? = null,
+    val measurement: MeasurementInfo? = null,
+    val user: UserInfo? = null
 )
 
 data class MentInfo(

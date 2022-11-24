@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.components.bottombar
 
+import android.app.PendingIntent.getActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -10,7 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,12 +29,10 @@ import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
 import orot.apps.smartcounselor.presentation.components.common.VDivider
-import orot.apps.smartcounselor.presentation.style.Display1
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Gray20
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.InputBloodPressure
 import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideViewModel
@@ -42,7 +40,6 @@ import orot.apps.smartcounselor.presentation.ui.screens.home.component.AgeTextFi
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.SexRadioButton
 import orot.apps.smartcounselor.presentation.ui.screens.home.component.StartButton
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.clearAndNewVMS
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
 
 @Composable
@@ -103,8 +100,7 @@ fun MagoBottomBar() {
 private fun StartBottomBar() {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
+            .fillMaxSize(),
     ) {
 
         Text(
@@ -124,7 +120,8 @@ private fun StartBottomBar() {
         ) {
             Column(
                 modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AgeTextField()
                 SexRadioButton()
@@ -168,7 +165,6 @@ fun LoadingText(
 @Composable
 private fun RetryAndChatBottomBar() {
 
-    val activity = LocalContext.current as MagoActivity
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
 
     Row(
@@ -179,27 +175,23 @@ private fun RetryAndChatBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Start)
-                    }
+                    mainViewModel.moveScreen(Screens.Home, BottomMenu.Start)
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
+                .padding(vertical = 20.dp, horizontal = 35.dp),
+            style = MaterialTheme.typography.h2,
             color = Color.Black,
             textAlign = TextAlign.Center)
         Text("대화내역",
             modifier = Modifier
                 .clickBounce {
-                    navigationKit.clearAndMove(Screens.ChatList.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Retry)
-                    }
+                    mainViewModel.moveScreen(Screens.ChatList, BottomMenu.Retry)
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFCFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
+                .padding(vertical = 20.dp, horizontal = 35.dp),
+            style = MaterialTheme.typography.h2,
             color = Color.Black,
             textAlign = TextAlign.Center)
     }
@@ -232,14 +224,12 @@ fun RetryBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    navigationKit.clearAndMove(Screens.Home.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Start)
-                    }
+                    mainViewModel.moveScreen(Screens.Home, BottomMenu.Start)
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
-                .padding(vertical = 35.dp, horizontal = 75.dp),
-            style = MaterialTheme.typography.Display2,
+                .padding(vertical = 20.dp, horizontal = 35.dp),
+            style = MaterialTheme.typography.h2,
             color = Color.Black,
             textAlign = TextAlign.Center)
     }
@@ -320,9 +310,7 @@ fun ServerRetryBottomBar() {
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                navigationKit.clearAndMove(Screens.Guide.route) {
-                    mainViewModel.updateBottomMenu(BottomMenu.Loading)
-                }
+                mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
             .background(Primary)

@@ -24,7 +24,6 @@ import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.presentation.style.Display1
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.navigationKit
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
@@ -34,7 +33,7 @@ fun BloodPressureSubmitButton() {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
-
+    val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
     Box {
         Text(modifier = Modifier
             .width(startWidth)
@@ -44,14 +43,9 @@ fun BloodPressureSubmitButton() {
                 }?.run {
                     mainViewModel.run {
                         updateHeartAnimationState(false)
-                        changeConversationList(
-                            ActionType.RESULT_WAITING,
-                            "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요",
-                            null
-                        )
-                    }
-                    navigationKit.clearAndMove(Screens.Conversation.route) {
-                        mainViewModel.updateBottomMenu(BottomMenu.Loading)
+                        playGoogleTts(content)
+                        changeConversationList(ActionType.RESULT_WAITING, content, null)
+                        moveScreen(Screens.Conversation, BottomMenu.Loading)
                     }
                 } ?: run {
                     Toast

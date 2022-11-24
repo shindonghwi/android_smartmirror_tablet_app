@@ -3,6 +3,7 @@ package orot.apps.smartcounselor.presentation.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,8 +24,8 @@ import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundVGradient
 import orot.apps.smartcounselor.presentation.ui.utils.permission.CheckPermission
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnMain
 import orot.apps.systems.hideSystemUI
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -38,7 +39,7 @@ class MagoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemUI()
         setContent {
-            navigationKit = NavigationKit(rememberNavController())
+            mainViewModel.value.navigationKit = NavigationKit(rememberNavController())
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()
         }
@@ -58,7 +59,6 @@ class MagoActivity : ComponentActivity() {
 
     companion object {
         val TAG = "MagoApplication"
-        lateinit var navigationKit: NavigationKit
     }
 }
 
