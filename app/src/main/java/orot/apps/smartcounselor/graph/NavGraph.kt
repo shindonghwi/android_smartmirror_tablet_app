@@ -1,5 +1,8 @@
 package orot.apps.smartcounselor.graph
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +21,9 @@ import orot.apps.smartcounselor.presentation.ui.screens.server_connection_fail.S
 @Composable
 fun NavGraph() {
 
+    var waitTime = 0L
+
+    val activity = LocalContext.current as MagoActivity
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val navController = mainViewModel.navigationKit.navHostController
 
@@ -42,6 +48,15 @@ fun NavGraph() {
         }
         composable(route = Screens.ServerConnectionFailScreen.route) {
             ServerConnectionFailScreen()
+        }
+    }
+
+    BackHandler(enabled = true) {
+        if(System.currentTimeMillis() - waitTime >=1500 ) {
+            waitTime = System.currentTimeMillis()
+            Toast.makeText(activity,"뒤로가기 버튼을 한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show()
+        } else {
+            activity.finish() // 액티비티 종료
         }
     }
 }

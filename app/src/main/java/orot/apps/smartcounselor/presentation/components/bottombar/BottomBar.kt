@@ -175,7 +175,7 @@ private fun RetryAndChatBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    mainViewModel.moveScreen(Screens.Home, BottomMenu.Start)
+                    mainViewModel.reset()
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
@@ -224,7 +224,7 @@ fun RetryBottomBar() {
         Text("다시하기",
             modifier = Modifier
                 .clickBounce {
-                    mainViewModel.moveScreen(Screens.Home, BottomMenu.Start)
+                    mainViewModel.reset()
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFCFFFCF))
@@ -310,7 +310,7 @@ fun ServerRetryBottomBar() {
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
+                mainViewModel.reset()
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
             .background(Primary)

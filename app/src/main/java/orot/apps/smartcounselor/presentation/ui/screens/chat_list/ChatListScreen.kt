@@ -32,22 +32,23 @@ fun ChatListScreen() {
         items(
             count = mainViewModel.chatList.size
         ) { idx ->
-            ChatContentTypeHolder(mainViewModel.chatList[idx])
+            ChatContentTypeHolder(mainViewModel.chatList.elementAtOrNull(idx))
         }
     }
 }
 
 
 @Composable
-private fun ChatContentTypeHolder(chatData: ChatData) {
+private fun ChatContentTypeHolder(chatData: ChatData?) {
 
-    when (chatData.isUser) {
+    when (chatData?.isUser) {
         false -> {
             AiTextContent(chatData.msg)
         }
         true -> {
             UserTextContent(chatData.msg)
         }
+        else -> {}
     }
 }
 

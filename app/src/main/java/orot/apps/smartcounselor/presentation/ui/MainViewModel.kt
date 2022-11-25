@@ -105,8 +105,7 @@ class MainViewModel @Inject constructor(
                                 if (conversationInfo.value.first == ActionType.DOCTORCALL) {
                                     changeSaidMeText("")
                                     moveScreen(null, BottomMenu.Conversation)
-                                }
-                                else if (type == ActionType.EXIT) {
+                                } else if (type == ActionType.EXIT) {
                                     changeSaidMeText("")
                                 }
                             }
@@ -319,7 +318,7 @@ class MainViewModel @Inject constructor(
                                     }
                                 }
                                 ActionType.END -> {
-                                    if (conversationInfo.value.third?.body?.ment?.uri?.contains("doctorcall") == true){
+                                    if (conversationInfo.value.third?.body?.ment?.uri?.contains("doctorcall") == true) {
                                         val content = "상담은 잘 진행되셨나요?"
                                         onDefault {
                                             moveScreen(bottomMenu = BottomMenu.Loading)
@@ -351,7 +350,10 @@ class MainViewModel @Inject constructor(
                                     }
 
                                     // 아직 학습중이여서 답변을 못함
-                                    else if (conversationInfo.value.third?.body?.ment?.uri?.contains("measurement_learning") == true){
+                                    else if (conversationInfo.value.third?.body?.ment?.uri?.contains(
+                                            "measurement_learning"
+                                        ) == true
+                                    ) {
                                         onDefault {
                                             moveScreen(bottomMenu = BottomMenu.RetryAndChat)
                                         }
@@ -399,8 +401,31 @@ class MainViewModel @Inject constructor(
         conversationInfo.value = Triple(type, contentList, msgResponse)
     }
 
+
+    fun reset() {
+        sognoraWebSocket.close()
+        sognoraAudioRecorder.stopAudioRecorder()
+        userAge = 0
+        userSex = true
+        bloodPressureMax = 0
+        bloodPressureMin = 0
+        bloodPressureSugar = 0
+        micIsAvailable.value = false
+        lastProtocolNum = -1
+        chatList.clear()
+        ttsState.value = TTSCallback.IDLE
+        conversationInfo.value = Triple(ActionType.IDLE, "",  null)
+
+        updateHeartAnimationState(false)
+        moveScreen(Screens.Home, BottomMenu.Start)
+        changeSendingStateAudioBuffer(false)
+        changeSaidMeText("")
+    }
+
     override fun onCleared() {
         super.onCleared()
         Log.d("MAINVIEWMODEL", "onCleared: $this")
+        sognoraWebSocket.close()
+        sognoraAudioRecorder.stopAudioRecorder()
     }
 }
