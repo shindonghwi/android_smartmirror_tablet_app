@@ -112,20 +112,33 @@ class MainViewModel @Inject constructor(
                             MAGO_PROTOCOL.PROTOCOL_16.id -> {
                                 changeSaidMeText("")
                             }
+                            MAGO_PROTOCOL.PROTOCOL_99.id -> {
+                                changeSaidMeText("")
+                                playGoogleTts(content.toString())
+                                changeConversationList(ActionType.CONVERSATION, content.toString(), null, isFallback = true)
+                            }
                         }
                     } catch (e: Exception) {
                         Log.w(TAG, "onMessageText Error: ${e.message}")
                     }
                 }
 
-                override fun onMessageByteString(byteString: ByteString) {}
-                override fun fail(response: Response?, t: Throwable) {}
-                override fun close(code: Int, reason: String) {}
-                override fun onClosing(code: Int, reason: String) {}
+                override fun onMessageByteString(byteString: ByteString) {
+                    Log.w(TAG, "onMessageByteString: ")
+                }
+                override fun fail(response: Response?, t: Throwable) {
+                    Log.w(TAG, "fail: ")
+                }
+                override fun close(code: Int, reason: String) {
+                    Log.w(TAG, "close: ")
+                }
+                override fun onClosing(code: Int, reason: String) {
+                    Log.w(TAG, "onClosing: ")
+                }
             })
         }.run {
-//            initWebSocket("ws://172.30.1.15:8080/ws/chat")
-            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
+            initWebSocket("ws://172.30.1.15:8080/ws/chat")
+//            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
         }
     }
 
@@ -220,6 +233,7 @@ class MainViewModel @Inject constructor(
             16 -> protocolId = MAGO_PROTOCOL.PROTOCOL_16.id
             17 -> protocolId = MAGO_PROTOCOL.PROTOCOL_17.id
             18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
+            99 -> protocolId = MAGO_PROTOCOL.PROTOCOL_99.id
         }
         Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $body")
 
@@ -359,9 +373,6 @@ class MainViewModel @Inject constructor(
                                         }
                                     }
                                 }
-                                ActionType.MANUAL_DOCTORCALL_END -> {
-
-                                }
                                 else -> {}
                             }
                         }
@@ -395,10 +406,13 @@ class MainViewModel @Inject constructor(
         MutableStateFlow(Triple(ActionType.IDLE, "", null))
 
     fun changeConversationList(
-        type: ActionType, contentList: String, msgResponse: MessageProtocol?
+        type: ActionType, content: String, msgResponse: MessageProtocol?, isFallback: Boolean = false
     ) {
-        Log.d(TAG, "changeConversationList: $contentList")
-        conversationInfo.value = Triple(type, contentList, msgResponse)
+        if (!isFallback){
+            conversationInfo.value = Triple(type, content, msgResponse)
+        }else{
+            conversationInfo.value = Triple(type, content, conversationInfo.value.third)
+        }
     }
 
 
