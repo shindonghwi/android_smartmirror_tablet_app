@@ -82,9 +82,7 @@ class MainViewModel @Inject constructor(
                                 voice?.let {
                                     playGoogleTts(it.text)
                                     changeConversationList(
-                                        ActionType.GREETING_END,
-                                        it.text,
-                                        receivedMsg
+                                        ActionType.GREETING_END, it.text, receivedMsg
                                     )
                                 }
                             }
@@ -128,10 +126,7 @@ class MainViewModel @Inject constructor(
                                 voice?.let {
                                     playGoogleTts(it.text)
                                     changeConversationList(
-                                        ActionType.CONVERSATION,
-                                        it.text,
-                                        null,
-                                        isFallback = true
+                                        ActionType.CONVERSATION, it.text, null, isFallback = true
                                     )
                                 }
                             }
@@ -188,11 +183,14 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
-    var userAge: Int = 0 // Default: 0세
-    var userSex: Boolean = true // Default: 남
-    var bloodPressureMax: Int = 0 // Default: 최고혈압
-    var bloodPressureMin: Int = 0 // Default: 최저혈압
-    var bloodPressureSugar: Int = 0 // Default: 혈당량
+    var userInputData: UserInputData? = UserInputData(
+        medication = listOf("htn", "hep"),
+        glucose = 105,
+        bodyTemperature = 36.5f,
+        height = 182f,
+        weight = 92f,
+        bodyMassIndex = 25.2f,
+    )
 
     /**
      * ================================================
@@ -230,6 +228,8 @@ class MainViewModel @Inject constructor(
     /** 웹 소켓으로 이벤트 전달하기 */
     var lastProtocolNum: Int = -1
     fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
+        if (userInputData?.userAge == 0) return
+
         if (lastProtocolNum == protocolNum) return
         else lastProtocolNum = protocolNum
 
@@ -257,23 +257,24 @@ class MainViewModel @Inject constructor(
             99 -> protocolId = MAGO_PROTOCOL.PROTOCOL_99.id
         }
 
+        val header: HeaderInfo
+        val newBody: BodyInfo?
 
-        val header = HeaderInfo().toStream(
-            type = protocolId,
-            age = userAge,
-            gender = if (userSex) "M" else "W"
-        )
+        userInputData?.let {
+            header = HeaderInfo().toStream(
+                type = protocolId, age = it.userAge, gender = if (it.userSex) "M" else "W"
+            )
 
-        val newBody = body?.body?.toMeasurement(
-            before = beforeBody,
-            measurementInfo = null
-        )
+            newBody = body?.body?.toMeasurement(
+                before = beforeBody, measurementInfo = null
+            )
 
-        val newRequestMsg =
-            MessageProtocol(header = header, body = if (protocolNum <= 2) null else newBody)
-        val params = Gson().toJson(newRequestMsg)
-        Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $params")
-        sognoraWebSocket.sendMsg(params)
+            val newResMsg = MessageProtocol(
+                header = header, body = if (protocolNum <= 2) null else newBody
+            )
+            Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $params")
+            sognoraWebSocket.sendMsg(Gson().toJson(newResMsg))
+        }
     }
 
     /** 오디오스트림 생성*/
@@ -335,31 +336,38 @@ class MainViewModel @Inject constructor(
 
                                 ActionType.RESULT_WAITING -> {
 
-                                    val header = HeaderInfo().toStream(
-                                        type = MAGO_PROTOCOL.PROTOCOL_15.id,
-                                        age = userAge,
-                                        gender = if (userSex) "M" else "W"
-                                    )
+                                    val header: HeaderInfo
+                                    val newBody: BodyInfo?
 
-                                    val newBody = BodyInfo().toMeasurement(
-                                        before = beforeBody,
-                                        measurementInfo = MeasurementInfo(
-                                            medication = listOf("htn"),
-                                            bloodPressureSystolic = 120,
-                                            bloodPressureDiastolic = 80,
-                                            glucose = 100,
-                                            heartRate = 60,
-                                            bodyTemperature = 36.5f,
-                                            height = 170,
-                                            weight = 60,
-                                            bodyMassIndex = 20.8f,
+                                    userInputData?.let {
+                                        header = HeaderInfo().toStream(
+                                            type = MAGO_PROTOCOL.PROTOCOL_15.id,
+                                            age = it.userAge,
+                                            gender = if (it.userSex) "M" else "W"
                                         )
-                                    )
 
-                                    sendProtocol(
-                                        protocolNum = 15,
-                                        body = MessageProtocol(header = header, body = newBody)
-                                    )
+                                        newBody = BodyInfo().toMeasurement(
+                                            before = beforeBody, measurementInfo = MeasurementInfo(
+                                                medication = listOf("htn"),
+                                                bloodPressureSystolic = 120,
+                                                bloodPressureDiastolic = 80,
+                                                glucose = 100,
+                                                heartRate = 60,
+                                                bodyTemperature = 36.5f,
+                                                height = 170,
+                                                weight = 60,
+                                                bodyMassIndex = 20.8f,
+                                            )
+                                        )
+                                        sendProtocol(
+                                            protocolNum = 15, body = MessageProtocol(
+                                                header = header,
+                                                body = newBody,
+                                            )
+                                        )
+                                    }
+
+
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
@@ -462,23 +470,31 @@ class MainViewModel @Inject constructor(
 
 
     fun reset() {
+        clearWebSocketAudio()
+        clearUserInputData()
+        clearConversationData()
+        moveScreen(Screens.Home, BottomMenu.Start)
+    }
+
+    private fun clearWebSocketAudio() {
         sognoraWebSocket.close()
         sognoraAudioRecorder.stopAudioRecorder()
-        userAge = 0
-        userSex = true
-        bloodPressureMax = 0
-        bloodPressureMin = 0
-        bloodPressureSugar = 0
         micIsAvailable.value = false
         lastProtocolNum = -1
-        chatList.clear()
-        ttsState.value = TTSCallback.IDLE
-        conversationInfo.value = Triple(ActionType.IDLE, "", null)
-
-        updateHeartAnimationState(false)
-        moveScreen(Screens.Home, BottomMenu.Start)
         changeSendingStateAudioBuffer(false)
+    }
+
+    private fun clearConversationData() {
+        chatList.clear()
+        conversationInfo.value = Triple(ActionType.IDLE, "", null)
+        ttsState.value = TTSCallback.IDLE
+        updateHeartAnimationState(false)
         changeSaidMeText("")
+    }
+
+    private fun clearUserInputData() {
+        userInputData = null
+        userInputData = UserInputData()
     }
 
     override fun onCleared() {

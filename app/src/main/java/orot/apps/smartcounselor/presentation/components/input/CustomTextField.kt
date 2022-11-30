@@ -31,6 +31,7 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
+    defaultText: String = "",
     placeholderText: String = "",
     textLimit: Int = Int.MAX_VALUE,
     textStyle: TextStyle = MaterialTheme.typography.body1.copy(
@@ -49,7 +50,7 @@ fun CustomTextField(
     keyboardActions: KeyboardActions? = null,
     iTextCallback: ITextCallback? = null
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf(defaultText) }
     Box(contentAlignment = contentAlignment) {
         BasicTextField(
             modifier = modifier,

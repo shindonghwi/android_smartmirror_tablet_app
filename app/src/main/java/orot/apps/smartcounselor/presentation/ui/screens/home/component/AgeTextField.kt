@@ -58,10 +58,12 @@ fun AgeTextField() {
         }),
         iTextCallback = object : ITextCallback {
             override fun renderText(content: String) {
-                content.replace("[^0-9]".toRegex(), "").takeIf { it.isNotEmpty() }?.apply {
-                    mainViewModel.userAge = this.toInt()
-                } ?: apply {
-                    mainViewModel.userAge = 0
+                mainViewModel.userInputData?.let {
+                    content.replace("[^0-9]".toRegex(), "").takeIf { it.isNotEmpty() }?.apply {
+                        it.userAge = this.toInt()
+                    } ?: apply {
+                        it.userAge = 0
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,27 +22,34 @@ import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ActionType
-import orot.apps.smartcounselor.presentation.style.Display1
+import orot.apps.smartcounselor.model.remote.asMap
+import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
-fun BloodPressureSubmitButton() {
+fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
 
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
-    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.35f }
-    val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
+    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.5f }
     Box {
-        Text(modifier = Modifier
+        Text(modifier = modifier
+            .padding(top = 18.dp)
             .width(startWidth)
             .clickBounce {
+
+                val remainKey = mainViewModel.userInputData?.asMap()?.entries
+                    ?.filter { it.value == null }
+                    ?.map { it.key } // 아직 입력하지 않은 정보
+
                 takeIf {
-                    mainViewModel.bloodPressureMin != 0 && mainViewModel.bloodPressureMax != 0 && mainViewModel.bloodPressureSugar != 0
+                    remainKey?.size == 0
                 }?.run {
                     mainViewModel.run {
+                        val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
                         updateHeartAnimationState(false)
                         playGoogleTts(content)
                         changeConversationList(ActionType.RESULT_WAITING, content, null)
@@ -49,16 +57,16 @@ fun BloodPressureSubmitButton() {
                     }
                 } ?: run {
                     Toast
-                        .makeText(context, "혈압과 혈당량을 입력해주세요", Toast.LENGTH_SHORT)
+                        .makeText(context, "정보를 모두 입력해주세요", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
             .background(Primary)
-            .padding(vertical = 36.dp),
+            .padding(vertical = 8.dp),
             textAlign = TextAlign.Center,
             text = "제출",
-            style = MaterialTheme.typography.Display1,
+            style = MaterialTheme.typography.Display3,
             color = Color.White)
     }
 }

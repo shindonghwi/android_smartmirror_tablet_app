@@ -41,7 +41,7 @@ fun SexRadioButton() {
         radioOptions.forEach { text ->
             Row(Modifier.selectable(selected = (text == selectedOption), onClick = {
                 onOptionSelected(text)
-                mainViewModel.userSex = text == "남"
+                mainViewModel.userInputData?.userSex = text == "남"
             }), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(30.dp)){
                     RadioButton(

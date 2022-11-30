@@ -37,7 +37,7 @@ fun StartButton() {
         Text(modifier = Modifier
             .width(startWidth)
             .clickBounce {
-                takeIf { mainViewModel.userAge != 0 }?.run {
+                takeIf { mainViewModel.userInputData?.userAge != 0 }?.run {
                     mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
                 } ?: run {
                     Toast

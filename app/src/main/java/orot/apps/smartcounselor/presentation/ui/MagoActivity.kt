@@ -2,10 +2,7 @@ package orot.apps.smartcounselor.presentation.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,7 +25,6 @@ import orot.apps.smartcounselor.presentation.style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundVGradient
 import orot.apps.smartcounselor.presentation.ui.utils.permission.CheckPermission
 import orot.apps.systems.hideSystemUI
-import java.util.*
 
 
 @AndroidEntryPoint

@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.components.bottombar
 
-import android.app.PendingIntent.getActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -59,7 +58,9 @@ fun MagoBottomBar() {
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
-                    StartBottomBar()
+                    VDivider()
+                    BloodPressureBottomBar()
+//                    StartBottomBar()
                 }
                 BottomMenu.Loading.type -> {
                     LoadingBottomBar()
@@ -99,8 +100,7 @@ fun MagoBottomBar() {
 @Composable
 private fun StartBottomBar() {
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
 
         Text(
@@ -200,13 +200,18 @@ private fun RetryAndChatBottomBar() {
 /** 혈압측정 바텀 바 */
 @Composable
 private fun BloodPressureBottomBar() {
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier.fillMaxSize().padding(18.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        InputBloodPressure()
-        BloodPressureSubmitButton()
+        InputBloodPressure(modifier = Modifier.weight(0.8f))
+        Box(
+            modifier = Modifier.weight(0.2f),
+            contentAlignment = Alignment.Center
+        ){
+            BloodPressureSubmitButton()
+        }
     }
 }
 
@@ -324,11 +329,11 @@ fun ServerRetryBottomBar() {
 
 fun getBottomBarHeight(route: String): Float {
     return when (route) {
-        BottomMenu.Start.type -> 0.23f
+        BottomMenu.Start.type -> 0.7f
         BottomMenu.Loading.type -> 0.33f
         BottomMenu.Empty.type -> 0f
         BottomMenu.Conversation.type -> 0.33f
-        BottomMenu.BloodPressure.type -> 0.33f
+        BottomMenu.BloodPressure.type -> 0.7f
         BottomMenu.Retry.type -> 0.33f
         BottomMenu.RetryAndChat.type -> 0.33f
         BottomMenu.Call.type -> 0.33f
