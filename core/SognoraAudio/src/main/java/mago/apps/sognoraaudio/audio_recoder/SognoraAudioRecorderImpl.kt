@@ -54,12 +54,16 @@ class SognoraAudioRecorderImpl @Inject constructor(private val context: Context)
         sognoraAudioRecorder = null
     }
 
-    override fun frameBuffer(byteRead: Int): Pair<ByteArray, Int> {
+    override fun frameBuffer(): Pair<ByteArray, Int?> {
         val buf = ByteArray(minBufferSize)
-        return Pair(
-            buf,
-            sognoraAudioRecorder?.read(buf, 0, buf.size, AudioRecord.READ_BLOCKING) ?: -1
-        )
+
+        val byteCount: Int? = try{
+            sognoraAudioRecorder?.read(buf, 0, buf.size)
+        }catch (e: Exception){
+            -1
+        }
+
+        return Pair(buf, byteCount)
     }
 
     override fun getMinBuffer() = minBufferSize

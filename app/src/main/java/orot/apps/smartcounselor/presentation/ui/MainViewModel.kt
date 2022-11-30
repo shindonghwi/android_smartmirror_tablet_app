@@ -203,9 +203,11 @@ class MainViewModel @Inject constructor(
                 do {
                     if (isAvailableAudioBuffer) {
                         val bufferSize = sognoraAudioRecorder.getMinBuffer()
-                        val bufferInfo = sognoraAudioRecorder.frameBuffer(bufferSize)
-                        if (bufferInfo.second < -1) break
-                        sognoraWebSocket.sendBuffer(bufferInfo.first, bufferSize)
+                        val bufferInfo = sognoraAudioRecorder.frameBuffer()
+                        bufferInfo.second?.let {
+                            if (it < -1) return@let
+                            sognoraWebSocket.sendBuffer(bufferInfo.first, bufferSize)
+                        }
                     }
                 } while (true)
             } catch (e: Exception) {
@@ -468,20 +470,20 @@ class MainViewModel @Inject constructor(
 
 
     fun reset() {
-        clearWebSocketAudio()
-        clearUserInputData()
         clearConversationData()
+        clearUserInputData()
+        clearWebSocketAudio()
         moveScreen(Screens.Home, BottomMenu.Start)
     }
 
     private fun clearWebSocketAudio() {
         ttsState.value = TTSCallback.IDLE
         stopGoogleTts()
-        sognoraWebSocket.close()
-        sognoraAudioRecorder.stopAudioRecorder()
         micIsAvailable.value = false
         lastProtocolNum = -1
         changeSendingStateAudioBuffer(false)
+        sognoraWebSocket.close()
+        sognoraAudioRecorder.stopAudioRecorder()
     }
 
     private fun clearConversationData() {

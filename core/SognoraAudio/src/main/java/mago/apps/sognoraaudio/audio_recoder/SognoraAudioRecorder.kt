@@ -13,7 +13,7 @@ interface SognoraAudioRecorder {
 
     fun stopAudioRecorder()
 
-    fun frameBuffer(byteRead: Int): Pair<ByteArray, Int>
+    fun frameBuffer(): Pair<ByteArray, Int?>
 
     fun getMinBuffer(): Int
 }
