@@ -21,13 +21,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 
 @Composable
 fun ConversationScreen() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
-    Log.e(TAG, "ConversationScreen: ${conversationInfo}")
 
     val isVisible = remember { mainViewModel.conversationVisibleState }
 

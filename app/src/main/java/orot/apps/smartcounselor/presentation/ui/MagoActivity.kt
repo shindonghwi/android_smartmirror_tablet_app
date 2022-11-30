@@ -2,8 +2,10 @@ package orot.apps.smartcounselor.presentation.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import orot.apps.smartcounselor.graph.NavGraph
@@ -39,6 +42,7 @@ class MagoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemUI()
         setContent {
+            hiltViewModel<MainViewModel>()
             mainViewModel.value.navigationKit = NavigationKit(rememberNavController())
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()

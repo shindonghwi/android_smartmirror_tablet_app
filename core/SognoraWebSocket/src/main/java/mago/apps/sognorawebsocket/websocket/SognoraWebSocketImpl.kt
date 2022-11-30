@@ -52,6 +52,11 @@ class SognoraWebSocketImpl @Inject constructor() : SognoraWebSocket {
                         webSocket: WebSocket, t: Throwable, response: Response?
                     ) {
                         super.onFailure(webSocket, t, response)
+                        Log.e("asdkj;asd;jklasjads", "onFailure: ${response?.code}", )
+                        Log.e("asdkj;asd;jklasjads", "onFailure: ${response?.message}", )
+                        Log.e("asdkj;asd;jklasjads", "onFailure: ${response?.body}", )
+                        Log.e("asdkj;asd;jklasjads", "onFailure: ${t.message}", )
+                        Log.e("asdkj;asd;jklasjads", "onFailure: ${t.stackTrace}", )
                         listener.fail(response, t)
                         webSocketState.value = WebSocketState.Failed
                     }

@@ -24,7 +24,10 @@ import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.model.local.ChatData
-import orot.apps.smartcounselor.model.remote.*
+import orot.apps.smartcounselor.model.remote.HeaderInfo
+import orot.apps.smartcounselor.model.remote.MAGO_PROTOCOL
+import orot.apps.smartcounselor.model.remote.MessageProtocol
+import orot.apps.smartcounselor.model.remote.mapper.header.toDialogStart
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
@@ -55,39 +58,46 @@ class MainViewModel @Inject constructor(
                 }
 
                 override fun onMessageText(msg: String) {
+                    Log.w(TAG, "onMessageText: $msg")
 
                     try {
                         val receivedMsg: MessageProtocol =
                             Gson().fromJson(msg, MessageProtocol::class.java)
 
                         val protocol = receivedMsg.header.protocol_id
-                        val content = receivedMsg.body?.ment?.text
+                        val voice = receivedMsg.body?.voice
+                        val display = receivedMsg.body?.display
 
                         val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
 
-                        if (!content.isNullOrEmpty()) {
-                            chatList.add(ChatData(msg = content.toString(), isUser = isUser))
+                        voice?.let {
+                            if (it.text.isNotEmpty()){
+                                chatList.add(ChatData(msg = it.text, isUser = isUser))
+                            }
                         }
-
-                        Log.w(TAG, "onMessageText: $receivedMsg")
 
 
                         when (protocol) {
                             /** AI의 첫 인사 */
                             MAGO_PROTOCOL.PROTOCOL_2.id -> {
-                                playGoogleTts(content.toString())
-                                changeConversationList(
-                                    ActionType.GREETING_END, content.toString(), receivedMsg
-                                )
+                                voice?.let {
+                                    playGoogleTts(it.text)
+                                    changeConversationList(
+                                        ActionType.GREETING_END,
+                                        it.text,
+                                        receivedMsg
+                                    )
+                                }
                             }
 
                             /** 내가 말한 내용을 STT 해서 결과를 응답받음. */
                             MAGO_PROTOCOL.PROTOCOL_11.id -> {
                                 stopGoogleTts()
                                 changeSendingStateAudioBuffer(false)
-                                changeSaidMeText(content.toString())
+                                voice?.let {
+                                    changeSaidMeText(it.text)
+                                }
                             }
-
                             /** AI의 다음 질문 */
                             MAGO_PROTOCOL.PROTOCOL_12.id -> {
                                 sendProtocol(13, conversationInfo.value.third)
@@ -99,8 +109,10 @@ class MainViewModel @Inject constructor(
                                     "exit" -> ActionType.EXIT
                                     else -> ActionType.CONVERSATION
                                 }
-                                playGoogleTts(content.toString())
-                                changeConversationList(type, content.toString(), receivedMsg)
+                                voice?.let {
+                                    playGoogleTts(it.text)
+                                    changeConversationList(type, it.text, receivedMsg)
+                                }
 
                                 if (conversationInfo.value.first == ActionType.DOCTORCALL) {
                                     changeSaidMeText("")
@@ -114,8 +126,15 @@ class MainViewModel @Inject constructor(
                             }
                             MAGO_PROTOCOL.PROTOCOL_99.id -> {
                                 changeSaidMeText("")
-                                playGoogleTts(content.toString())
-                                changeConversationList(ActionType.CONVERSATION, content.toString(), null, isFallback = true)
+                                voice?.let {
+                                    playGoogleTts(it.text)
+                                    changeConversationList(
+                                        ActionType.CONVERSATION,
+                                        it.text,
+                                        null,
+                                        isFallback = true
+                                    )
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -126,19 +145,22 @@ class MainViewModel @Inject constructor(
                 override fun onMessageByteString(byteString: ByteString) {
                     Log.w(TAG, "onMessageByteString: ")
                 }
+
                 override fun fail(response: Response?, t: Throwable) {
-                    Log.w(TAG, "fail: ")
+                    Log.w(TAG, "fail: $response || ${t.message}")
                 }
+
                 override fun close(code: Int, reason: String) {
                     Log.w(TAG, "close: ")
                 }
+
                 override fun onClosing(code: Int, reason: String) {
                     Log.w(TAG, "onClosing: ")
                 }
             })
         }.run {
-            initWebSocket("ws://172.30.1.15:8080/ws/chat")
-//            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
+//            initWebSocket("ws://172.30.1.15:8080/ws/chat")
+            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
         }
     }
 
@@ -237,10 +259,19 @@ class MainViewModel @Inject constructor(
         }
         Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $body")
 
-        val msg = if (body == null) {
-            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = null)
+        val msg = if (protocolNum == 1) {
+            MessageProtocol(
+                header = HeaderInfo().toDialogStart(
+                    age = userAge,
+                    gender = if (userSex) {
+                        "M"
+                    } else {
+                        "W"
+                    }
+                ), body = null
+            )
         } else {
-            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body.body)
+            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body?.body)
         }
 
         val params = Gson().toJson(msg)
@@ -304,24 +335,25 @@ class MainViewModel @Inject constructor(
                                 ActionType.MEASUREMENT -> {
                                     moveScreen(Screens.BloodPressure, BottomMenu.BloodPressure)
                                 }
+
                                 ActionType.RESULT_WAITING -> {
-                                    sendProtocol(
-                                        15, MessageProtocol(
-                                            header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
-                                            body = BodyInfo(
-                                                measurement = MeasurementInfo(
-                                                    blood_pressure = listOf(
-                                                        bloodPressureMax, bloodPressureMin
-                                                    ),
-                                                    blood_sugar = bloodPressureSugar,
-                                                ),
-                                                user = UserInfo(
-                                                    gender = if (userSex) "M" else "F",
-                                                    age = userAge
-                                                )
-                                            )
-                                        )
-                                    )
+//                                    sendProtocol(
+//                                        15, MessageProtocol(
+//                                            header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
+//                                            body = BodyInfo(
+//                                                measurement = MeasurementInfo(
+//                                                    blood_pressure = listOf(
+//                                                        bloodPressureMax, bloodPressureMin
+//                                                    ),
+//                                                    blood_sugar = bloodPressureSugar,
+//                                                ),
+//                                                user = UserInfo(
+//                                                    gender = if (userSex) "M" else "F",
+//                                                    age = userAge
+//                                                )
+//                                            )
+//                                        )
+//                                    )
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
@@ -332,46 +364,46 @@ class MainViewModel @Inject constructor(
                                     }
                                 }
                                 ActionType.END -> {
-                                    if (conversationInfo.value.third?.body?.ment?.uri?.contains("doctorcall") == true) {
-                                        val content = "상담은 잘 진행되셨나요?"
-                                        onDefault {
-                                            moveScreen(bottomMenu = BottomMenu.Loading)
-                                            delay(2000)
-                                            moveScreen(bottomMenu = BottomMenu.Call)
-                                            delay(1000)
-                                            onMain {
-                                                Toast.makeText(
-                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                            delay(3000)
-                                            onMain {
-                                                Toast.makeText(
-                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                            moveScreen(bottomMenu = BottomMenu.Loading)
-                                            delay(1000)
-                                            changeSaidMeText("")
-                                            moveScreen(bottomMenu = BottomMenu.Conversation)
-                                            playGoogleTts(content)
-                                            changeConversationList(
-                                                ActionType.MANUAL_DOCTORCALL_END,
-                                                content,
-                                                conversationInfo.value.third
-                                            )
-                                        }
-                                    }
-
-                                    // 아직 학습중이여서 답변을 못함
-                                    else if (conversationInfo.value.third?.body?.ment?.uri?.contains(
-                                            "measurement_learning"
-                                        ) == true
-                                    ) {
-                                        onDefault {
-                                            moveScreen(bottomMenu = BottomMenu.RetryAndChat)
-                                        }
-                                    }
+//                                    if (conversationInfo.value.third?.body?.ment?.uri?.contains("doctorcall") == true) {
+//                                        val content = "상담은 잘 진행되셨나요?"
+//                                        onDefault {
+//                                            moveScreen(bottomMenu = BottomMenu.Loading)
+//                                            delay(2000)
+//                                            moveScreen(bottomMenu = BottomMenu.Call)
+//                                            delay(1000)
+//                                            onMain {
+//                                                Toast.makeText(
+//                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
+//                                                ).show()
+//                                            }
+//                                            delay(3000)
+//                                            onMain {
+//                                                Toast.makeText(
+//                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
+//                                                ).show()
+//                                            }
+//                                            moveScreen(bottomMenu = BottomMenu.Loading)
+//                                            delay(1000)
+//                                            changeSaidMeText("")
+//                                            moveScreen(bottomMenu = BottomMenu.Conversation)
+//                                            playGoogleTts(content)
+//                                            changeConversationList(
+//                                                ActionType.MANUAL_DOCTORCALL_END,
+//                                                content,
+//                                                conversationInfo.value.third
+//                                            )
+//                                        }
+//                                    }
+//
+//                                    // 아직 학습중이여서 답변을 못함
+//                                    else if (conversationInfo.value.third?.body?.ment?.uri?.contains(
+//                                            "measurement_learning"
+//                                        ) == true
+//                                    ) {
+//                                        onDefault {
+//                                            moveScreen(bottomMenu = BottomMenu.RetryAndChat)
+//                                        }
+//                                    }
                                 }
                                 else -> {}
                             }
@@ -386,12 +418,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun playGoogleTts(msg: String) {
+    fun playGoogleTts(msg: String?) {
         tts?.let {
             if (it.isSpeaking) {
                 it.stop()
             }
-            it.speak(msg, TextToSpeech.QUEUE_ADD, params, msg)
+            msg?.let { content ->
+                it.speak(content, TextToSpeech.QUEUE_ADD, params, content)
+            }
         }
     }
 
@@ -406,11 +440,14 @@ class MainViewModel @Inject constructor(
         MutableStateFlow(Triple(ActionType.IDLE, "", null))
 
     fun changeConversationList(
-        type: ActionType, content: String, msgResponse: MessageProtocol?, isFallback: Boolean = false
+        type: ActionType,
+        content: String,
+        msgResponse: MessageProtocol?,
+        isFallback: Boolean = false
     ) {
-        if (!isFallback){
+        if (!isFallback) {
             conversationInfo.value = Triple(type, content, msgResponse)
-        }else{
+        } else {
             conversationInfo.value = Triple(type, content, conversationInfo.value.third)
         }
     }
@@ -428,7 +465,7 @@ class MainViewModel @Inject constructor(
         lastProtocolNum = -1
         chatList.clear()
         ttsState.value = TTSCallback.IDLE
-        conversationInfo.value = Triple(ActionType.IDLE, "",  null)
+        conversationInfo.value = Triple(ActionType.IDLE, "", null)
 
         updateHeartAnimationState(false)
         moveScreen(Screens.Home, BottomMenu.Start)

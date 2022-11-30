@@ -22,42 +22,58 @@ enum class MAGO_PROTOCOL(val id: String) {
     PROTOCOL_99("STT_FALLBACK_DELIVERY")
 }
 
-
 data class MessageProtocol(
     val header: HeaderInfo,
-    val body: BodyInfo?
+    val body: BodyInfo? = null,
 )
 
-data class HeaderInfo(
-    val protocol_id: String,
+data class HeaderInfo constructor(
+    val protocol_id: String? = null,
     val protocol_version: String = "v1.0",
-    val timestamp: Long = System.currentTimeMillis() / 1000
+    val timestamp: Long = System.currentTimeMillis() / 1000,
+    val device: String? = null,
+    val age: Int? = null,
+    val gender: String? = null,
 )
 
-data class BodyInfo(
-    val ment: MentInfo? = null,
+data class BodyInfo constructor(
+    val before: BodyInfo? = null,
+    val measurement: MeasurementInfo? = null,
     val action: String? = null,
     val turn: Int? = null,
+    val voice: VoiceInfo? = null,
+    val display: DisplayInfo? = null,
     val code: Int? = null,
     val message: String? = null,
-    val reason: String? = null,
-    val measurement: MeasurementInfo? = null,
-    val user: UserInfo? = null
+    val reason: String? = null
 )
 
-data class MentInfo(
+data class MeasurementInfo(
+    val medication: List<String>,
+    val bloodPressureSystolic: String,
+    val bloodPressureDiastolic: String,
+    val glucose: String,
+    val heartRate: String,
+    val bodyTemperature: String,
+    val height: String,
+    val weight: String,
+    val bodyMassIndex: String,
+)
+
+data class VoiceInfo(
     val id: String,
     val text: String,
     val type: String,
     val uri: String,
 )
 
-data class MeasurementInfo(
-    val blood_pressure: List<Int>,
-    val blood_sugar: Int
+data class DisplayInfo(
+    val id: String,
+    val recommendation: RecommendationInfo
 )
 
-data class UserInfo(
-    val gender: String,
-    val age: Int
+data class RecommendationInfo(
+    val food: String,
+    val weight: String,
+    val exercise: String,
 )
