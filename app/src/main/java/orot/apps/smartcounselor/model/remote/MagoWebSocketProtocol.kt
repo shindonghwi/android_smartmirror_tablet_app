@@ -29,7 +29,7 @@ data class MessageProtocol(
 
 data class HeaderInfo constructor(
     val protocol_id: String? = null,
-    val protocol_version: String = "v1.0",
+    val protocol_version: String = "1.0",
     val timestamp: Long = System.currentTimeMillis() / 1000,
     val device: String? = null,
     val age: Int? = null,
@@ -37,7 +37,7 @@ data class HeaderInfo constructor(
 )
 
 data class BodyInfo constructor(
-    val before: BodyInfo? = null,
+    var before: BodyInfo? = null,
     val measurement: MeasurementInfo? = null,
     val action: String? = null,
     val turn: Int? = null,
