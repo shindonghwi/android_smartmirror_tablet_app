@@ -69,7 +69,12 @@ data class VoiceInfo(
 
 data class DisplayInfo(
     val id: String,
-    val recommendation: RecommendationInfo
+    val recommendation: RecommendationInfo,
+    val warning: List<String>,
+    val food: List<String>,
+    val weight: List<String>,
+    val exercise: List<String>,
+    val drinking_smoking: List<String>,
 )
 
 data class RecommendationInfo(

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.text.TextUtils
 import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +66,10 @@ class MainViewModel @Inject constructor(
                         val protocol = receivedMsg.header.protocol_id
                         val voice = receivedMsg.body?.voice
                         val display = receivedMsg.body?.display
-                        beforeBody = receivedMsg.body
+
+                        receivedMsg.body?.let {
+                            beforeBody = receivedMsg.body
+                        }
 
                         val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
 
@@ -106,16 +110,28 @@ class MainViewModel @Inject constructor(
                                     "exit" -> ActionType.EXIT
                                     else -> ActionType.CONVERSATION
                                 }
-                                voice?.let {
-                                    playGoogleTts(it.text)
-                                    changeConversationList(type, it.text, receivedMsg)
+                                voice?.let { voiceInfo ->
+                                    playGoogleTts(voiceInfo.text)
+
+                                    if (ActionType.DOCTORCALL == type) {
+
+                                        var showingContent: String = ""
+
+                                        showingContent += "-음식-\n"
+                                        showingContent += display?.food?.let { it -> TextUtils.join("\n", it) }
+
+                                        showingContent += "\n\n-운동-\n"
+                                        showingContent += display?.exercise?.let { it -> TextUtils.join("\n", it) }
+
+                                        changeConversationList(type, showingContent, receivedMsg)
+                                    } else {
+                                        changeConversationList(type, voiceInfo.text, receivedMsg)
+                                    }
                                 }
 
                                 if (conversationInfo.value.first == ActionType.DOCTORCALL) {
                                     changeSaidMeText("")
                                     moveScreen(null, BottomMenu.Conversation)
-                                } else if (type == ActionType.EXIT) {
-                                    changeSaidMeText("")
                                 }
                             }
                             MAGO_PROTOCOL.PROTOCOL_16.id -> {
@@ -272,8 +288,9 @@ class MainViewModel @Inject constructor(
             val newResMsg = MessageProtocol(
                 header = header, body = if (protocolNum <= 2) null else newBody
             )
-            Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $params")
-            sognoraWebSocket.sendMsg(Gson().toJson(newResMsg))
+            val sendingData = Gson().toJson(newResMsg)
+            Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $sendingData")
+            sognoraWebSocket.sendMsg(sendingData)
         }
     }
 
@@ -377,48 +394,6 @@ class MainViewModel @Inject constructor(
                                         moveScreen(bottomMenu = BottomMenu.RetryAndChat)
                                     }
                                 }
-                                ActionType.END -> {
-//                                    if (conversationInfo.value.third?.body?.ment?.uri?.contains("doctorcall") == true) {
-//                                        val content = "상담은 잘 진행되셨나요?"
-//                                        onDefault {
-//                                            moveScreen(bottomMenu = BottomMenu.Loading)
-//                                            delay(2000)
-//                                            moveScreen(bottomMenu = BottomMenu.Call)
-//                                            delay(1000)
-//                                            onMain {
-//                                                Toast.makeText(
-//                                                    context, "상담원으로부터 전화가 왔습니다", Toast.LENGTH_SHORT
-//                                                ).show()
-//                                            }
-//                                            delay(3000)
-//                                            onMain {
-//                                                Toast.makeText(
-//                                                    context, "상담원과의 전화가 종료되었습니다", Toast.LENGTH_SHORT
-//                                                ).show()
-//                                            }
-//                                            moveScreen(bottomMenu = BottomMenu.Loading)
-//                                            delay(1000)
-//                                            changeSaidMeText("")
-//                                            moveScreen(bottomMenu = BottomMenu.Conversation)
-//                                            playGoogleTts(content)
-//                                            changeConversationList(
-//                                                ActionType.MANUAL_DOCTORCALL_END,
-//                                                content,
-//                                                conversationInfo.value.third
-//                                            )
-//                                        }
-//                                    }
-//
-//                                    // 아직 학습중이여서 답변을 못함
-//                                    else if (conversationInfo.value.third?.body?.ment?.uri?.contains(
-//                                            "measurement_learning"
-//                                        ) == true
-//                                    ) {
-//                                        onDefault {
-//                                            moveScreen(bottomMenu = BottomMenu.RetryAndChat)
-//                                        }
-//                                    }
-                                }
                                 else -> {
                                     changeSendingStateAudioBuffer(true)
                                 }
@@ -477,6 +452,8 @@ class MainViewModel @Inject constructor(
     }
 
     private fun clearWebSocketAudio() {
+        ttsState.value = TTSCallback.IDLE
+        stopGoogleTts()
         sognoraWebSocket.close()
         sognoraAudioRecorder.stopAudioRecorder()
         micIsAvailable.value = false
@@ -487,14 +464,20 @@ class MainViewModel @Inject constructor(
     private fun clearConversationData() {
         chatList.clear()
         conversationInfo.value = Triple(ActionType.IDLE, "", null)
-        ttsState.value = TTSCallback.IDLE
         updateHeartAnimationState(false)
         changeSaidMeText("")
     }
 
     private fun clearUserInputData() {
         userInputData = null
-        userInputData = UserInputData()
+        userInputData = UserInputData(
+            medication = listOf("htn", "hep"),
+            glucose = 105,
+            bodyTemperature = 36.5f,
+            height = 182f,
+            weight = 92f,
+            bodyMassIndex = 25.2f,
+        )
     }
 
     override fun onCleared() {

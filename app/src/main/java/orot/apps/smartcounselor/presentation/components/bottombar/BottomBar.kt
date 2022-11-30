@@ -58,9 +58,7 @@ fun MagoBottomBar() {
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
-                    VDivider()
-                    BloodPressureBottomBar()
-//                    StartBottomBar()
+                    StartBottomBar()
                 }
                 BottomMenu.Loading.type -> {
                     LoadingBottomBar()
@@ -329,7 +327,7 @@ fun ServerRetryBottomBar() {
 
 fun getBottomBarHeight(route: String): Float {
     return when (route) {
-        BottomMenu.Start.type -> 0.7f
+        BottomMenu.Start.type -> 0.3f
         BottomMenu.Loading.type -> 0.33f
         BottomMenu.Empty.type -> 0f
         BottomMenu.Conversation.type -> 0.33f

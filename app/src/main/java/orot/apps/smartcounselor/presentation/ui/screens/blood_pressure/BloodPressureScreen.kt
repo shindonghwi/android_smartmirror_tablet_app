@@ -33,7 +33,7 @@ fun BloodPressureScreen() {
 
         DisposableEffect(key1 = Unit, effect = {
             val animationJob = coroutineScopeOnDefault {
-                delay(1000)
+                delay(300)
                 targetState = true
             }
 
