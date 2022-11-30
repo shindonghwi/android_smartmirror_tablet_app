@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -24,14 +23,12 @@ import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.model.local.ChatData
-import orot.apps.smartcounselor.model.remote.HeaderInfo
-import orot.apps.smartcounselor.model.remote.MAGO_PROTOCOL
-import orot.apps.smartcounselor.model.remote.MessageProtocol
-import orot.apps.smartcounselor.model.remote.mapper.header.toDialogStart
+import orot.apps.smartcounselor.model.remote.*
+import orot.apps.smartcounselor.model.remote.mapper.body.toMeasurement
+import orot.apps.smartcounselor.model.remote.mapper.header.toStream
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onMain
 import java.util.*
 import javax.inject.Inject
 
@@ -48,6 +45,7 @@ class MainViewModel @Inject constructor(
      *     Web Sokcet
      * ================================================
      * */
+    var beforeBody: BodyInfo? = null
     fun connectWebSocket() {
         sognoraWebSocket.apply {
             setWebSocketListener(object : SognoraWebSocketListener {
@@ -67,11 +65,12 @@ class MainViewModel @Inject constructor(
                         val protocol = receivedMsg.header.protocol_id
                         val voice = receivedMsg.body?.voice
                         val display = receivedMsg.body?.display
+                        beforeBody = receivedMsg.body
 
                         val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
 
                         voice?.let {
-                            if (it.text.isNotEmpty()){
+                            if (it.text.isNotEmpty()) {
                                 chatList.add(ChatData(msg = it.text, isUser = isUser))
                             }
                         }
@@ -257,24 +256,23 @@ class MainViewModel @Inject constructor(
             18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
             99 -> protocolId = MAGO_PROTOCOL.PROTOCOL_99.id
         }
-        Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $body")
 
-        val msg = if (protocolNum == 1) {
-            MessageProtocol(
-                header = HeaderInfo().toDialogStart(
-                    age = userAge,
-                    gender = if (userSex) {
-                        "M"
-                    } else {
-                        "W"
-                    }
-                ), body = null
-            )
-        } else {
-            MessageProtocol(header = HeaderInfo(protocol_id = protocolId), body = body?.body)
-        }
 
-        val params = Gson().toJson(msg)
+        val header = HeaderInfo().toStream(
+            type = protocolId,
+            age = userAge,
+            gender = if (userSex) "M" else "W"
+        )
+
+        val newBody = body?.body?.toMeasurement(
+            before = beforeBody,
+            measurementInfo = null
+        )
+
+        val newRequestMsg =
+            MessageProtocol(header = header, body = if (protocolNum <= 2) null else newBody)
+        val params = Gson().toJson(newRequestMsg)
+        Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $params")
         sognoraWebSocket.sendMsg(params)
     }
 
@@ -327,7 +325,6 @@ class MainViewModel @Inject constructor(
                         }
 
                         override fun onDone(utteranceId: String?) {
-                            changeSendingStateAudioBuffer(true)
                             conversationVisibleState.targetState = false
                             ttsState.value = TTSCallback.DONE
 
@@ -337,23 +334,32 @@ class MainViewModel @Inject constructor(
                                 }
 
                                 ActionType.RESULT_WAITING -> {
-//                                    sendProtocol(
-//                                        15, MessageProtocol(
-//                                            header = HeaderInfo(protocol_id = MAGO_PROTOCOL.PROTOCOL_15.id),
-//                                            body = BodyInfo(
-//                                                measurement = MeasurementInfo(
-//                                                    blood_pressure = listOf(
-//                                                        bloodPressureMax, bloodPressureMin
-//                                                    ),
-//                                                    blood_sugar = bloodPressureSugar,
-//                                                ),
-//                                                user = UserInfo(
-//                                                    gender = if (userSex) "M" else "F",
-//                                                    age = userAge
-//                                                )
-//                                            )
-//                                        )
-//                                    )
+
+                                    val header = HeaderInfo().toStream(
+                                        type = MAGO_PROTOCOL.PROTOCOL_15.id,
+                                        age = userAge,
+                                        gender = if (userSex) "M" else "W"
+                                    )
+
+                                    val newBody = BodyInfo().toMeasurement(
+                                        before = beforeBody,
+                                        measurementInfo = MeasurementInfo(
+                                            medication = listOf("htn"),
+                                            bloodPressureSystolic = 120,
+                                            bloodPressureDiastolic = 80,
+                                            glucose = 100,
+                                            heartRate = 60,
+                                            bodyTemperature = 36.5f,
+                                            height = 170,
+                                            weight = 60,
+                                            bodyMassIndex = 20.8f,
+                                        )
+                                    )
+
+                                    sendProtocol(
+                                        protocolNum = 15,
+                                        body = MessageProtocol(header = header, body = newBody)
+                                    )
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
@@ -405,7 +411,9 @@ class MainViewModel @Inject constructor(
 //                                        }
 //                                    }
                                 }
-                                else -> {}
+                                else -> {
+                                    changeSendingStateAudioBuffer(true)
+                                }
                             }
                         }
 

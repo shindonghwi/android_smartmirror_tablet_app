@@ -50,14 +50,14 @@ data class BodyInfo constructor(
 
 data class MeasurementInfo(
     val medication: List<String>,
-    val bloodPressureSystolic: String,
-    val bloodPressureDiastolic: String,
-    val glucose: String,
-    val heartRate: String,
-    val bodyTemperature: String,
-    val height: String,
-    val weight: String,
-    val bodyMassIndex: String,
+    val bloodPressureSystolic: Int,
+    val bloodPressureDiastolic: Int,
+    val glucose: Int,
+    val heartRate: Int,
+    val bodyTemperature: Float,
+    val height: Int,
+    val weight: Int,
+    val bodyMassIndex: Float,
 )
 
 data class VoiceInfo(
