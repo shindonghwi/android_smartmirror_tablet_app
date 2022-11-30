@@ -46,8 +46,8 @@ android {
 
 dependencies {
 
-    implementation(project(":test:SognoraWebSocket"))
-    implementation(project(":test:SognoraAudio"))
+    implementation(project(":core:SognoraWebSocket"))
+    implementation(project(":core:SognoraAudio"))
 
     Libraries.apply {
 

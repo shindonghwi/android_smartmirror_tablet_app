@@ -1,8 +1,6 @@
 rootProject.name = "SmartCounselor"
 include(
     ":app",
-    ":test",
-    ":core"
+    ":core:SognoraAudio",
+    ":core:SognoraWebSocket",
 )
-include(":test:SognoraAudio")
-include(":test:SognoraWebSocket")
