@@ -33,7 +33,7 @@ fun BloodPressureScreen() {
 
         DisposableEffect(key1 = Unit, effect = {
             val animationJob = coroutineScopeOnDefault {
-                delay(300)
+                delay(1000)
                 targetState = true
             }
 
@@ -72,7 +72,7 @@ fun BloodPressureScreen() {
                             1f
                         }
                     )
-                    .size(350.dp),
+                    .size(300.dp),
                 painter = painterResource(id = R.drawable.heartbeat),
                 contentDescription = null,
                 tint = Color.Unspecified

@@ -46,7 +46,6 @@ class MainViewModel @Inject constructor(
      *     Web Sokcet
      * ================================================
      * */
-    var beforeBody: BodyInfo? = null
     fun connectWebSocket() {
         sognoraWebSocket.apply {
             setWebSocketListener(object : SognoraWebSocketListener {
@@ -79,7 +78,6 @@ class MainViewModel @Inject constructor(
                             }
                         }
 
-
                         when (protocol) {
                             /** AI의 첫 인사 */
                             MAGO_PROTOCOL.PROTOCOL_2.id -> {
@@ -110,18 +108,41 @@ class MainViewModel @Inject constructor(
                                     "exit" -> ActionType.EXIT
                                     else -> ActionType.CONVERSATION
                                 }
+
                                 voice?.let { voiceInfo ->
                                     playGoogleTts(voiceInfo.text)
 
                                     if (ActionType.DOCTORCALL == type) {
 
-                                        var showingContent: String = ""
+                                        var showingContent = ""
 
-                                        showingContent += "-음식-\n"
-                                        showingContent += display?.food?.let { it -> TextUtils.join("\n", it) }
+                                        display?.current_status?.let {
+                                            if (it.isNotEmpty()){
+                                                showingContent += "-현재상태-\n"
+                                                showingContent += TextUtils.join("\n", it)
+                                            }
+                                        }
 
-                                        showingContent += "\n\n-운동-\n"
-                                        showingContent += display?.exercise?.let { it -> TextUtils.join("\n", it) }
+                                        display?.food?.let {
+                                            if (it.isNotEmpty()){
+                                                showingContent += "\n-음식-\n"
+                                                showingContent += TextUtils.join("\n", it)
+                                            }
+                                        }
+
+                                        display?.exercise?.let {
+                                            if (it.isNotEmpty()){
+                                                showingContent += "\n-운동-\n"
+                                                showingContent += TextUtils.join("\n", it)
+                                            }
+                                        }
+
+                                        display?.warning?.let {
+                                            if (it.isNotEmpty()){
+                                                showingContent += "\n-경고-\n"
+                                                showingContent += TextUtils.join("\n", it)
+                                            }
+                                        }
 
                                         changeConversationList(type, showingContent, receivedMsg)
                                     } else {
@@ -199,6 +220,7 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
+    var beforeBody: BodyInfo? = null
     var userInputData: UserInputData? = UserInputData(
         medication = listOf("htn", "hep"),
         glucose = 105,
@@ -388,6 +410,7 @@ class MainViewModel @Inject constructor(
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
+                                        sendProtocol(17) // dialog end action을 보낸다
                                         changeSendingStateAudioBuffer(false)
                                         moveScreen(bottomMenu = BottomMenu.Loading)
                                         delay(2000)

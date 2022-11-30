@@ -71,6 +71,7 @@ data class DisplayInfo(
     val id: String,
     val recommendation: RecommendationInfo,
     val warning: List<String>,
+    val current_status: List<String>,
     val food: List<String>,
     val weight: List<String>,
     val exercise: List<String>,

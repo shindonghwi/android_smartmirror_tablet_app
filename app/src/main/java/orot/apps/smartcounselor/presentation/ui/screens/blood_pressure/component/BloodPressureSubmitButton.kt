@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
