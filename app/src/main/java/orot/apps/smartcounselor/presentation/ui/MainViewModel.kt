@@ -114,31 +114,31 @@ class MainViewModel @Inject constructor(
 
                                     if (ActionType.DOCTORCALL == type) {
 
-                                        var showingContent = ""
+                                        var showingContent = "[recommendation]"
 
                                         display?.current_status?.let {
-                                            if (it.isNotEmpty()){
+                                            if (it.isNotEmpty()) {
                                                 showingContent += "-현재상태-\n"
                                                 showingContent += TextUtils.join("\n", it)
                                             }
                                         }
 
                                         display?.food?.let {
-                                            if (it.isNotEmpty()){
+                                            if (it.isNotEmpty()) {
                                                 showingContent += "\n-음식-\n"
                                                 showingContent += TextUtils.join("\n", it)
                                             }
                                         }
 
                                         display?.exercise?.let {
-                                            if (it.isNotEmpty()){
+                                            if (it.isNotEmpty()) {
                                                 showingContent += "\n-운동-\n"
                                                 showingContent += TextUtils.join("\n", it)
                                             }
                                         }
 
                                         display?.warning?.let {
-                                            if (it.isNotEmpty()){
+                                            if (it.isNotEmpty()) {
                                                 showingContent += "\n-경고-\n"
                                                 showingContent += TextUtils.join("\n", it)
                                             }
@@ -224,7 +224,7 @@ class MainViewModel @Inject constructor(
      * */
     var beforeBody: BodyInfo? = null
     var userInputData: UserInputData? = UserInputData(
-        medication = listOf("htn", "hep"),
+        medication = listOf("htn"),
         glucose = 105,
         bodyTemperature = 36.5f,
         height = 182f,
@@ -389,15 +389,17 @@ class MainViewModel @Inject constructor(
 
                                         newBody = BodyInfo().toMeasurement(
                                             before = beforeBody, measurementInfo = MeasurementInfo(
-                                                medication = listOf("htn"),
-                                                bloodPressureSystolic = 120,
-                                                bloodPressureDiastolic = 80,
-                                                glucose = 100,
-                                                heartRate = 60,
-                                                bodyTemperature = 36.5f,
-                                                height = 170,
-                                                weight = 60,
-                                                bodyMassIndex = 20.8f,
+                                                medication = it.medication ?: listOf("hnr"),
+                                                bloodPressureSystolic = it.bloodPressureSystolic
+                                                    ?: 120,
+                                                bloodPressureDiastolic = it.bloodPressureDiastolic
+                                                    ?: 80,
+                                                glucose = it.glucose ?: 100,
+                                                heartRate = it.heartRate ?: 60,
+                                                bodyTemperature = it.bodyTemperature ?: 36.5f,
+                                                height = it.height ?: 170f,
+                                                weight = it.weight ?: 60f,
+                                                bodyMassIndex = it.bodyMassIndex ?: 20.8f,
                                             )
                                         )
                                         sendProtocol(
@@ -496,7 +498,7 @@ class MainViewModel @Inject constructor(
     private fun clearUserInputData() {
         userInputData = null
         userInputData = UserInputData(
-            medication = listOf("htn", "hep"),
+            medication = listOf("htn"),
             glucose = 105,
             bodyTemperature = 36.5f,
             height = 182f,

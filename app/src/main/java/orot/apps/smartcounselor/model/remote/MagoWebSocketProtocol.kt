@@ -55,8 +55,8 @@ data class MeasurementInfo(
     val glucose: Int,
     val heartRate: Int,
     val bodyTemperature: Float,
-    val height: Int,
-    val weight: Int,
+    val height: Float,
+    val weight: Float,
     val bodyMassIndex: Float,
 )
 

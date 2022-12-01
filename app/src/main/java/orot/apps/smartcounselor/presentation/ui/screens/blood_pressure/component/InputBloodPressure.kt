@@ -40,7 +40,7 @@ fun InputBloodPressure(modifier: Modifier) {
     val screenWidth = configuration.screenWidthDp
 
     val contentList = listOf(
-        Pair("약물복용력: ", "htn,hep ( ,로 구분 )"),
+        Pair("약물복용력: ", "htn ( ,로 구분 )"),
         Pair("수축기 혈압[mmHg]: ", "140"),
         Pair("이완기 혈압[mmHg]: ", "90"),
         Pair("공복 혈당[mg/DL]: ", "105"),
