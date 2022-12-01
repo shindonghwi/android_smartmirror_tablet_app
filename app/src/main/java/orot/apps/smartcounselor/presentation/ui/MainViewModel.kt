@@ -24,6 +24,7 @@ import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.model.local.ChatData
+import orot.apps.smartcounselor.model.local.RecommendationMent
 import orot.apps.smartcounselor.model.remote.*
 import orot.apps.smartcounselor.model.remote.mapper.body.toMeasurement
 import orot.apps.smartcounselor.model.remote.mapper.header.toStream
@@ -113,34 +114,49 @@ class MainViewModel @Inject constructor(
                                     playGoogleTts(voiceInfo.text)
 
                                     if (ActionType.DOCTORCALL == type) {
-
-                                        var showingContent = "[recommendation]"
+                                        val showingContent = "[recommendation]"
 
                                         display?.current_status?.let {
                                             if (it.isNotEmpty()) {
-                                                showingContent += "-현재상태-\n"
-                                                showingContent += TextUtils.join("\n", it)
+                                                tempRecommendationMent.add(
+                                                    RecommendationMent(
+                                                        "현재상태",
+                                                        TextUtils.join("\n", it)
+                                                    )
+                                                )
                                             }
                                         }
 
                                         display?.food?.let {
                                             if (it.isNotEmpty()) {
-                                                showingContent += "\n-음식-\n"
-                                                showingContent += TextUtils.join("\n", it)
+                                                tempRecommendationMent.add(
+                                                    RecommendationMent(
+                                                        "음식",
+                                                        TextUtils.join("\n", it)
+                                                    )
+                                                )
                                             }
                                         }
 
                                         display?.exercise?.let {
                                             if (it.isNotEmpty()) {
-                                                showingContent += "\n-운동-\n"
-                                                showingContent += TextUtils.join("\n", it)
+                                                tempRecommendationMent.add(
+                                                    RecommendationMent(
+                                                        "운동",
+                                                        TextUtils.join("\n", it)
+                                                    )
+                                                )
                                             }
                                         }
 
                                         display?.warning?.let {
                                             if (it.isNotEmpty()) {
-                                                showingContent += "\n-경고-\n"
-                                                showingContent += TextUtils.join("\n", it)
+                                                tempRecommendationMent.add(
+                                                    RecommendationMent(
+                                                        "경고",
+                                                        TextUtils.join("\n", it)
+                                                    )
+                                                )
                                             }
                                         }
 
@@ -222,6 +238,7 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
+    var tempRecommendationMent: ArrayList<RecommendationMent> = arrayListOf()
     var beforeBody: BodyInfo? = null
     var userInputData: UserInputData? = UserInputData(
         medication = listOf("htn"),
@@ -489,6 +506,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun clearConversationData() {
+        tempRecommendationMent.clear()
         chatList.clear()
         conversationInfo.value = Triple(ActionType.IDLE, "", null)
         updateHeartAnimationState(false)
