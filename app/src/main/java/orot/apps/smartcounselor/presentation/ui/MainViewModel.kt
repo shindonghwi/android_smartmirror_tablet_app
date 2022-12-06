@@ -423,7 +423,7 @@ class MainViewModel @Inject constructor(
                                             )
                                         )
                                         sendProtocol(
-                                            protocolNum = 15, body = MessageProtocol(
+                                            protocolNum = 18, body = MessageProtocol(
                                                 header = header,
                                                 body = newBody,
                                             )
@@ -434,7 +434,7 @@ class MainViewModel @Inject constructor(
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
-                                        sendProtocol(17) // dialog end action을 보낸다
+                                        sendProtocol(20) // dialog end action을 보낸다
                                         changeSendingStateAudioBuffer(false)
                                         moveScreen(bottomMenu = BottomMenu.Loading)
                                         delay(2000)
@@ -498,6 +498,14 @@ class MainViewModel @Inject constructor(
         moveScreen(Screens.Home, BottomMenu.Start)
     }
 
+    private fun clearConversationData() {
+        tempRecommendationMent.clear()
+        chatList.clear()
+        conversationInfo.value = Triple(ActionType.IDLE, "", null)
+        updateHeartAnimationState(false)
+        changeSaidMeText("")
+    }
+
     private fun clearWebSocketAudio() {
         ttsState.value = TTSCallback.IDLE
         stopGoogleTts()
@@ -506,14 +514,6 @@ class MainViewModel @Inject constructor(
         changeSendingStateAudioBuffer(false)
         sognoraWebSocket.close()
         sognoraAudioRecorder.stopAudioRecorder()
-    }
-
-    private fun clearConversationData() {
-        tempRecommendationMent.clear()
-        chatList.clear()
-        conversationInfo.value = Triple(ActionType.IDLE, "", null)
-        updateHeartAnimationState(false)
-        changeSaidMeText("")
     }
 
     private fun clearUserInputData() {
