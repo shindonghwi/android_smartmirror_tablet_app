@@ -171,7 +171,7 @@ class MainViewModel @Inject constructor(
                                     moveScreen(null, BottomMenu.Conversation)
                                 }
                             }
-                            MAGO_PROTOCOL.PROTOCOL_16.id -> {
+                            MAGO_PROTOCOL.PROTOCOL_19.id -> {
                                 changeSaidMeText("")
                             }
                             MAGO_PROTOCOL.PROTOCOL_99.id -> {
@@ -311,6 +311,9 @@ class MainViewModel @Inject constructor(
             16 -> protocolId = MAGO_PROTOCOL.PROTOCOL_16.id
             17 -> protocolId = MAGO_PROTOCOL.PROTOCOL_17.id
             18 -> protocolId = MAGO_PROTOCOL.PROTOCOL_18.id
+            19 -> protocolId = MAGO_PROTOCOL.PROTOCOL_19.id
+            20 -> protocolId = MAGO_PROTOCOL.PROTOCOL_20.id
+            21 -> protocolId = MAGO_PROTOCOL.PROTOCOL_21.id
             99 -> protocolId = MAGO_PROTOCOL.PROTOCOL_99.id
         }
 
@@ -399,7 +402,7 @@ class MainViewModel @Inject constructor(
 
                                     userInputData?.let {
                                         header = HeaderInfo().toStream(
-                                            type = MAGO_PROTOCOL.PROTOCOL_15.id,
+                                            type = MAGO_PROTOCOL.PROTOCOL_18.id,
                                             age = it.userAge,
                                             gender = if (it.userSex) "M" else "W"
                                         )
