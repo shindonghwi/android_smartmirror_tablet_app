@@ -1,6 +1,7 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
 import android.text.TextUtils
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.MainViewModel
+import java.util.regex.Pattern
 
 @Composable
 fun InputBloodPressure(modifier: Modifier) {
@@ -109,7 +111,7 @@ fun InputBloodPressure(modifier: Modifier) {
                                     }
                                 }
                                 5, 6, 7, 8 -> { // float
-                                    content.replace("^[0-9]{1,2}(\\.[0-9]{1,2})?$".toRegex(), "")
+                                    content.replace("[^0-9]{0,2}(\\.[^0-9]{0,2})?$".toRegex(), "")
                                         .takeIf { it.isNotEmpty() }?.apply {
                                             floatTextNum = this.toFloat()
                                         } ?: apply {
