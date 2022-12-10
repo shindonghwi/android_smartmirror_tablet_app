@@ -1,13 +1,11 @@
 package orot.apps.smartcounselor.presentation.components.input
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,82 +13,112 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 
 interface ITextCallback {
     fun renderText(content: String)
 }
 
+interface IFocusCallback {
+    fun onFocus(isFocus: Boolean)
+}
+
+data class KeyBoardActionUnit(
+    val onDone: (() -> Unit)? = null,
+    val onGo: (() -> Unit)? = null,
+    val onNext: (() -> Unit)? = null,
+    val onPrevious: (() -> Unit)? = null,
+    val onSearch: (() -> Unit)? = null,
+    val onSend: (() -> Unit)? = null,
+)
+
 @Composable
 fun CustomTextField(
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,
+    leadingPaddingValues: PaddingValues = PaddingValues(0.dp),
     trailingIcon: (@Composable () -> Unit)? = null,
+    trailingPaddingValues: PaddingValues = PaddingValues(0.dp),
+    innerTextPaddingValues: PaddingValues = PaddingValues(horizontal = 0.dp),
     defaultText: String = "",
-    placeholderText: String = "",
+    placeholderText: (@Composable () -> Unit)? = null,
+    textStyle: TextStyle = MaterialTheme.typography.h3,
+    isSingleLine: Boolean = true,
     textLimit: Int = Int.MAX_VALUE,
-    textStyle: TextStyle = MaterialTheme.typography.body1.copy(
-        color = Color.White,
-        textAlign = TextAlign.Start
+    textAlignment: Alignment = Alignment.Center,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Next
     ),
-    placeHolderTextStyle: TextStyle = MaterialTheme.typography.body1.copy(
-        color = Color.White.copy(alpha = 0.3f),
-        textAlign = TextAlign.Start
-    ),
-    contentAlignment: Alignment = Alignment.TopStart,
-    cursorBrush: Brush = SolidColor(MaterialTheme.colors.primary),
-    singleLine: Boolean = true,
-    textOverflow: TextOverflow = TextOverflow.Ellipsis,
-    keyboardOptions: KeyboardOptions? = null,
-    keyboardActions: KeyboardActions? = null,
+    keyBoardActionUnit: KeyBoardActionUnit? = null,
+    actionDoneAfterClearText: Boolean = false,
+    enable: Boolean = true,
     iTextCallback: ITextCallback? = null
 ) {
     var text by rememberSaveable { mutableStateOf(defaultText) }
-    Box(contentAlignment = contentAlignment) {
-        BasicTextField(
-            modifier = modifier,
-            value = text,
-            onValueChange = { content ->
 
-                content.takeIf {
-                    content.length <= textLimit
-                }?.apply {
-                    text = content
+    Column(modifier = modifier) {
+        BasicTextField(
+            value = text,
+            onValueChange = {
+                if (it.length <= textLimit) {
+                    text = it
+                    iTextCallback?.renderText(it)
                 }
-                iTextCallback?.renderText(text)
             },
-            singleLine = singleLine,
-            cursorBrush = cursorBrush,
+            singleLine = isSingleLine,
+            cursorBrush = SolidColor(MaterialTheme.colors.primary),
             textStyle = textStyle,
-            decorationBox = { innerTextField ->
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (leadingIcon != null) leadingIcon()
-                    Box(
-                        contentAlignment = contentAlignment
-                    ) {
-                        if (text.isEmpty()) {
-                            Text(
-                                text = placeholderText,
-                                style = placeHolderTextStyle,
-                                overflow = textOverflow,
-                                maxLines = if (singleLine) 1 else Int.MAX_VALUE
-                            )
+            keyboardOptions = keyboardOptions,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyBoardActionUnit?.onDone?.let {
+                        if (actionDoneAfterClearText) {
+                            text = ""
                         }
-                        innerTextField()
+                        it()
                     }
-                    if (trailingIcon != null) trailingIcon()
+                },
+                onGo = { keyBoardActionUnit?.onGo?.let { it() } },
+                onNext = { keyBoardActionUnit?.onNext?.let { it() } },
+                onPrevious = { keyBoardActionUnit?.onPrevious?.let { it() } },
+                onSearch = { keyBoardActionUnit?.onSearch?.let { it() } },
+                onSend = { keyBoardActionUnit?.onSend?.let { it() } },
+            ),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.padding(leadingPaddingValues)) {
+                            if (leadingIcon != null) leadingIcon()
+                        }
+                        Box(
+                            Modifier
+                                .weight(1f)
+                                .padding(innerTextPaddingValues),
+                            contentAlignment = textAlignment
+                        ) {
+                            if (text.isEmpty()) {
+                                placeholderText?.let { it() }
+                            }
+                            innerTextField()
+                        }
+                        Box(Modifier.padding(trailingPaddingValues)) {
+                            if (trailingIcon != null) trailingIcon()
+                        }
+                    }
                 }
             },
-            keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
-            keyboardActions = keyboardActions ?: KeyboardActions.Default,
+            enabled = enable
         )
     }
 }

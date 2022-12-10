@@ -7,12 +7,14 @@ import android.speech.tts.UtteranceProgressListener
 import android.text.TextUtils
 import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorder
 import mago.apps.sognorawebsocket.websocket.SognoraWebSocket
 import mago.apps.sognorawebsocket.websocket.SognoraWebSocketListener
@@ -29,6 +31,7 @@ import orot.apps.smartcounselor.model.remote.*
 import orot.apps.smartcounselor.model.remote.mapper.body.toMeasurement
 import orot.apps.smartcounselor.model.remote.mapper.header.toStream
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
 import java.util.*
@@ -39,7 +42,6 @@ class MainViewModel @Inject constructor(
     val sognoraWebSocket: SognoraWebSocket,
     val sognoraAudioRecorder: SognoraAudioRecorder,
 ) : ViewModel() {
-
     lateinit var navigationKit: NavigationKit
 
     /**
@@ -51,6 +53,7 @@ class MainViewModel @Inject constructor(
         sognoraWebSocket.apply {
             setWebSocketListener(object : SognoraWebSocketListener {
                 override fun open(response: Response) {
+                    Log.w(TAG, "open: ${response.body} | ${response.message}")
                     moveScreen(Screens.Conversation, BottomMenu.Conversation)
                     startAudioRecorder()
                     sendProtocol(1)
@@ -240,6 +243,27 @@ class MainViewModel @Inject constructor(
      * */
     var tempRecommendationMent: ArrayList<RecommendationMent> = arrayListOf()
     var beforeBody: BodyInfo? = null
+
+    val userListInfo = mutableStateListOf<String>().apply {
+        repeat((1..5).count()) { add("user$it") }
+    }
+
+    var addAccountInputData = ""
+
+    fun addUser(userInfo: String){
+        if (!userListInfo.contains(userInfo)){
+            userListInfo.add(userInfo)
+        }
+    }
+
+    var isShowingAccountBottomSheet = MutableStateFlow(false)
+    fun changeBottomSheetFlag(flag: Boolean){
+        isShowingAccountBottomSheet.update { flag }
+    }
+
+    val userAge = 60 // TODO: 사용자 나이, 성별 셋팅해야함.
+    val userGender = "M"
+
     var userInputData: UserInputData? = UserInputData(
         medication = listOf("htn"),
         glucose = 105,
@@ -285,8 +309,6 @@ class MainViewModel @Inject constructor(
     /** 웹 소켓으로 이벤트 전달하기 */
     var lastProtocolNum: Int = -1
     fun sendProtocol(protocolNum: Int, body: MessageProtocol? = null) {
-        if (userInputData?.userAge == 0) return
-
         if (lastProtocolNum == protocolNum) return
         else lastProtocolNum = protocolNum
 
@@ -322,7 +344,7 @@ class MainViewModel @Inject constructor(
 
         userInputData?.let {
             header = HeaderInfo().toStream(
-                type = protocolId, age = it.userAge, gender = if (it.userSex) "M" else "W"
+                type = protocolId, age = userAge, gender = userGender
             )
 
             newBody = body?.body?.toMeasurement(
@@ -403,8 +425,7 @@ class MainViewModel @Inject constructor(
                                     userInputData?.let {
                                         header = HeaderInfo().toStream(
                                             type = MAGO_PROTOCOL.PROTOCOL_18.id,
-                                            age = it.userAge,
-                                            gender = if (it.userSex) "M" else "W"
+                                            age = userAge, gender = userGender
                                         )
 
                                         newBody = BodyInfo().toMeasurement(

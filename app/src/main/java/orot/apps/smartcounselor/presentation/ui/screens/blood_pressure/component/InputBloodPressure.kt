@@ -1,7 +1,6 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
 import android.text.TextUtils
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -9,12 +8,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,9 +26,8 @@ import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.model.remote.UserInputData
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
+import orot.apps.smartcounselor.presentation.components.input.KeyBoardActionUnit
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MainViewModel
-import java.util.regex.Pattern
 
 @Composable
 fun InputBloodPressure(modifier: Modifier) {
@@ -84,7 +80,7 @@ fun InputBloodPressure(modifier: Modifier) {
                         },
                         imeAction = if (item.first.contains("체질량 지수")) ImeAction.Done else ImeAction.Next
                     ),
-                    keyboardActions = KeyboardActions(onDone = {
+                    keyBoardActionUnit = KeyBoardActionUnit(onDone = {
                         focusManager.clearFocus()
                     }),
                     textLimit = when (index) {
@@ -93,8 +89,13 @@ fun InputBloodPressure(modifier: Modifier) {
                         5, 6, 7, 8 -> 5
                         else -> Int.MAX_VALUE
                     },
-                    placeholderText = item.second,
-                    contentAlignment = Alignment.Center,
+                    placeholderText = {
+                        Text(
+                            text = item.second,
+                            color = Color.White.copy(0.8f),
+                            textAlign = TextAlign.Center
+                        )
+                    },
                     iTextCallback = object : ITextCallback {
                         override fun renderText(content: String) {
 

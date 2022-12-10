@@ -2,8 +2,6 @@ package orot.apps.smartcounselor.model.remote
 import kotlin.reflect.full.memberProperties
 
 data class UserInputData(
-    var userAge: Int = 0, // Default: 0세
-    var userSex: Boolean = true, // Default: 남
     var medication: List<String>? = null, // 약물 복용력
     var bloodPressureSystolic: Int? = null, // 수축기 혈압
     var bloodPressureDiastolic: Int? = null,// 이완기 혈압

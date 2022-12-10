@@ -4,13 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,11 +21,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
+import orot.apps.smartcounselor.presentation.components.bottombar.home.UserRadioButton
 import orot.apps.smartcounselor.presentation.components.common.VDivider
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Gray20
@@ -35,10 +36,8 @@ import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.BloodPressureSubmitButton
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.InputBloodPressure
 import orot.apps.smartcounselor.presentation.ui.screens.guide.GuideViewModel
-import orot.apps.smartcounselor.presentation.ui.screens.home.component.AgeTextField
-import orot.apps.smartcounselor.presentation.ui.screens.home.component.SexRadioButton
-import orot.apps.smartcounselor.presentation.ui.screens.home.component.StartButton
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
+import orot.apps.smartcounselor.presentation.ui.utils.modifier.noDuplicationClickable
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.getViewModel
 
 @Composable
@@ -58,6 +57,7 @@ fun MagoBottomBar() {
         ) {
             when (route) {
                 BottomMenu.Start.type -> {
+                    VDivider()
                     StartBottomBar()
                 }
                 BottomMenu.Loading.type -> {
@@ -93,38 +93,69 @@ fun MagoBottomBar() {
     }
 }
 
-
 /** 홈(시작하기) 화면 바텀 바 */
 @Composable
 private fun StartBottomBar() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
 
-        Text(
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    val configuration = LocalConfiguration.current
+    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        UserRadioButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
-            text = "회원님의 정보를 입력해주세요",
-            color = Color.White,
-            style = MaterialTheme.typography.h3,
-            textAlign = TextAlign.Center
+                .padding(top = 20.dp)
         )
 
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier
+                    .width(startWidth)
+                    .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
+                    .background(Primary)
+                    .noDuplicationClickable {
+                        mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
+                    },
+                contentAlignment = Alignment.Center
             ) {
-                AgeTextField()
-                SexRadioButton()
+                Text(
+                    modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),
+                    text = "입장하기",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.h3,
+                    color = Color.White
+                )
             }
-            StartButton()
+            Box(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .width(startWidth)
+                    .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
+                    .background(Color.White)
+                    .noDuplicationClickable {
+                        mainViewModel.changeBottomSheetFlag(true)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),
+                    text = "계정 연결하기",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.h3,
+                    color = Primary
+                )
+            }
         }
     }
 }
@@ -199,15 +230,16 @@ private fun RetryAndChatBottomBar() {
 @Composable
 private fun BloodPressureBottomBar() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(18.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(18.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         InputBloodPressure(modifier = Modifier.weight(0.8f))
         Box(
-            modifier = Modifier.weight(0.2f),
-            contentAlignment = Alignment.Center
-        ){
+            modifier = Modifier.weight(0.2f), contentAlignment = Alignment.Center
+        ) {
             BloodPressureSubmitButton()
         }
     }
