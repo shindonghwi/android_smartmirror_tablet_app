@@ -49,7 +49,6 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
                 }?.run {
                     mainViewModel.run {
                         val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
-                        updateHeartAnimationState(false)
                         playGoogleTts(content)
                         changeConversationList(ActionType.RESULT_WAITING, content, null)
                         moveScreen(Screens.Conversation, BottomMenu.Loading)

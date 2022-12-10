@@ -60,12 +60,13 @@ class MainViewModel @Inject constructor(
                     Log.w(TAG, "onMessageText: $msg")
 
                     try {
-                        val receivedMsg: MessageProtocol =
-                            Gson().fromJson(msg, MessageProtocol::class.java)
+                        val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
 
                         val protocol = receivedMsg.header.protocol_id
+                        val device = receivedMsg.header.device
                         val voice = receivedMsg.body?.voice
                         val display = receivedMsg.body?.display
+                        val measurement = receivedMsg.body?.measurement
 
                         receivedMsg.body?.let {
                             beforeBody = receivedMsg.body
@@ -120,8 +121,7 @@ class MainViewModel @Inject constructor(
                                             if (it.isNotEmpty()) {
                                                 tempRecommendationMent.add(
                                                     RecommendationMent(
-                                                        "현재상태",
-                                                        TextUtils.join("\n", it)
+                                                        "현재상태", TextUtils.join("\n", it)
                                                     )
                                                 )
                                             }
@@ -131,8 +131,7 @@ class MainViewModel @Inject constructor(
                                             if (it.isNotEmpty()) {
                                                 tempRecommendationMent.add(
                                                     RecommendationMent(
-                                                        "음식",
-                                                        TextUtils.join("\n", it)
+                                                        "음식", TextUtils.join("\n", it)
                                                     )
                                                 )
                                             }
@@ -142,8 +141,7 @@ class MainViewModel @Inject constructor(
                                             if (it.isNotEmpty()) {
                                                 tempRecommendationMent.add(
                                                     RecommendationMent(
-                                                        "운동",
-                                                        TextUtils.join("\n", it)
+                                                        "운동", TextUtils.join("\n", it)
                                                     )
                                                 )
                                             }
@@ -153,8 +151,7 @@ class MainViewModel @Inject constructor(
                                             if (it.isNotEmpty()) {
                                                 tempRecommendationMent.add(
                                                     RecommendationMent(
-                                                        "경고",
-                                                        TextUtils.join("\n", it)
+                                                        "경고", TextUtils.join("\n", it)
                                                     )
                                                 )
                                             }
@@ -171,8 +168,30 @@ class MainViewModel @Inject constructor(
                                     moveScreen(null, BottomMenu.Conversation)
                                 }
                             }
+                            /** Watch, Chair 데이터 도착 */
                             MAGO_PROTOCOL.PROTOCOL_17.id -> {
-                                Log.w("HHHHHERLEWKRJKLW", "onMessageText: $receivedMsg")
+                                when (device) {
+                                    "Watch" -> {
+                                        Log.w(TAG, "onMessageText: WATCH DATA", )
+                                        medicalDeviceWatchData.update {
+                                            WatchData(
+                                                bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
+                                                heartRate = measurement?.heartRate ?: 0
+                                            )
+                                        }
+                                    }
+                                    "Chair" -> {
+                                        Log.w(TAG, "onMessageText: Chair DATA", )
+                                        medicalDeviceChairData.update {
+                                            ChairData(
+                                                bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
+                                                glucose = measurement?.glucose ?: 0,
+                                                weight = measurement?.weight ?: 0f,
+                                                bmi = measurement?.bodyMassIndex ?: 0f
+                                            )
+                                        }
+                                    }
+                                }
                             }
                             MAGO_PROTOCOL.PROTOCOL_19.id -> {
                                 changeSaidMeText("")
@@ -240,10 +259,18 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
-    var medicalDeviceWatchData: MutableStateFlow<WatchData> =
-        MutableStateFlow(WatchData(0, 0))
-    var medicalDeviceChairData: MutableStateFlow<ChairData> =
-        MutableStateFlow(ChairData(0, 0, 0f, 0f))
+
+    val isEndMedicalMeasurement: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    fun updateMedicalEndStatus(flag: Boolean) {
+        isEndMedicalMeasurement.update { flag }
+    }
+
+    var medicalDeviceWatchData: MutableStateFlow<WatchData> = MutableStateFlow<WatchData>(
+        WatchData(0, 0)
+    )
+    var medicalDeviceChairData: MutableStateFlow<ChairData> = MutableStateFlow<ChairData>(
+        ChairData(0, 0, 0f, 0f)
+    )
 
     var tempRecommendationMent: ArrayList<RecommendationMent> = arrayListOf()
     var beforeBody: BodyInfo? = null
@@ -283,12 +310,6 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
     val currentBottomMenu = mutableStateOf(BottomMenu.Start.type) // 바텀 메뉴
-
-    var heartAnimationState = mutableStateOf(true)
-
-    fun updateHeartAnimationState(flag: Boolean) {
-        heartAnimationState.value = flag
-    }
 
     fun moveScreen(screen: Screens? = null, bottomMenu: BottomMenu? = null) {
         screen?.let {
@@ -435,17 +456,14 @@ class MainViewModel @Inject constructor(
 
                                     userInputData?.let {
                                         header = HeaderInfo().toStream(
-                                            type = MAGO_PROTOCOL.PROTOCOL_18.id,
-                                            age = userAge, gender = userGender
+                                            type = MAGO_PROTOCOL.PROTOCOL_18.id, age = userAge, gender = userGender
                                         )
 
                                         newBody = BodyInfo().toMeasurement(
                                             before = beforeBody, measurementInfo = MeasurementInfo(
                                                 medication = it.medication ?: listOf("hnr"),
-                                                bloodPressureSystolic = it.bloodPressureSystolic
-                                                    ?: 120,
-                                                bloodPressureDiastolic = it.bloodPressureDiastolic
-                                                    ?: 80,
+                                                bloodPressureSystolic = it.bloodPressureSystolic ?: 120,
+                                                bloodPressureDiastolic = it.bloodPressureDiastolic ?: 80,
                                                 glucose = it.glucose ?: 100,
                                                 heartRate = it.heartRate ?: 60,
                                                 bodyTemperature = it.bodyTemperature ?: 36.5f,
@@ -513,10 +531,7 @@ class MainViewModel @Inject constructor(
         MutableStateFlow(Triple(ActionType.IDLE, "", null))
 
     fun changeConversationList(
-        type: ActionType,
-        content: String,
-        msgResponse: MessageProtocol?,
-        isFallback: Boolean = false
+        type: ActionType, content: String, msgResponse: MessageProtocol?, isFallback: Boolean = false
     ) {
         if (!isFallback) {
             conversationInfo.value = Triple(type, content, msgResponse)
@@ -537,7 +552,6 @@ class MainViewModel @Inject constructor(
         tempRecommendationMent.clear()
         chatList.clear()
         conversationInfo.value = Triple(ActionType.IDLE, "", null)
-        updateHeartAnimationState(false)
         changeSaidMeText("")
     }
 

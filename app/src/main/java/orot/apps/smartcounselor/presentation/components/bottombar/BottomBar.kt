@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.components.bottombar
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.model.local.WatchData
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
 import orot.apps.smartcounselor.presentation.components.bottombar.blood_pressure.WaitingMeasurement
 import orot.apps.smartcounselor.presentation.components.bottombar.home.UserRadioButton
@@ -233,31 +231,26 @@ private fun RetryAndChatBottomBar() {
 private fun BloodPressureBottomBar() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
 
-    val watch = mainViewModel.medicalDeviceWatchData.collectAsState().value
-    val chair = mainViewModel.medicalDeviceChairData.collectAsState().value
+    val isEndMeasurement = mainViewModel.isEndMedicalMeasurement.collectAsState().value
 
-    Log.w("Adsasdas", "BloodPressureBottomBar: ${watch.isDataExist()} || ${chair.isDataExist()}", )
-
-    if (watch.isDataExist() || chair.isDataExist()){
-
+    if (isEndMeasurement){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            InputBloodPressure(modifier = Modifier.weight(0.8f))
+            Box(
+                modifier = Modifier.weight(0.2f), contentAlignment = Alignment.Center
+            ) {
+                BloodPressureSubmitButton()
+            }
+        }
     }else{
         WaitingMeasurement()
     }
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(18.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        InputBloodPressure(modifier = Modifier.weight(0.8f))
-//        Box(
-//            modifier = Modifier.weight(0.2f), contentAlignment = Alignment.Center
-//        ) {
-//            BloodPressureSubmitButton()
-//        }
-//    }
 }
 
 /** 다시하기 */

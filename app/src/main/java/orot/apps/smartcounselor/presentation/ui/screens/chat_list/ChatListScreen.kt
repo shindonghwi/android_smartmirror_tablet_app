@@ -29,10 +29,11 @@ fun ChatViewContent() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     if (mainViewModel.isChatViewShowing.collectAsState().value) {
         LazyColumn(
-            modifier = Modifier.padding(top = 40.dp),
+            modifier = Modifier.padding(top = 20.dp),
             state = rememberLazyListState(),
             reverseLayout = false,
-            contentPadding = PaddingValues(bottom = 20.dp)
+            contentPadding = PaddingValues(vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             items(
                 count = mainViewModel.chatList.size
@@ -87,7 +88,7 @@ private fun AiTextContent(msg: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 40.dp, bottom = 35.dp, top = 35.dp),
+            .padding(start = 40.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
