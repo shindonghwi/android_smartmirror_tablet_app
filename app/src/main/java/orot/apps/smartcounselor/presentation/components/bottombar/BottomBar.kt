@@ -2,14 +2,16 @@ package orot.apps.smartcounselor.presentation.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,16 +23,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
 import orot.apps.smartcounselor.presentation.components.bottombar.home.UserRadioButton
 import orot.apps.smartcounselor.presentation.components.common.VDivider
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Gray20
+import orot.apps.smartcounselor.presentation.style.GrayDivider
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component.BloodPressureSubmitButton
@@ -67,7 +68,6 @@ fun MagoBottomBar() {
 
                 }
                 BottomMenu.Conversation.type -> {
-                    VDivider()
                     ConversationBottomBar()
                 }
                 BottomMenu.BloodPressure.type -> {
@@ -299,26 +299,73 @@ fun CallBottomBar() {
     }
 }
 
-/** 상담원 전화 걸려올때 */
+/** 대화하기 */
 @Composable
 fun ConversationBottomBar() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
-    val isPlaying = remember { mainViewModel.micIsAvailable }
+    val micIsAvailable = remember { mainViewModel.micIsAvailable }
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 40.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        RotationAnimation(
-            modifier = Modifier.padding(start = 60.dp),
-            isPlaying = isPlaying,
-            iconDrawable = R.drawable.mago_logo_icon,
-            iconSize = 80.dp
-        )
+        Box(
+            modifier = Modifier.wrapContentHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(80.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                VDivider(color = GrayDivider.copy(0.4f))
+            }
 
-        SaidMeText()
+            WavesAnimation(
+                waveSize = 80.dp,
+                waveDuration = 2500,
+                waveColor = Color.White.copy(alpha = if (micIsAvailable.value) 0.4f else 0.01f),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .padding(5.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(10.dp),
+                        painter = painterResource(R.drawable.mic),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            }
+
+            if (micIsAvailable.value) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(80.dp),
+                    color = MaterialTheme.colors.primary,
+                    strokeWidth = 1.dp
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            SaidMeText()
+        }
     }
 }
 
@@ -327,10 +374,9 @@ private fun SaidMeText() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
     val text = mainViewModel.saidMeText.collectAsState().value
     Text(
-        modifier = Modifier.padding(start = 60.dp),
         text = text,
         color = Color.White,
-        style = MaterialTheme.typography.h1.copy(textAlign = TextAlign.Center)
+        style = MaterialTheme.typography.h1,
     )
 }
 
@@ -362,7 +408,7 @@ fun getBottomBarHeight(route: String): Float {
         BottomMenu.Start.type -> 0.3f
         BottomMenu.Loading.type -> 0.33f
         BottomMenu.Empty.type -> 0f
-        BottomMenu.Conversation.type -> 0.33f
+        BottomMenu.Conversation.type -> 0.4f
         BottomMenu.BloodPressure.type -> 0.7f
         BottomMenu.Retry.type -> 0.33f
         BottomMenu.RetryAndChat.type -> 0.33f

@@ -376,7 +376,7 @@ class MainViewModel @Inject constructor(
     }
 
     val saidMeText = MutableStateFlow("")
-    val chatList = arrayListOf<ChatData>()
+    val chatList = mutableStateListOf<ChatData>()
     fun changeSaidMeText(msg: String) {
         saidMeText.value = msg
     }
@@ -395,6 +395,8 @@ class MainViewModel @Inject constructor(
     var conversationVisibleState = MutableTransitionState(false)
     var tts: TextToSpeech? = null
     val ttsState = MutableStateFlow(TTSCallback.IDLE)
+    val ttsIsSpeaking = mutableStateOf(false) // TTS 말하는중 여부
+
     fun initTTS(context: Context) {
         params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, null)
         tts = TextToSpeech(context) { state ->
@@ -403,12 +405,14 @@ class MainViewModel @Inject constructor(
                     language = Locale.KOREAN
                     setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {
+                            ttsIsSpeaking.value = true
                             changeSendingStateAudioBuffer(false)
                             conversationVisibleState.targetState = true
                             ttsState.value = TTSCallback.START
                         }
 
                         override fun onDone(utteranceId: String?) {
+                            ttsIsSpeaking.value = false
                             conversationVisibleState.targetState = false
                             ttsState.value = TTSCallback.DONE
 
@@ -469,6 +473,7 @@ class MainViewModel @Inject constructor(
                         }
 
                         override fun onError(utteranceId: String?) {
+                            ttsIsSpeaking.value = false
                             ttsState.value = TTSCallback.ERROR
                         }
                     })
@@ -480,6 +485,7 @@ class MainViewModel @Inject constructor(
     fun playGoogleTts(msg: String?) {
         tts?.let {
             if (it.isSpeaking) {
+                ttsIsSpeaking.value = false
                 it.stop()
             }
             msg?.let { content ->
@@ -490,6 +496,7 @@ class MainViewModel @Inject constructor(
 
     fun stopGoogleTts() {
         tts?.run {
+            ttsIsSpeaking.value = false
             stop()
             null
         }

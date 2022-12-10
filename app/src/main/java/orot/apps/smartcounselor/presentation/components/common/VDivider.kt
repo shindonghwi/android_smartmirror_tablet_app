@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.presentation.style.GrayDivider
 
 @Composable
-fun VDivider() {
+fun VDivider(color: Color = GrayDivider) {
     Divider(
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp),
-        color = GrayDivider
+        color = color
     )
 }

@@ -39,7 +39,7 @@ fun ChatListScreen() {
 
 
 @Composable
-private fun ChatContentTypeHolder(chatData: ChatData?) {
+fun ChatContentTypeHolder(chatData: ChatData?) {
 
     when (chatData?.isUser) {
         false -> {
@@ -69,7 +69,7 @@ private fun UserTextContent(msg: String) {
                 .background(Color.White)
                 .padding(vertical = 14.dp, horizontal = 12.dp),
             text = msg,
-            style = MaterialTheme.typography.h2,
+            style = MaterialTheme.typography.h3,
             color = Color.Black
         )
     }
@@ -91,7 +91,7 @@ private fun AiTextContent(msg: String) {
                 .background(Color(0xFFE16145))
                 .padding(vertical = 14.dp, horizontal = 12.dp),
             text = msg,
-            style = MaterialTheme.typography.h2,
+            style = MaterialTheme.typography.h3,
             color = Color.White
         )
     }
