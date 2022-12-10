@@ -24,14 +24,11 @@ import okio.ByteString
 import orot.apps.smartcounselor.graph.NavigationKit
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.model.local.ActionType
-import orot.apps.smartcounselor.model.local.ChatData
-import orot.apps.smartcounselor.model.local.RecommendationMent
+import orot.apps.smartcounselor.model.local.*
 import orot.apps.smartcounselor.model.remote.*
 import orot.apps.smartcounselor.model.remote.mapper.body.toMeasurement
 import orot.apps.smartcounselor.model.remote.mapper.header.toStream
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
-import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
 import java.util.*
@@ -174,6 +171,9 @@ class MainViewModel @Inject constructor(
                                     moveScreen(null, BottomMenu.Conversation)
                                 }
                             }
+                            MAGO_PROTOCOL.PROTOCOL_17.id -> {
+                                Log.w("HHHHHERLEWKRJKLW", "onMessageText: $receivedMsg")
+                            }
                             MAGO_PROTOCOL.PROTOCOL_19.id -> {
                                 changeSaidMeText("")
                             }
@@ -209,7 +209,6 @@ class MainViewModel @Inject constructor(
                 }
             })
         }.run {
-//            initWebSocket("ws://172.30.1.15:8080/ws/chat")
             initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
         }
     }
@@ -241,6 +240,11 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
+    var medicalDeviceWatchData: MutableStateFlow<WatchData> =
+        MutableStateFlow(WatchData(0, 0))
+    var medicalDeviceChairData: MutableStateFlow<ChairData> =
+        MutableStateFlow(ChairData(0, 0, 0f, 0f))
+
     var tempRecommendationMent: ArrayList<RecommendationMent> = arrayListOf()
     var beforeBody: BodyInfo? = null
 
@@ -250,14 +254,14 @@ class MainViewModel @Inject constructor(
 
     var addAccountInputData = ""
 
-    fun addUser(userInfo: String){
-        if (!userListInfo.contains(userInfo)){
+    fun addUser(userInfo: String) {
+        if (!userListInfo.contains(userInfo)) {
             userListInfo.add(userInfo)
         }
     }
 
     var isShowingAccountBottomSheet = MutableStateFlow(false)
-    fun changeBottomSheetFlag(flag: Boolean){
+    fun changeBottomSheetFlag(flag: Boolean) {
         isShowingAccountBottomSheet.update { flag }
     }
 
@@ -377,6 +381,8 @@ class MainViewModel @Inject constructor(
 
     val saidMeText = MutableStateFlow("")
     val chatList = mutableStateListOf<ChatData>()
+    val isChatViewShowing = MutableStateFlow(true)
+    fun changeChatViewShowing(flag: Boolean) = isChatViewShowing.update { false }
     fun changeSaidMeText(msg: String) {
         saidMeText.value = msg
     }
@@ -418,7 +424,8 @@ class MainViewModel @Inject constructor(
 
                             when (conversationInfo.value.first) {
                                 ActionType.MEASUREMENT -> {
-                                    moveScreen(Screens.BloodPressure, BottomMenu.BloodPressure)
+                                    changeChatViewShowing(false)
+                                    moveScreen(null, BottomMenu.BloodPressure)
                                 }
 
                                 ActionType.RESULT_WAITING -> {

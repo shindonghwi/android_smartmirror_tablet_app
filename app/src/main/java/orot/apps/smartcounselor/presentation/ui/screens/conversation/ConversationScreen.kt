@@ -36,6 +36,7 @@ import orot.apps.smartcounselor.model.local.RecommendationMent
 import orot.apps.smartcounselor.presentation.components.animation.RotationAnimation
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatContentTypeHolder
+import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatViewContent
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -74,19 +75,7 @@ fun ConversationScreen() {
                     AIReceivedTextContent()
                 }
             }
-
-            LazyColumn(
-                modifier = Modifier.padding(top = 10.dp),
-                state = rememberLazyListState(),
-                reverseLayout = false,
-                contentPadding = PaddingValues(bottom = 20.dp)
-            ) {
-                items(
-                    count = mainViewModel.chatList.size
-                ) { idx ->
-                    ChatContentTypeHolder(mainViewModel.chatList.elementAtOrNull(idx))
-                }
-            }
+            ChatViewContent()
         }
     }
 }

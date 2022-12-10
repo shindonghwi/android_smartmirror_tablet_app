@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,19 +21,24 @@ import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 @Composable
 fun ChatListScreen() {
+    ChatViewContent()
+}
 
+@Composable
+fun ChatViewContent() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
-
-    LazyColumn(
-        modifier = Modifier.padding(top = 40.dp),
-        state = rememberLazyListState(),
-        reverseLayout = false,
-        contentPadding = PaddingValues(bottom = 20.dp)
-    ) {
-        items(
-            count = mainViewModel.chatList.size
-        ) { idx ->
-            ChatContentTypeHolder(mainViewModel.chatList.elementAtOrNull(idx))
+    if (mainViewModel.isChatViewShowing.collectAsState().value) {
+        LazyColumn(
+            modifier = Modifier.padding(top = 40.dp),
+            state = rememberLazyListState(),
+            reverseLayout = false,
+            contentPadding = PaddingValues(bottom = 20.dp)
+        ) {
+            items(
+                count = mainViewModel.chatList.size
+            ) { idx ->
+                ChatContentTypeHolder(mainViewModel.chatList.elementAtOrNull(idx))
+            }
         }
     }
 }
