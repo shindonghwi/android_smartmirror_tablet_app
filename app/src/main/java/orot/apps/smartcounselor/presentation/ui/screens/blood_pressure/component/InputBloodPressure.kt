@@ -2,13 +2,12 @@ package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.componen
 
 import android.text.TextUtils
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -18,11 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.model.remote.UserInputData
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
@@ -65,6 +66,42 @@ fun InputBloodPressure(modifier: Modifier) {
                     color = Color.White,
                     overflow = TextOverflow.Ellipsis
                 )
+                Spacer(modifier = modifier.weight(1f))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // 시계에서 수집되는 데이터
+                    if (index == 1 && mainViewModel.watchHashData["bloodPressureSystolic"] != 0 ||
+                        index == 4 && mainViewModel.watchHashData["heartRate"] != 0
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(end = 8.dp),
+                            painter = painterResource(id = R.drawable.watch),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                    // 의자에서 수집되는 데이터
+                    if (index == 1 && mainViewModel.chairHashData["bloodPressureSystolic"] != 0 ||
+                        index == 3 && mainViewModel.chairHashData["glucose"] != 0 ||
+                        index == 7 && mainViewModel.chairHashData["weight"] != 0
+                    ) {
+
+                        Icon(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(end = 8.dp),
+                            painter = painterResource(id = R.drawable.chair),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
+
                 CustomTextField(modifier = Modifier
                     .width(screenWidth.dp * 0.3f)
                     .border(1.dp, Color.White, RoundedCornerShape(16.dp))
@@ -163,7 +200,10 @@ fun InputBloodPressure(modifier: Modifier) {
 private fun getDefaultText(userInputData: UserInputData?, index: Int): String {
     return when (index) {
         0 -> userInputData?.medication?.let { it1 -> TextUtils.join(",", it1) }.toString()
+        1 -> userInputData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
+        2 -> userInputData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         3 -> userInputData?.glucose.toString()
+        4 -> userInputData?.heartRate?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         5 -> userInputData?.bodyTemperature.toString()
         6 -> userInputData?.height.toString()
         7 -> userInputData?.weight.toString()

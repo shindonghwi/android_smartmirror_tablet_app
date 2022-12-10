@@ -172,7 +172,19 @@ class MainViewModel @Inject constructor(
                             MAGO_PROTOCOL.PROTOCOL_17.id -> {
                                 when (device) {
                                     "Watch" -> {
-                                        Log.w(TAG, "onMessageText: WATCH DATA", )
+                                        Log.w(TAG, "onMessageText: WATCH DATA")
+                                        userInputData?.apply {
+                                            measurement?.bloodPressureSystolic.takeIf { it != 0 }
+                                                ?.apply {
+                                                    watchHashData["bloodPressureSystolic"] = this
+                                                    bloodPressureSystolic = this
+                                                }
+                                            measurement?.heartRate.takeIf { it != 0 }
+                                                ?.apply {
+                                                    watchHashData["heartRate"] = this
+                                                    heartRate = this
+                                                }
+                                        }
                                         medicalDeviceWatchData.update {
                                             WatchData(
                                                 bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
@@ -181,7 +193,30 @@ class MainViewModel @Inject constructor(
                                         }
                                     }
                                     "Chair" -> {
-                                        Log.w(TAG, "onMessageText: Chair DATA", )
+                                        Log.w(TAG, "onMessageText: Chair DATA")
+
+                                        userInputData?.apply {
+                                            measurement?.bloodPressureSystolic.takeIf { it != 0 }
+                                                ?.apply {
+                                                    chairHashData["bloodPressureSystolic"] = this
+                                                    bloodPressureSystolic = this
+                                                }
+                                            measurement?.glucose.takeIf { it != 0 }
+                                                ?.apply {
+                                                    chairHashData["glucose"] = this
+                                                    glucose = this
+                                                }
+                                            measurement?.weight.takeIf { it != 0f }
+                                                ?.apply {
+                                                    chairHashData["weight"] = this.toInt()
+                                                    weight = this
+                                                }
+                                            measurement?.bodyMassIndex.takeIf { it != 0f }
+                                                ?.apply {
+                                                    chairHashData["bodyMassIndex"] = this.toInt()
+                                                    bodyMassIndex = this
+                                                }
+                                        }
                                         medicalDeviceChairData.update {
                                             ChairData(
                                                 bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
@@ -259,6 +294,17 @@ class MainViewModel @Inject constructor(
      *     SAVE DATA
      * ================================================
      * */
+
+    var watchHashData = HashMap<String, Int>().apply {
+        put("bloodPressureSystolic", 0)
+        put("heartRate", 0)
+    }
+    var chairHashData = HashMap<String, Int>().apply {
+        put("bloodPressureSystolic", 0)
+        put("glucose", 0)
+        put("weight", 0)
+        put("bodyMassIndex", 0)
+    }
 
     val isEndMedicalMeasurement: MutableStateFlow<Boolean> = MutableStateFlow(false)
     fun updateMedicalEndStatus(flag: Boolean) {
