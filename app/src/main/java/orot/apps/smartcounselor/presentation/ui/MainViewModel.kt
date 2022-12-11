@@ -33,6 +33,7 @@ import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -68,8 +69,10 @@ class MainViewModel @Inject constructor(
                         val display = receivedMsg.body?.display
                         val measurement = receivedMsg.body?.measurement
 
-                        receivedMsg.body?.let {
-                            beforeBody = receivedMsg.body
+                        if (protocol != MAGO_PROTOCOL.PROTOCOL_17.id){
+                            receivedMsg.body?.let {
+                                beforeBody = receivedMsg.body
+                            }
                         }
 
                         val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
@@ -173,56 +176,48 @@ class MainViewModel @Inject constructor(
                                 when (device) {
                                     "Watch" -> {
                                         Log.w(TAG, "onMessageText: WATCH DATA")
-                                        userInputData?.apply {
-                                            measurement?.bloodPressureSystolic.takeIf { it != 0 }
-                                                ?.apply {
-                                                    watchHashData["bloodPressureSystolic"] = this
-                                                    bloodPressureSystolic = this
-                                                }
-                                            measurement?.heartRate.takeIf { it != 0 }
-                                                ?.apply {
-                                                    watchHashData["heartRate"] = this
-                                                    heartRate = this
-                                                }
-                                        }
+                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
+                                        val heartRate = measurement?.heartRate ?: 0
+
+                                        userInputData = userInputData?.copy(
+                                            bloodPressureSystolic = bloodPressureSystolic,
+                                            heartRate = heartRate
+                                        )
+                                        watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
+                                        watchHashData["heartRate"] = heartRate
+
                                         medicalDeviceWatchData.update {
                                             WatchData(
-                                                bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
-                                                heartRate = measurement?.heartRate ?: 0
+                                                bloodPressureSystolic = bloodPressureSystolic,
+                                                heartRate = heartRate
                                             )
                                         }
                                     }
                                     "Chair" -> {
                                         Log.w(TAG, "onMessageText: Chair DATA")
 
-                                        userInputData?.apply {
-                                            measurement?.bloodPressureSystolic.takeIf { it != 0 }
-                                                ?.apply {
-                                                    chairHashData["bloodPressureSystolic"] = this
-                                                    bloodPressureSystolic = this
-                                                }
-                                            measurement?.glucose.takeIf { it != 0 }
-                                                ?.apply {
-                                                    chairHashData["glucose"] = this
-                                                    glucose = this
-                                                }
-                                            measurement?.weight.takeIf { it != 0f }
-                                                ?.apply {
-                                                    chairHashData["weight"] = this.toInt()
-                                                    weight = this
-                                                }
-                                            measurement?.bodyMassIndex.takeIf { it != 0f }
-                                                ?.apply {
-                                                    chairHashData["bodyMassIndex"] = this.toInt()
-                                                    bodyMassIndex = this
-                                                }
-                                        }
+                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
+                                        val glucose = measurement?.glucose ?: 0
+                                        val weight = measurement?.weight ?: 0f
+                                        val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
+
+                                        userInputData = userInputData?.copy(
+                                            bloodPressureSystolic = bloodPressureSystolic,
+                                            glucose = glucose,
+                                            weight = weight,
+                                            bodyMassIndex = bodyMassIndex
+                                        )
+                                        chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
+                                        chairHashData["glucose"] = glucose
+                                        chairHashData["weight"] = weight.toInt()
+                                        chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
+
                                         medicalDeviceChairData.update {
                                             ChairData(
-                                                bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0,
-                                                glucose = measurement?.glucose ?: 0,
-                                                weight = measurement?.weight ?: 0f,
-                                                bmi = measurement?.bodyMassIndex ?: 0f
+                                                bloodPressureSystolic = bloodPressureSystolic,
+                                                glucose = glucose,
+                                                weight = weight,
+                                                bmi = bodyMassIndex
                                             )
                                         }
                                     }
@@ -295,6 +290,15 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
 
+    var userInputData: UserInputData? = UserInputData(
+        medication = listOf("htn"),
+        glucose = 105,
+        bodyTemperature = 36.5f,
+        height = 182f,
+        weight = 92f,
+        bodyMassIndex = 25.2f,
+    )
+
     var watchHashData = HashMap<String, Int>().apply {
         put("bloodPressureSystolic", 0)
         put("heartRate", 0)
@@ -337,18 +341,6 @@ class MainViewModel @Inject constructor(
     fun changeBottomSheetFlag(flag: Boolean) {
         isShowingAccountBottomSheet.update { flag }
     }
-
-    val userAge = 60 // TODO: 사용자 나이, 성별 셋팅해야함.
-    val userGender = "M"
-
-    var userInputData: UserInputData? = UserInputData(
-        medication = listOf("htn"),
-        glucose = 105,
-        bodyTemperature = 36.5f,
-        height = 182f,
-        weight = 92f,
-        bodyMassIndex = 25.2f,
-    )
 
     /**
      * ================================================
@@ -415,12 +407,19 @@ class MainViewModel @Inject constructor(
 
         userInputData?.let {
             header = HeaderInfo().toStream(
-                type = protocolId, age = userAge, gender = userGender
+                type = protocolId, age = it.age, gender = it.gender
             )
 
-            newBody = body?.body?.toMeasurement(
-                before = beforeBody, measurementInfo = null
-            )
+            newBody = if (protocolId == MAGO_PROTOCOL.PROTOCOL_18.id){ // 측정된 값은 measurementInfo 정보로 넘긴다.
+                body?.body?.toMeasurement(
+                    before = beforeBody, measurementInfo = body.body.measurement
+                )
+            }else{
+                body?.body?.toMeasurement(
+                    before = beforeBody, measurementInfo = null
+                )
+            }
+
 
             val newResMsg = MessageProtocol(
                 header = header, body = if (protocolNum <= 2) null else newBody
@@ -502,22 +501,41 @@ class MainViewModel @Inject constructor(
 
                                     userInputData?.let {
                                         header = HeaderInfo().toStream(
-                                            type = MAGO_PROTOCOL.PROTOCOL_18.id, age = userAge, gender = userGender
+                                            type = MAGO_PROTOCOL.PROTOCOL_18.id, age = it.age, gender = it.gender
                                         )
 
                                         newBody = BodyInfo().toMeasurement(
                                             before = beforeBody, measurementInfo = MeasurementInfo(
-                                                medication = it.medication ?: listOf("hnr"),
-                                                bloodPressureSystolic = it.bloodPressureSystolic ?: 120,
-                                                bloodPressureDiastolic = it.bloodPressureDiastolic ?: 80,
-                                                glucose = it.glucose ?: 100,
-                                                heartRate = it.heartRate ?: 60,
-                                                bodyTemperature = it.bodyTemperature ?: 36.5f,
-                                                height = it.height ?: 170f,
-                                                weight = it.weight ?: 60f,
-                                                bodyMassIndex = it.bodyMassIndex ?: 20.8f,
+                                                medication = it.medication,
+                                                bloodPressureSystolic = it.bloodPressureSystolic,
+                                                bloodPressureDiastolic = it.bloodPressureDiastolic,
+                                                glucose = it.glucose,
+                                                heartRate = it.heartRate,
+                                                bodyTemperature = it.bodyTemperature,
+                                                height = it.height,
+                                                weight = it.weight,
+                                                bodyMassIndex = it.bodyMassIndex,
                                             )
                                         )
+
+                                        Log.w(TAG, "beforeBody: ${Gson().toJson(beforeBody)}", )
+                                        Log.w(TAG, "measurementInfo: ${Gson().toJson(MeasurementInfo(
+                                            medication = it.medication,
+                                            bloodPressureSystolic = it.bloodPressureSystolic,
+                                            bloodPressureDiastolic = it.bloodPressureDiastolic,
+                                            glucose = it.glucose,
+                                            heartRate = it.heartRate,
+                                            bodyTemperature = it.bodyTemperature,
+                                            height = it.height,
+                                            weight = it.weight,
+                                            bodyMassIndex = it.bodyMassIndex,
+                                        ))}", )
+                                        Log.w(TAG, "newBody: ${Gson().toJson(newBody)}", )
+                                        Log.w(TAG, "sendBody: ${Gson().toJson(MessageProtocol(
+                                            header = header,
+                                            body = newBody,
+                                        ))}", )
+
                                         sendProtocol(
                                             protocolNum = 18, body = MessageProtocol(
                                                 header = header,

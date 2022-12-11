@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -115,11 +116,12 @@ fun InputBloodPressure(modifier: Modifier) {
                             0 -> KeyboardType.Text
                             else -> KeyboardType.Number
                         },
-                        imeAction = if (item.first.contains("체질량 지수")) ImeAction.Done else ImeAction.Next
+                        imeAction = if (item.first.contains("체질량")) ImeAction.Done else ImeAction.Next
                     ),
-                    keyBoardActionUnit = KeyBoardActionUnit(onDone = {
-                        focusManager.clearFocus()
-                    }),
+                    keyBoardActionUnit = KeyBoardActionUnit(
+                        onDone = { focusManager.clearFocus() },
+                        onNext = { focusManager.moveFocus(FocusDirection.Next) },
+                    ),
                     textLimit = when (index) {
                         0 -> Int.MAX_VALUE
                         1, 2, 3, 4 -> 3
@@ -136,58 +138,36 @@ fun InputBloodPressure(modifier: Modifier) {
                     iTextCallback = object : ITextCallback {
                         override fun renderText(content: String) {
 
-                            var intTextNum: Int? = null
-                            var floatTextNum: Float? = null
+                            var intTextNum = 0
+                            var floatTextNum = 0f
 
                             when (index) {
                                 1, 2, 3, 4 -> { // int
                                     content.replace("[^0-9]".toRegex(), "")
-                                        .takeIf { it.isNotEmpty() }?.apply {
-                                            intTextNum = this.toInt()
-                                        } ?: apply {
-                                        intTextNum = null
-                                    }
+                                        .takeIf { it.isNotEmpty() }
+                                        ?.apply { intTextNum = this.toInt() }
+                                        ?: apply { intTextNum = 0 }
                                 }
                                 5, 6, 7, 8 -> { // float
                                     content.replace("[^0-9]{0,2}(\\.[^0-9]{0,2})?$".toRegex(), "")
-                                        .takeIf { it.isNotEmpty() }?.apply {
-                                            floatTextNum = this.toFloat()
-                                        } ?: apply {
-                                        floatTextNum = null
-                                    }
+                                        .takeIf { it.isNotEmpty() }
+                                        ?.apply { floatTextNum = this.toFloat() }
+                                        ?: apply { floatTextNum = 0f }
                                 }
                                 else -> {}
                             }
 
                             mainViewModel.userInputData?.let {
                                 when (index) {
-                                    0 -> {
-                                        it.medication = content.split(",")
-                                    }
-                                    1 -> {
-                                        it.bloodPressureSystolic = intTextNum
-                                    }
-                                    2 -> {
-                                        it.bloodPressureDiastolic = intTextNum
-                                    }
-                                    3 -> {
-                                        it.glucose = intTextNum
-                                    }
-                                    4 -> {
-                                        it.heartRate = intTextNum
-                                    }
-                                    5 -> {
-                                        it.bodyTemperature = floatTextNum
-                                    }
-                                    6 -> {
-                                        it.height = floatTextNum
-                                    }
-                                    7 -> {
-                                        it.weight = floatTextNum
-                                    }
-                                    8 -> {
-                                        it.bodyMassIndex = floatTextNum
-                                    }
+                                    0 -> it.medication = content.split(",")
+                                    1 -> it.bloodPressureSystolic = intTextNum
+                                    2 -> it.bloodPressureDiastolic = intTextNum
+                                    3 -> it.glucose = intTextNum
+                                    4 -> it.heartRate = intTextNum
+                                    5 -> it.bodyTemperature = floatTextNum
+                                    6 -> it.height = floatTextNum
+                                    7 -> it.weight = floatTextNum
+                                    8 -> it.bodyMassIndex = floatTextNum
                                 }
                             }
                         }

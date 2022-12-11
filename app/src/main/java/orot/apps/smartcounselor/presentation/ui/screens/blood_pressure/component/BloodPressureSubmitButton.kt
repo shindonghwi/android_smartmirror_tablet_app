@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,10 +22,10 @@ import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.ActionType
-import orot.apps.smartcounselor.model.remote.asMap
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable
@@ -40,23 +41,18 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
             .width(startWidth)
             .clickBounce {
 
-                val remainKey = mainViewModel.userInputData?.asMap()?.entries
-                    ?.filter { it.value == null }
-                    ?.map { it.key } // 아직 입력하지 않은 정보
+                Log.w(TAG, "BloodPressureSubmitButton: ${mainViewModel.userInputData}" )
+                val isValueEmpty = mainViewModel.userInputData?.isEmptyCheck()
 
-                takeIf {
-                    remainKey?.size == 0
-                }?.run {
+                if (isValueEmpty == true){
+                    Toast.makeText(context, "정보를 모두 입력해주세요", Toast.LENGTH_SHORT).show()
+                }else{
                     mainViewModel.run {
                         val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
                         playGoogleTts(content)
                         changeConversationList(ActionType.RESULT_WAITING, content, null)
                         moveScreen(Screens.Conversation, BottomMenu.Loading)
                     }
-                } ?: run {
-                    Toast
-                        .makeText(context, "정보를 모두 입력해주세요", Toast.LENGTH_SHORT)
-                        .show()
                 }
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))
