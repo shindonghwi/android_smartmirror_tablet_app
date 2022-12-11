@@ -21,9 +21,9 @@ data class ChairData(
     val bloodPressureSystolic: Int, // 혈압
     val glucose: Int, // 혈당
     val weight: Float, // 체중
-    val bmi: Float, // 체지방
+    val bodyMassIndex: Float, // 체지방
 ) : IChair {
     override fun isDataExist(): Boolean {
-        return bloodPressureSystolic + glucose + weight + bmi != 0f
+        return bloodPressureSystolic + glucose + weight + bodyMassIndex != 0f
     }
 }

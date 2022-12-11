@@ -217,7 +217,7 @@ class MainViewModel @Inject constructor(
                                                 bloodPressureSystolic = bloodPressureSystolic,
                                                 glucose = glucose,
                                                 weight = weight,
-                                                bmi = bodyMassIndex
+                                                bodyMassIndex = bodyMassIndex
                                             )
                                         }
                                     }
