@@ -338,8 +338,13 @@ class MainViewModel @Inject constructor(
     }
 
     var isShowingAccountBottomSheet = MutableStateFlow(false)
-    fun changeBottomSheetFlag(flag: Boolean) {
+    fun changeAccountBottomSheetFlag(flag: Boolean) {
         isShowingAccountBottomSheet.update { flag }
+    }
+
+    var isShowingRecommendationBottomSheet = MutableStateFlow(false)
+    fun changeRecommendationBottomSheetFlag(flag: Boolean) {
+        isShowingRecommendationBottomSheet.update { flag }
     }
 
     /**

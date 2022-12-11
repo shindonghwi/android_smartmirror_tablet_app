@@ -38,7 +38,8 @@ import orot.apps.smartcounselor.presentation.style.Black
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.SmartCounselorTheme
-import orot.apps.smartcounselor.presentation.ui.screens.account_register.AccountRegisterSheetContent
+import orot.apps.smartcounselor.presentation.ui.screens.sheet.account_register.AccountRegisterSheetContent
+import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.RecommendationSheetContent
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundVGradient
 import orot.apps.smartcounselor.presentation.ui.utils.permission.CheckPermission
 import orot.apps.systems.hideSystemUI
@@ -91,14 +92,16 @@ private fun MagoHCApp() {
                 .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
-            Scaffold(backgroundColor = Color.Transparent,
-                topBar = { MagoAppBar() },
-                bottomBar = { MagoBottomBar() }) {
-                Box(modifier = Modifier.padding(paddingValues = it)) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                MagoAppBar()
+                Box(modifier = Modifier.weight(1f)) {
                     NavGraph()
                 }
+                MagoBottomBar()
             }
             AccountRegisterSheetContent()
+            RecommendationSheetContent()
         }
     }
 }
+

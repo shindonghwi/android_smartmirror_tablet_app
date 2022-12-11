@@ -144,7 +144,7 @@ private fun StartBottomBar() {
                     .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                     .background(Color.White)
                     .noDuplicationClickable {
-                        mainViewModel.changeBottomSheetFlag(true)
+                        mainViewModel.changeAccountBottomSheetFlag(true)
                     },
                 contentAlignment = Alignment.Center
             ) {

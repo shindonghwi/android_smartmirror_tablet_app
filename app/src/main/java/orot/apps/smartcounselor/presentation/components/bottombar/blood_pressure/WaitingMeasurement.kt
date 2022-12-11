@@ -67,7 +67,7 @@ private fun HeartAnimationIcon() {
             modifier = Modifier
                 .scale(if (animVisibleState.targetState) scale else 1f)
                 .size(150.dp),
-            painter = painterResource(id = R.drawable.heartbeat),
+            painter = painterResource(id = R.drawable.result_heartbeat),
             contentDescription = null,
             tint = Color.Unspecified
         )

@@ -11,3 +11,9 @@ fun Modifier.backgroundVGradient(
 ) = composed {
     this.background(brush = Brush.verticalGradient(colors = colorList))
 }
+
+fun Modifier.backgroundHGradient(
+    colorList: List<Color>,
+) = composed {
+    this.background(brush = Brush.horizontalGradient(colors = colorList))
+}

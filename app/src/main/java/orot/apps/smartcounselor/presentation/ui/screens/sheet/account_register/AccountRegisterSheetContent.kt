@@ -1,6 +1,7 @@
-package orot.apps.smartcounselor.presentation.ui.screens.account_register
+package orot.apps.smartcounselor.presentation.ui.screens.sheet.account_register
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,7 +43,6 @@ import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.noDuplicationClickable
 
-@ExperimentalMaterialApi
 @Composable
 fun AccountRegisterSheetContent() {
     val config = LocalConfiguration.current
@@ -94,6 +94,10 @@ fun AccountRegisterSheetContent() {
 
             RegisterButton()
         }
+    }
+
+    BackHandler(enabled = isShowing) {
+        mainViewModel.changeAccountBottomSheetFlag(false)
     }
 }
 
@@ -253,7 +257,9 @@ private fun InputContent(modifier: Modifier, content: String, key: String, hint:
                 }
             ), iTextCallback = object : ITextCallback {
                 override fun renderText(content: String) {
-                    mainViewModel.addAccountInputData = content
+                    if (key == "성함") {
+                        mainViewModel.addAccountInputData = content
+                    }
                 }
             }
         )
@@ -374,12 +380,16 @@ private fun RegisterButton() {
                 .background(Primary)
                 .noDuplicationClickable {
                     mainViewModel.run {
-                        if (addAccountInputData.isNotEmpty()){
+                        if (addAccountInputData.isNotEmpty()) {
                             addUser(addAccountInputData)
-                            changeBottomSheetFlag(false)
-                            Toast.makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT).show()
+                            changeAccountBottomSheetFlag(false)
+                            Toast
+                                .makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast
+                                .makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                 },
@@ -401,7 +411,7 @@ private fun RegisterButton() {
                 .background(Color(0xFFD9D9D9))
                 .noDuplicationClickable {
                     Toast.makeText(context, "등록을 취소하였습니다", Toast.LENGTH_SHORT).show()
-                    mainViewModel.changeBottomSheetFlag(false)
+                    mainViewModel.changeAccountBottomSheetFlag(false)
                 },
             contentAlignment = Alignment.Center
         ) {
