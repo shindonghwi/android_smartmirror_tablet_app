@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Primary
@@ -109,7 +110,7 @@ private fun CloseButton(modifier: Modifier) {
                 .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                 .background(Primary)
                 .noDuplicationClickable {
-                    mainViewModel.changeRecommendationBottomSheetFlag(false)
+                    mainViewModel.proceedAfterMeasurement()
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -149,7 +150,7 @@ private fun RecommendationTitle() {
                 modifier = Modifier
                     .size(48.dp)
                     .noDuplicationClickable {
-                        mainViewModel.changeRecommendationBottomSheetFlag(false)
+                        mainViewModel.proceedAfterMeasurement()
                     }
                     .padding(8.dp),
                 imageVector = Icons.Default.Close,

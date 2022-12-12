@@ -32,7 +32,7 @@ import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundHGradie
 @Composable
 fun HeightWeightBmiCard(modifier: Modifier) {
 
-    val heightAndWeightDataList = listOf<ResultMeasurementCardInfo>(
+    val heightAndWeightDataList = listOf(
         ResultMeasurementCardInfo("키", Pair(173f, "cm"), "", null),
         ResultMeasurementCardInfo("몸무게", Pair(83f, "kg"), "", null),
         ResultMeasurementCardInfo("비만도(BMI)", Pair(26f, ""), "주의가 필요해요", null),

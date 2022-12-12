@@ -97,13 +97,7 @@ private fun AIReceivedTextContent() {
             targetAlpha = 0.3f
         )
     ) {
-        val showingContent: String = conversationInfo.second
-
-        if (showingContent.contains("[recommendation]")) {
-            RecommendationText(mainViewModel.tempRecommendationMent)
-        } else {
-            DefaultDisplayText(showingContent)
-        }
+        DefaultDisplayText(conversationInfo.second)
     }
 }
 

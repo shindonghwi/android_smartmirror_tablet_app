@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.text.TextUtils
 import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
@@ -26,14 +25,11 @@ import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.*
 import orot.apps.smartcounselor.model.remote.*
-import orot.apps.smartcounselor.model.remote.mapper.body.toMeasurement
-import orot.apps.smartcounselor.model.remote.mapper.header.toStream
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -58,7 +54,7 @@ class MainViewModel @Inject constructor(
                 }
 
                 override fun onMessageText(msg: String) {
-                    Log.w(TAG, "onMessageText: $msg")
+                    Log.w(TAG, "${conversationInfo.value.first} | onMessageText: $msg")
 
                     try {
                         val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
@@ -69,7 +65,7 @@ class MainViewModel @Inject constructor(
                         val display = receivedMsg.body?.display
                         val measurement = receivedMsg.body?.measurement
 
-                        if (protocol != MAGO_PROTOCOL.PROTOCOL_17.id){
+                        if (protocol != MAGO_PROTOCOL.PROTOCOL_17.id) {
                             receivedMsg.body?.let {
                                 beforeBody = receivedMsg.body
                             }
@@ -104,7 +100,6 @@ class MainViewModel @Inject constructor(
                             }
                             /** AI의 다음 질문 */
                             MAGO_PROTOCOL.PROTOCOL_12.id -> {
-                                sendProtocol(13, conversationInfo.value.third)
 
                                 val type = when (receivedMsg.body?.action) {
                                     "measurement" -> ActionType.MEASUREMENT
@@ -116,59 +111,17 @@ class MainViewModel @Inject constructor(
 
                                 voice?.let { voiceInfo ->
                                     playGoogleTts(voiceInfo.text)
-
-                                    if (ActionType.DOCTORCALL == type) {
-                                        val showingContent = "[recommendation]"
-
-                                        display?.current_status?.let {
-                                            if (it.isNotEmpty()) {
-                                                tempRecommendationMent.add(
-                                                    RecommendationMent(
-                                                        "현재상태", TextUtils.join("\n", it)
-                                                    )
-                                                )
-                                            }
-                                        }
-
-                                        display?.food?.let {
-                                            if (it.isNotEmpty()) {
-                                                tempRecommendationMent.add(
-                                                    RecommendationMent(
-                                                        "음식", TextUtils.join("\n", it)
-                                                    )
-                                                )
-                                            }
-                                        }
-
-                                        display?.exercise?.let {
-                                            if (it.isNotEmpty()) {
-                                                tempRecommendationMent.add(
-                                                    RecommendationMent(
-                                                        "운동", TextUtils.join("\n", it)
-                                                    )
-                                                )
-                                            }
-                                        }
-
-                                        display?.warning?.let {
-                                            if (it.isNotEmpty()) {
-                                                tempRecommendationMent.add(
-                                                    RecommendationMent(
-                                                        "경고", TextUtils.join("\n", it)
-                                                    )
-                                                )
-                                            }
-                                        }
-
-                                        changeConversationList(type, showingContent, receivedMsg)
-                                    } else {
+                                    if (ActionType.DOCTORCALL != type) {
                                         changeConversationList(type, voiceInfo.text, receivedMsg)
                                     }
                                 }
 
-                                if (conversationInfo.value.first == ActionType.DOCTORCALL) {
+                                if (display?.measurement != null) {
                                     changeSaidMeText("")
                                     moveScreen(null, BottomMenu.Conversation)
+                                    changeRecommendationBottomSheetFlag(true)
+                                }else{
+                                    sendProtocol(13, conversationInfo.value.third)
                                 }
                             }
                             /** Watch, Chair 데이터 도착 */
@@ -259,6 +212,16 @@ class MainViewModel @Inject constructor(
             })
         }.run {
             initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
+        }
+    }
+
+    /** 권고사항 화면 노출 후 이어서 진행하기 **/
+    fun proceedAfterMeasurement() {
+        pauseGoogleTts()
+        changeRecommendationBottomSheetFlag(false)
+        changeSendingStateAudioBuffer(true)
+        conversationInfo.value.let {
+            changeConversationList(it.first, "건강검진 결과는 어떠셨나요?", it.third)
         }
     }
 
@@ -415,13 +378,16 @@ class MainViewModel @Inject constructor(
                 type = protocolId, age = it.age, gender = it.gender
             )
 
-            newBody = if (protocolId == MAGO_PROTOCOL.PROTOCOL_18.id){ // 측정된 값은 measurementInfo 정보로 넘긴다.
+            newBody = if (protocolId == MAGO_PROTOCOL.PROTOCOL_18.id) { // 측정된 값은 measurementInfo 정보로 넘긴다.
+                conversationInfo.value.let {
+                    changeConversationList(ActionType.IDLE, it.second, it.third)
+                }
                 body?.body?.toMeasurement(
-                    before = beforeBody, measurementInfo = body.body.measurement
+                    beforeBody = beforeBody, measurement = body.body.measurement
                 )
-            }else{
+            } else {
                 body?.body?.toMeasurement(
-                    before = beforeBody, measurementInfo = null
+                    beforeBody = beforeBody, measurement = null
                 )
             }
 
@@ -430,7 +396,7 @@ class MainViewModel @Inject constructor(
                 header = header, body = if (protocolNum <= 2) null else newBody
             )
             val sendingData = Gson().toJson(newResMsg)
-            Log.w(TAG, "sendProtocol: protocol: $protocolId / body: $sendingData")
+            Log.w(TAG, "${conversationInfo.value.first} | sendProtocol: protocol: $protocolId / body: $sendingData")
             sognoraWebSocket.sendMsg(sendingData)
         }
     }
@@ -453,7 +419,7 @@ class MainViewModel @Inject constructor(
     val saidMeText = MutableStateFlow("")
     val chatList = mutableStateListOf<ChatData>()
     val isChatViewShowing = MutableStateFlow(true)
-    fun changeChatViewShowing(flag: Boolean) = isChatViewShowing.update { false }
+    fun changeChatViewShowing(flag: Boolean) = isChatViewShowing.update { flag }
     fun changeSaidMeText(msg: String) {
         saidMeText.value = msg
     }
@@ -510,7 +476,8 @@ class MainViewModel @Inject constructor(
                                         )
 
                                         newBody = BodyInfo().toMeasurement(
-                                            before = beforeBody, measurementInfo = MeasurementInfo(
+                                            beforeBody = beforeBody,
+                                            measurement = RequestedMeasurementInfo(
                                                 medication = it.medication,
                                                 bloodPressureSystolic = it.bloodPressureSystolic,
                                                 bloodPressureDiastolic = it.bloodPressureDiastolic,
@@ -523,24 +490,6 @@ class MainViewModel @Inject constructor(
                                             )
                                         )
 
-                                        Log.w(TAG, "beforeBody: ${Gson().toJson(beforeBody)}", )
-                                        Log.w(TAG, "measurementInfo: ${Gson().toJson(MeasurementInfo(
-                                            medication = it.medication,
-                                            bloodPressureSystolic = it.bloodPressureSystolic,
-                                            bloodPressureDiastolic = it.bloodPressureDiastolic,
-                                            glucose = it.glucose,
-                                            heartRate = it.heartRate,
-                                            bodyTemperature = it.bodyTemperature,
-                                            height = it.height,
-                                            weight = it.weight,
-                                            bodyMassIndex = it.bodyMassIndex,
-                                        ))}", )
-                                        Log.w(TAG, "newBody: ${Gson().toJson(newBody)}", )
-                                        Log.w(TAG, "sendBody: ${Gson().toJson(MessageProtocol(
-                                            header = header,
-                                            body = newBody,
-                                        ))}", )
-
                                         sendProtocol(
                                             protocolNum = 18, body = MessageProtocol(
                                                 header = header,
@@ -548,8 +497,6 @@ class MainViewModel @Inject constructor(
                                             )
                                         )
                                     }
-
-
                                 }
                                 ActionType.EXIT -> {
                                     onDefault {
@@ -560,6 +507,8 @@ class MainViewModel @Inject constructor(
                                         moveScreen(bottomMenu = BottomMenu.RetryAndChat)
                                     }
                                 }
+                                ActionType.IDLE,
+                                ActionType.DOCTORCALL -> {}
                                 else -> {
                                     changeSendingStateAudioBuffer(true)
                                 }
@@ -585,6 +534,13 @@ class MainViewModel @Inject constructor(
             msg?.let { content ->
                 it.speak(content, TextToSpeech.QUEUE_ADD, params, content)
             }
+        }
+    }
+
+    fun pauseGoogleTts(){
+        tts?.run {
+            ttsIsSpeaking.value = false
+            stop()
         }
     }
 

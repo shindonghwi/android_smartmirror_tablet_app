@@ -33,7 +33,9 @@ import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineS
 fun WaitingMeasurement() {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.padding(top = 30.dp).fillMaxSize(),
+            modifier = Modifier
+                .padding(top = 30.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HeartAnimationIcon()
@@ -69,7 +71,7 @@ private fun HeartAnimationIcon() {
                 .size(150.dp),
             painter = painterResource(id = R.drawable.result_heartbeat),
             contentDescription = null,
-            tint = Color.Unspecified
+            tint = Color(0xFFFF5151)
         )
     }
 }
@@ -102,7 +104,7 @@ private fun WatchIcon() {
                 .size(200.dp),
             painter = painterResource(id = R.drawable.watch),
             contentDescription = null,
-            tint = if (isWatchDataIsExist) Green80 else  Color.White.copy(0.8f)
+            tint = if (isWatchDataIsExist) Green80 else Color.White.copy(0.8f)
         )
         Text(
             modifier = Modifier.padding(vertical = 22.dp, horizontal = 30.dp),
@@ -127,7 +129,7 @@ private fun ChairIcon() {
                 .size(200.dp),
             painter = painterResource(id = R.drawable.chair),
             contentDescription = null,
-            tint = if (isChairDataIsExist) Green80 else  Color.White.copy(0.8f)
+            tint = if (isChairDataIsExist) Green80 else Color.White.copy(0.8f)
         )
         Text(
             modifier = Modifier.padding(vertical = 22.dp, horizontal = 30.dp),

@@ -215,7 +215,10 @@ private fun RetryAndChatBottomBar() {
         Text("대화내역",
             modifier = Modifier
                 .clickBounce {
-                    mainViewModel.moveScreen(Screens.ChatList, BottomMenu.Retry)
+                    mainViewModel.run {
+                        changeChatViewShowing(true)
+                        moveScreen(Screens.ChatList, BottomMenu.Retry)
+                    }
                 }
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFCFCF))
