@@ -15,11 +15,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorder
-import mago.apps.sognorawebsocket.websocket.SognoraWebSocket
-import mago.apps.sognorawebsocket.websocket.SognoraWebSocketListener
-import mago.apps.sognorawebsocket.websocket.model.WebSocketState
-import okhttp3.Response
-import okio.ByteString
+import mago.apps.sognorawebsocket.websocket.model.ServerState
+import mago.apps.sognorawebsocket.websocket.model.callback.IActionCallback
+import mago.apps.sognorawebsocket.websocket.model.callback.OrotActionType
+import mago.apps.sognorawebsocket.websocket.new_ws.OrotWebSocket
 import orot.apps.smartcounselor.graph.NavigationKit
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
@@ -33,193 +32,259 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val sognoraWebSocket: SognoraWebSocket,
+//    val sognoraWebSocket: SognoraWebSocket,
     val sognoraAudioRecorder: SognoraAudioRecorder,
 ) : ViewModel() {
     lateinit var navigationKit: NavigationKit
 
-    /**
-     * ================================================
-     *     Web Sokcet
-     * ================================================
-     * */
-    fun connectWebSocket() {
-        sognoraWebSocket.apply {
-            setWebSocketListener(object : SognoraWebSocketListener {
-                override fun open(response: Response) {
-                    Log.w(TAG, "open: ${response.body} | ${response.message}")
-                    moveScreen(Screens.Conversation, BottomMenu.Conversation)
-                    startAudioRecorder()
-                    sendProtocol(1)
-                }
+    var orotWebSocket: OrotWebSocket? = null
+    val orotServerURL: String = "ws://demo-health-stream.mago52.com/ws/chat"
 
-                override fun onMessageText(msg: String) {
-                    Log.w(TAG, "${conversationInfo.value.first} | onMessageText: $msg")
+    val displayText = MutableStateFlow<String?>("")
+    fun updateDisplayText(msg: String? = "") = displayText.update { msg }
 
-                    try {
-                        val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
+    init {
+        orotWebSocket = OrotWebSocket().apply {
+            setActionCallback(
+                object : IActionCallback {
 
-                        val protocol = receivedMsg.header.protocol_id
-                        val device = receivedMsg.header.device
-                        val voice = receivedMsg.body?.voice
-                        val display = receivedMsg.body?.display
-                        val measurement = receivedMsg.body?.measurement
-
-                        if (protocol != MAGO_PROTOCOL.PROTOCOL_17.id) {
-                            receivedMsg.body?.let {
-                                beforeBody = receivedMsg.body
-                            }
-                        }
-
-                        val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
-
-                        voice?.let {
-                            if (it.text.isNotEmpty()) {
-                                chatList.add(ChatData(msg = it.text, isUser = isUser))
-                            }
-                        }
-
-                        when (protocol) {
-                            /** AI의 첫 인사 */
-                            MAGO_PROTOCOL.PROTOCOL_2.id -> {
-                                voice?.let {
-                                    playGoogleTts(it.text)
-                                    changeConversationList(
-                                        ActionType.GREETING_END, it.text, receivedMsg
-                                    )
-                                }
-                            }
-
-                            /** 내가 말한 내용을 STT 해서 결과를 응답받음. */
-                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
-                                stopGoogleTts()
-                                changeSendingStateAudioBuffer(false)
-                                voice?.let {
-                                    changeSaidMeText(it.text)
-                                }
-                            }
-                            /** AI의 다음 질문 */
-                            MAGO_PROTOCOL.PROTOCOL_12.id -> {
-
-                                val type = when (receivedMsg.body?.action) {
-                                    "measurement" -> ActionType.MEASUREMENT
-                                    "end" -> ActionType.END
-                                    "doctorcall" -> ActionType.DOCTORCALL
-                                    "exit" -> ActionType.EXIT
-                                    else -> ActionType.CONVERSATION
-                                }
-
-                                voice?.let { voiceInfo ->
-                                    playGoogleTts(voiceInfo.text)
-                                    if (ActionType.DOCTORCALL != type) {
-                                        changeConversationList(type, voiceInfo.text, receivedMsg)
-                                    }
-                                }
-
-                                if (display?.measurement != null) {
-                                    changeSaidMeText("")
-                                    moveScreen(null, BottomMenu.Conversation)
-                                    changeRecommendationBottomSheetFlag(true)
-                                }else{
-                                    sendProtocol(13, conversationInfo.value.third)
-                                }
-                            }
-                            /** Watch, Chair 데이터 도착 */
-                            MAGO_PROTOCOL.PROTOCOL_17.id -> {
-                                when (device) {
-                                    "Watch" -> {
-                                        Log.w(TAG, "onMessageText: WATCH DATA")
-                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
-                                        val heartRate = measurement?.heartRate ?: 0
-
-                                        userInputData = userInputData?.copy(
-                                            bloodPressureSystolic = bloodPressureSystolic,
-                                            heartRate = heartRate
-                                        )
-                                        watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
-                                        watchHashData["heartRate"] = heartRate
-
-                                        medicalDeviceWatchData.update {
-                                            WatchData(
-                                                bloodPressureSystolic = bloodPressureSystolic,
-                                                heartRate = heartRate
-                                            )
-                                        }
-                                    }
-                                    "Chair" -> {
-                                        Log.w(TAG, "onMessageText: Chair DATA")
-
-                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
-                                        val glucose = measurement?.glucose ?: 0
-                                        val weight = measurement?.weight ?: 0f
-                                        val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
-
-                                        userInputData = userInputData?.copy(
-                                            bloodPressureSystolic = bloodPressureSystolic,
-                                            glucose = glucose,
-                                            weight = weight,
-                                            bodyMassIndex = bodyMassIndex
-                                        )
-                                        chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
-                                        chairHashData["glucose"] = glucose
-                                        chairHashData["weight"] = weight.toInt()
-                                        chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
-
-                                        medicalDeviceChairData.update {
-                                            ChairData(
-                                                bloodPressureSystolic = bloodPressureSystolic,
-                                                glucose = glucose,
-                                                weight = weight,
-                                                bodyMassIndex = bodyMassIndex
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_19.id -> {
-                                changeSaidMeText("")
-                            }
-                            MAGO_PROTOCOL.PROTOCOL_99.id -> {
-                                changeSaidMeText("")
-                                voice?.let {
-                                    playGoogleTts(it.text)
-                                    changeConversationList(
-                                        ActionType.CONVERSATION, it.text, null, isFallback = true
-                                    )
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.w(TAG, "onMessageText Error: ${e.message}")
+                    /** 서버 오픈 수신 */
+                    override fun onStartDialog() {
+                        startDialog()
                     }
-                }
 
-                override fun onMessageByteString(byteString: ByteString) {
-                    Log.w(TAG, "onMessageByteString: ")
-                }
+                    override fun onStartConversation(
+                        voiceComment: String?,
+                        displayComment: String?,
+                        actionType: OrotActionType
+                    ) {
+                        playTts(voiceComment)
+                        updateDisplayText(displayComment)
+                    }
 
-                override fun fail(response: Response?, t: Throwable) {
-                    Log.w(TAG, "fail: $response || ${t.message}")
-                }
+                    override fun onReqActiveSpeak() {
+                    }
 
-                override fun close(code: Int, reason: String) {
-                    Log.w(TAG, "close: ")
-                }
+                    override fun onAckEndMeasurement() {
+                    }
 
-                override fun onClosing(code: Int, reason: String) {
-                    Log.w(TAG, "onClosing: ")
-                }
-            })
-        }.run {
-            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
+                    override fun onReceivedFallback() {
+
+                    }
+
+                    override fun onReceivedSaidMe(
+                        displayComment: String?,
+                        actionType: OrotActionType
+                    ) {
+                        receivedSaidMe(displayComment)
+                    }
+
+                    override fun showHealthOverView(
+                        voiceComment: String?,
+                        actionType: OrotActionType
+                    ) {
+                        playTts(voiceComment)
+                        changeSaidMeText("")
+                        moveScreen(null, BottomMenu.Conversation)
+                        changeRecommendationBottomSheetFlag(true)
+                    }
+                },
+            )
         }
+    }
+
+    /** 다이얼로그 시작 */
+    private fun startDialog() {
+        moveScreen(Screens.Conversation, BottomMenu.Conversation)
+        startAudioRecorder()
+        sendProtocol(1)
+    }
+
+    /** 내가 말한 내용을 수신 했을때 */
+    private fun receivedSaidMe(msg: String?) {
+        stopGoogleTts()
+        changeMicState(false)
+        changeSaidMeText(msg.toString())
+    }
+
+    fun connectWebSocket() {
+        orotWebSocket?.initWebSocket(url = orotServerURL)
+
+//        sognoraWebSocket.apply {
+//            setWebSocketListener(object : SognoraWebSocketListener {
+//                override fun open(response: Response) {
+//                    Log.w(TAG, "open: ${response.body} | ${response.message}")
+//                    moveScreen(Screens.Conversation, BottomMenu.Conversation)
+//                    startAudioRecorder()
+//                    sendProtocol(1)
+//                }
+//
+//                override fun onMessageText(msg: String) {
+//                    Log.w(TAG, "${conversationInfo.value.first} | onMessageText: $msg")
+//
+//                    try {
+//                        val receivedMsg: MessageProtocol = Gson().fromJson(msg, MessageProtocol::class.java)
+//
+//                        val protocol = receivedMsg.header.protocol_id
+//                        val device = receivedMsg.header.device
+//                        val voice = receivedMsg.body?.voice
+//                        val display = receivedMsg.body?.display
+//                        val measurement = receivedMsg.body?.measurement
+//
+//                        if (protocol != MAGO_PROTOCOL.PROTOCOL_17.id) {
+//                            receivedMsg.body?.let {
+//                                beforeBody = receivedMsg.body
+//                            }
+//                        }
+//
+//                        val isUser = protocol == MAGO_PROTOCOL.PROTOCOL_11.id
+//                        voice?.let {
+//                            if (it.text.isNotEmpty()) {
+//                                chatList.add(ChatData(msg = it.text, isUser = isUser))
+//                            }
+//                        }
+//
+//                        when (protocol) {
+//                            /** AI의 첫 인사 */
+//                            MAGO_PROTOCOL.PROTOCOL_2.id -> {
+//                                voice?.let {
+//                                    playGoogleTts(it.text)
+//                                    changeConversationList(
+//                                        ActionType.GREETING_END, it.text, receivedMsg
+//                                    )
+//                                }
+//                            }
+//
+//                            /** 내가 말한 내용을 STT 해서 결과를 응답받음. */
+//                            MAGO_PROTOCOL.PROTOCOL_11.id -> {
+//                                stopGoogleTts()
+//                                changeSendingStateAudioBuffer(false)
+//                                voice?.let {
+//                                    changeSaidMeText(it.text)
+//                                }
+//                            }
+//                            /** AI의 다음 질문 */
+//                            MAGO_PROTOCOL.PROTOCOL_12.id -> {
+//
+//                                val type = when (receivedMsg.body?.action) {
+//                                    "measurement" -> ActionType.MEASUREMENT
+//                                    "end" -> ActionType.END
+//                                    "doctorcall" -> ActionType.DOCTORCALL
+//                                    "exit" -> ActionType.EXIT
+//                                    else -> ActionType.CONVERSATION
+//                                }
+//
+//                                voice?.let { voiceInfo ->
+//                                    playGoogleTts(voiceInfo.text)
+//                                    if (ActionType.DOCTORCALL != type) {
+//                                        changeConversationList(type, voiceInfo.text, receivedMsg)
+//                                    }
+//                                }
+//
+//                                if (display?.measurement != null) {
+//                                    changeSaidMeText("")
+//                                    moveScreen(null, BottomMenu.Conversation)
+//                                    changeRecommendationBottomSheetFlag(true)
+//                                }else{
+//                                    sendProtocol(13, conversationInfo.value.third)
+//                                }
+//                            }
+//                            /** Watch, Chair 데이터 도착 */
+//                            MAGO_PROTOCOL.PROTOCOL_17.id -> {
+//                                when (device) {
+//                                    "Watch" -> {
+//                                        Log.w(TAG, "onMessageText: WATCH DATA")
+//                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
+//                                        val heartRate = measurement?.heartRate ?: 0
+//
+//                                        userInputData = userInputData?.copy(
+//                                            bloodPressureSystolic = bloodPressureSystolic,
+//                                            heartRate = heartRate
+//                                        )
+//                                        watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
+//                                        watchHashData["heartRate"] = heartRate
+//
+//                                        medicalDeviceWatchData.update {
+//                                            WatchData(
+//                                                bloodPressureSystolic = bloodPressureSystolic,
+//                                                heartRate = heartRate
+//                                            )
+//                                        }
+//                                    }
+//                                    "Chair" -> {
+//                                        Log.w(TAG, "onMessageText: Chair DATA")
+//
+//                                        val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
+//                                        val glucose = measurement?.glucose ?: 0
+//                                        val weight = measurement?.weight ?: 0f
+//                                        val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
+//
+//                                        userInputData = userInputData?.copy(
+//                                            bloodPressureSystolic = bloodPressureSystolic,
+//                                            glucose = glucose,
+//                                            weight = weight,
+//                                            bodyMassIndex = bodyMassIndex
+//                                        )
+//                                        chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
+//                                        chairHashData["glucose"] = glucose
+//                                        chairHashData["weight"] = weight.toInt()
+//                                        chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
+//
+//                                        medicalDeviceChairData.update {
+//                                            ChairData(
+//                                                bloodPressureSystolic = bloodPressureSystolic,
+//                                                glucose = glucose,
+//                                                weight = weight,
+//                                                bodyMassIndex = bodyMassIndex
+//                                            )
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_19.id -> {
+//                                changeSaidMeText("")
+//                            }
+//                            MAGO_PROTOCOL.PROTOCOL_99.id -> {
+//                                changeSaidMeText("")
+//                                voice?.let {
+//                                    playGoogleTts(it.text)
+//                                    changeConversationList(
+//                                        ActionType.CONVERSATION, it.text, null, isFallback = true
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    } catch (e: Exception) {
+//                        Log.w(TAG, "onMessageText Error: ${e.message}")
+//                    }
+//                }
+//
+//                override fun onMessageByteString(byteString: ByteString) {
+//                    Log.w(TAG, "onMessageByteString: ")
+//                }
+//
+//                override fun fail(response: Response?, t: Throwable) {
+//                    Log.w(TAG, "fail: $response || ${t.message}")
+//                }
+//
+//                override fun close(code: Int, reason: String) {
+//                    Log.w(TAG, "close: ")
+//                }
+//
+//                override fun onClosing(code: Int, reason: String) {
+//                    Log.w(TAG, "onClosing: ")
+//                }
+//            })
+//        }.run {
+//            initWebSocket("ws://demo-health-stream.mago52.com/ws/chat")
+//        }
     }
 
     /** 권고사항 화면 노출 후 이어서 진행하기 **/
     fun proceedAfterMeasurement() {
         pauseGoogleTts()
         changeRecommendationBottomSheetFlag(false)
-        changeSendingStateAudioBuffer(true)
+        changeMicState(true)
         conversationInfo.value.let {
             changeConversationList(it.first, "건강검진 결과는 어떠셨나요?", it.third)
         }
@@ -236,7 +301,7 @@ class MainViewModel @Inject constructor(
                         val bufferInfo = sognoraAudioRecorder.frameBuffer()
                         bufferInfo.second?.let {
                             if (it < -1) return@let
-                            sognoraWebSocket.sendBuffer(bufferInfo.first, bufferSize)
+                            orotWebSocket?.sendBuffer(bufferInfo.first, bufferSize)
                         }
                     }
                 } while (true)
@@ -333,7 +398,7 @@ class MainViewModel @Inject constructor(
      *     Audio Stream
      * ================================================
      * */
-    fun getWebSocketState() = sognoraWebSocket.getWebSocketState()
+    fun getServerState() = orotWebSocket?.serverState
     val micIsAvailable = mutableStateOf(false) // 마이크 사용가능 상태
 
 
@@ -397,18 +462,13 @@ class MainViewModel @Inject constructor(
             )
             val sendingData = Gson().toJson(newResMsg)
             Log.w(TAG, "${conversationInfo.value.first} | sendProtocol: protocol: $protocolId / body: $sendingData")
-            sognoraWebSocket.sendMsg(sendingData)
+            orotWebSocket?.sendMsg(sendingData)
         }
     }
 
-    /** 오디오스트림 생성*/
-    fun createAudioStreamManager() {
-        connectWebSocket()
-    }
-
-    fun changeSendingStateAudioBuffer(flag: Boolean) {
+    fun changeMicState(flag: Boolean) {
         isAvailableAudioBuffer = flag
-        if (getWebSocketState().value is WebSocketState.Connected) {
+        if (getServerState()?.value is ServerState.Connected) {
             micIsAvailable.value = flag
             if (flag) {
                 sendProtocol(3, conversationInfo.value.third)
@@ -449,7 +509,7 @@ class MainViewModel @Inject constructor(
                     setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {
                             ttsIsSpeaking.value = true
-                            changeSendingStateAudioBuffer(false)
+                            changeMicState(false)
                             conversationVisibleState.targetState = true
                             ttsState.value = TTSCallback.START
                         }
@@ -501,16 +561,17 @@ class MainViewModel @Inject constructor(
                                 ActionType.EXIT -> {
                                     onDefault {
                                         sendProtocol(20) // dialog end action을 보낸다
-                                        changeSendingStateAudioBuffer(false)
+                                        changeMicState(false)
                                         moveScreen(bottomMenu = BottomMenu.Loading)
                                         delay(2000)
                                         moveScreen(bottomMenu = BottomMenu.RetryAndChat)
                                     }
                                 }
                                 ActionType.IDLE,
-                                ActionType.DOCTORCALL -> {}
+                                ActionType.DOCTORCALL -> {
+                                }
                                 else -> {
-                                    changeSendingStateAudioBuffer(true)
+                                    changeMicState(true)
                                 }
                             }
                         }
@@ -525,7 +586,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun playGoogleTts(msg: String?) {
+    fun playTts(msg: String?) {
         tts?.let {
             if (it.isSpeaking) {
                 ttsIsSpeaking.value = false
@@ -537,7 +598,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun pauseGoogleTts(){
+    fun pauseGoogleTts() {
         tts?.run {
             ttsIsSpeaking.value = false
             stop()
@@ -585,8 +646,8 @@ class MainViewModel @Inject constructor(
         stopGoogleTts()
         micIsAvailable.value = false
         lastProtocolNum = -1
-        changeSendingStateAudioBuffer(false)
-        sognoraWebSocket.close()
+        changeMicState(false)
+        orotWebSocket?.close()
         sognoraAudioRecorder.stopAudioRecorder()
     }
 
@@ -605,7 +666,7 @@ class MainViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         Log.d("MAINVIEWMODEL", "onCleared: $this")
-        sognoraWebSocket.close()
+        orotWebSocket?.close()
         sognoraAudioRecorder.stopAudioRecorder()
     }
 }

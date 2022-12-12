@@ -25,7 +25,7 @@ import orot.apps.smartcounselor.presentation.style.Gray10
 fun GuideScreen() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     LaunchedEffect(key1 = Unit) {
-        mainViewModel.createAudioStreamManager() // 가이드 화면 진입시 소켓 연결
+        mainViewModel.connectWebSocket() // 가이드 화면 진입시 소켓 연결
     }
 
     ConstraintLayout(

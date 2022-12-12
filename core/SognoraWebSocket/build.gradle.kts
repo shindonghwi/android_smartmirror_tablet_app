@@ -41,6 +41,10 @@ dependencies {
         api(logging)
     }
 
+    Libraries.Gson.apply {
+        implementation(gson)
+    }
+
     Kapts.apply {
         Kapts.Hilt.apply {
             kapt(hiltCompiler)

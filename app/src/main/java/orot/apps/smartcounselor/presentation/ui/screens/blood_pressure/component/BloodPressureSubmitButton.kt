@@ -49,7 +49,7 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
                 }else{
                     mainViewModel.run {
                         val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
-                        playGoogleTts(content)
+                        playTts(content)
                         conversationInfo.value.let {
                             changeConversationList(ActionType.RESULT_WAITING, content, it.third)
                         }
