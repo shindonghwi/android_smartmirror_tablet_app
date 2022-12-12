@@ -24,7 +24,7 @@ fun MagoLifecycle() {
             Lifecycle.Event.ON_PAUSE -> {
                 Log.d(TAG, "MagoLifecycle: ON_PAUSE")
                 mainViewModel.changeMicState(false)
-                mainViewModel.stopGoogleTts()
+                mainViewModel.pauseTts()
             }
             else -> Log.d(TAG, "MagoLifecycle: ON_ANY: $event")
         }

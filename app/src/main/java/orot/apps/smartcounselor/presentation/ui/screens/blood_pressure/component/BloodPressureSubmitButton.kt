@@ -40,21 +40,13 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
             .padding(top = 18.dp)
             .width(startWidth)
             .clickBounce {
-
                 Log.w(TAG, "BloodPressureSubmitButton: ${mainViewModel.userInputData}" )
                 val isValueEmpty = mainViewModel.userInputData?.isEmptyCheck()
 
                 if (isValueEmpty == true){
                     Toast.makeText(context, "정보를 모두 입력해주세요", Toast.LENGTH_SHORT).show()
                 }else{
-                    mainViewModel.run {
-                        val content = "헬스케어 결과를 불러오는중입니다\n잠시만 기다려주세요"
-                        playTts(content)
-                        conversationInfo.value.let {
-                            changeConversationList(ActionType.RESULT_WAITING, content, it.third)
-                        }
-                        moveScreen(Screens.Conversation, BottomMenu.Loading)
-                    }
+                    mainViewModel.startWaitingResult()
                 }
             }
             .clip(RoundedCornerShape(corner = CornerSize(20.dp)))

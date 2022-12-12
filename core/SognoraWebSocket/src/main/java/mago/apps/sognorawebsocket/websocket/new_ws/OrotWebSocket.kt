@@ -5,8 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import mago.apps.sognorawebsocket.websocket.model.ChatData
 import mago.apps.sognorawebsocket.websocket.model.ServerState
 import mago.apps.sognorawebsocket.websocket.model.callback.IActionCallback
+import mago.apps.sognorawebsocket.websocket.model.protocol.MessageProtocol
 import okhttp3.*
 import okio.ByteString.Companion.toByteString
 
@@ -18,7 +20,7 @@ class OrotWebSocket : IOrotWebSocket {
     private var request: Request? = null
     private var client: OkHttpClient? = null
     private var orotMessageParseHelper: OrotMessageParseHelper? = null
-    var serverState = MutableStateFlow<ServerState>(ServerState.Idle)
+    private var serverState = MutableStateFlow<ServerState>(ServerState.Idle)
     private var iActionCallback: IActionCallback? = null
 
     /** 웹 소켓 연결하기 */
@@ -63,6 +65,18 @@ class OrotWebSocket : IOrotWebSocket {
         iActionCallback = callback
     }
 
+    override fun getLastInfo(): MessageProtocol? {
+        return orotMessageParseHelper?.currentMessageProtocol
+    }
+
+    override fun getServerState(): MutableStateFlow<ServerState> {
+        return serverState
+    }
+
+    override fun getChatList(): MutableStateFlow<ArrayList<ChatData>>? {
+        return orotMessageParseHelper?.chatList
+    }
+
     override fun close() {
         orotMessageParseHelper = null
         request = null
@@ -82,7 +96,7 @@ class OrotWebSocket : IOrotWebSocket {
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
-            orotMessageParseHelper?.parse(text)
+            orotMessageParseHelper?.activeActionCallback(text)
             serverState.value = ServerState.Connected
         }
 

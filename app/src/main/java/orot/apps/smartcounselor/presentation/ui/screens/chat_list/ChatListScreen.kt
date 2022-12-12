@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.model.local.ChatData
+import mago.apps.sognorawebsocket.websocket.model.ChatData
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 @Composable
