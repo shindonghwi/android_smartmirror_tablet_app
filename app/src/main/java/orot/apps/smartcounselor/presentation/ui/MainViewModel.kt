@@ -346,7 +346,6 @@ class MainViewModel @Inject constructor(
         } ?: run {
             bottomMenu?.run { currentBottomMenu.value = this.type }
         }
-
     }
 
     /**
@@ -533,14 +532,25 @@ class MainViewModel @Inject constructor(
         moveScreen(Screens.Home, BottomMenu.Start)
     }
 
+    private fun clearMedicationDeviceData(){
+        updateMedicalEndStatus(false)
+        watchHashData.entries.map { watchHashData[it.key] = 0 }
+        chairHashData.entries.map { chairHashData[it.key] = 0 }
+        medicalDeviceWatchData.update { WatchData(0,0) }
+        medicalDeviceChairData.update { ChairData(0,0,0f,0f) }
+    }
+
     private fun clearConversationData() {
         chatList.clear()
+        clearMedicationDeviceData()
         changeSaidMeText("")
+        updateDisplayText("")
     }
 
     private fun clearWebSocketAudio() {
-        clearTts()
+        pauseTts()
         changeMicState(false)
+        orotWebSocket?.close()
         sognoraAudioRecorder.stopAudioRecorder()
     }
 
@@ -559,9 +569,10 @@ class MainViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         Log.d("MAINVIEWMODEL", "onCleared: $this")
+        clearTts()
+        orotTTS = null
         orotWebSocket?.close()
         orotWebSocket = null
-        orotTTS = null
         sognoraAudioRecorder.stopAudioRecorder()
     }
 }

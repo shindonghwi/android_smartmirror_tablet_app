@@ -41,9 +41,6 @@ class OrotMessageParseHelper(private val iActionCallback: IActionCallback?) {
                         iActionCallback?.moveMeasurement(voice?.text, voice?.text)
                         return
                     }
-                    "doctorcall" -> {
-                        iActionCallback?.onDoctorCall(voice?.text)
-                    }
                     "end" -> {
                         iActionCallback?.onConversationEnd(voice?.text, voice?.text)
                         return
