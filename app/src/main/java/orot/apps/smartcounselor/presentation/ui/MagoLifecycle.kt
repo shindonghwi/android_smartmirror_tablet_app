@@ -18,22 +18,15 @@ fun MagoLifecycle() {
 
     OnLifecycleEvent { owner, event ->
         when (event) {
-            Lifecycle.Event.ON_RESUME -> {
-                Log.d(TAG, "MagoLifecycle: ON_RESUME")
-            }
             Lifecycle.Event.ON_CREATE -> {
                 mainViewModel.initTTS(context)
-                Log.d(TAG, "MagoLifecycle: ON_CREATE")
             }
-            Lifecycle.Event.ON_DESTROY -> Log.d(TAG, "MagoLifecycle: ON_DESTROY")
-            Lifecycle.Event.ON_START -> Log.d(TAG, "MagoLifecycle: ON_START")
-            Lifecycle.Event.ON_STOP -> Log.d(TAG, "MagoLifecycle: ON_STOP")
             Lifecycle.Event.ON_PAUSE -> {
                 Log.d(TAG, "MagoLifecycle: ON_PAUSE")
-                mainViewModel.changeSendingStateAudioBuffer(false)
-                mainViewModel.stopGoogleTts()
+                mainViewModel.changeMicState(false)
+                mainViewModel.pauseTts()
             }
-            else -> Log.d(TAG, "MagoLifecycle: ON_ANY")
+            else -> Log.d(TAG, "MagoLifecycle: ON_ANY: $event")
         }
     }
 }

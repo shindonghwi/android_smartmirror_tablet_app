@@ -38,11 +38,9 @@ import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatContentTypeHolder
 import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatViewContent
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ConversationScreen() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val chatListSize = mainViewModel.chatList.size
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -83,7 +81,7 @@ fun ConversationScreen() {
 @Composable
 private fun AIReceivedTextContent() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val conversationInfo = mainViewModel.conversationInfo.collectAsState().value
+    val content = mainViewModel.displayText.collectAsState().value
     val isVisible = remember { mainViewModel.conversationVisibleState }
 
     AnimatedVisibility(
@@ -97,7 +95,7 @@ private fun AIReceivedTextContent() {
             targetAlpha = 0.3f
         )
     ) {
-        DefaultDisplayText(conversationInfo.second)
+        DefaultDisplayText(content.toString())
     }
 }
 

@@ -125,7 +125,10 @@ private fun StartBottomBar() {
                     .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                     .background(Primary)
                     .noDuplicationClickable {
-                        mainViewModel.moveScreen(Screens.Guide, BottomMenu.Loading)
+                        mainViewModel.run {
+                            connectWebSocket()
+                            moveScreen(Screens.Guide, BottomMenu.Loading)
+                        }
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -314,7 +317,7 @@ fun CallBottomBar() {
 @Composable
 fun ConversationBottomBar() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
-    val micIsAvailable = remember { mainViewModel.micIsAvailable }
+    val micIsAvailable = remember { mainViewModel.isAvailableAudioBuffer }
 
     Column(
         modifier = Modifier

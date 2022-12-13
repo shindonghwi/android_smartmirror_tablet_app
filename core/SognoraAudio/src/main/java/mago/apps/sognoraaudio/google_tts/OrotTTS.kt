@@ -5,15 +5,13 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import java.util.*
-import javax.inject.Inject
 
-
-class SognoraGoogleTTSImpl @Inject constructor(private val context: Context) : SognoraGoogleTTS() {
+class OrotTTS : IOrotTTS {
 
     private val params = Bundle()
-    var tts: TextToSpeech? = null
+    private var tts: TextToSpeech? = null
 
-    override fun createTts(listener: UtteranceProgressListener) {
+    override fun createTts(context: Context, listener: UtteranceProgressListener) {
         params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, null)
         tts = TextToSpeech(context) { state ->
             if (state == TextToSpeech.SUCCESS) {
@@ -25,20 +23,23 @@ class SognoraGoogleTTSImpl @Inject constructor(private val context: Context) : S
         }
     }
 
-    override fun startPlay(msg: String) {
+    override fun start(msg: String?) {
         tts?.let {
             if (it.isSpeaking) {
                 it.stop()
             }
-            it.speak(msg, TextToSpeech.QUEUE_ADD, params, msg)
-            return@let
+            msg.let { content ->
+                it.speak(content, TextToSpeech.QUEUE_ADD, params, content)
+            }
         }
     }
 
-    override fun stop() {
-        tts?.run {
-            stop()
-            null
-        }
+    override fun pause() {
+        tts?.stop()
+    }
+
+    override fun clear() {
+        tts?.stop()
+        tts = null
     }
 }
