@@ -23,6 +23,7 @@ import mago.apps.sognorawebsocket.websocket.model.callback.IActionCallback
 import mago.apps.sognorawebsocket.websocket.model.callback.OrotActionType
 import mago.apps.sognorawebsocket.websocket.model.protocol.MessageProtocol
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.BodyInfo
+import mago.apps.sognorawebsocket.websocket.model.protocol.body.DisplayInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.RequestedMeasurementInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.header.HeaderInfo
 import mago.apps.sognorawebsocket.websocket.new_ws.OrotWebSocket
@@ -141,9 +142,10 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun showHealthOverView(
-                        voiceComment: String?, actionType: OrotActionType
+                        voiceComment: String?, displayInfo: DisplayInfo?, actionType: OrotActionType
                     ) {
                         resultActionType = actionType
+                        recommendationInfo = displayInfo
                         playTts(voiceComment)
                         changeSaidMeText("")
                         moveScreen(null, BottomMenu.Conversation)
@@ -213,18 +215,21 @@ class MainViewModel @Inject constructor(
 
     private fun setChairData(measurement: RequestedMeasurementInfo?) {
         val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
+        val bloodPressureDiastolic = measurement?.bloodPressureDiastolic ?: 0
         val glucose = measurement?.glucose ?: 0
         val weight = measurement?.weight ?: 0f
         val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
 
         selectedUser = selectedUser?.copy(
             bloodPressureSystolic = bloodPressureSystolic,
+            bloodPressureDiastolic = bloodPressureDiastolic,
             glucose = glucose,
             weight = weight,
             bodyMassIndex = bodyMassIndex
         )
 
         chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
+        chairHashData["bloodPressureDiastolic"] = bloodPressureDiastolic
         chairHashData["glucose"] = glucose
         chairHashData["weight"] = weight.toInt()
         chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
@@ -232,6 +237,7 @@ class MainViewModel @Inject constructor(
         medicalDeviceChairData.update {
             ChairData(
                 bloodPressureSystolic = bloodPressureSystolic,
+                bloodPressureDiastolic = bloodPressureDiastolic,
                 glucose = glucose,
                 weight = weight,
                 bodyMassIndex = bodyMassIndex
@@ -275,12 +281,15 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
 
+    var recommendationInfo: DisplayInfo? = null
+
     var watchHashData = HashMap<String, Int>().apply {
         put("bloodPressureSystolic", 0)
         put("heartRate", 0)
     }
     var chairHashData = HashMap<String, Int>().apply {
         put("bloodPressureSystolic", 0)
+        put("bloodPressureDiastolic", 0)
         put("glucose", 0)
         put("weight", 0)
         put("bodyMassIndex", 0)
@@ -295,14 +304,13 @@ class MainViewModel @Inject constructor(
         WatchData(0, 0)
     )
     var medicalDeviceChairData: MutableStateFlow<ChairData> = MutableStateFlow<ChairData>(
-        ChairData(0, 0, 0f, 0f)
+        ChairData(0, 0, 0, 0f, 0f)
     )
 
-    var selectedUser: UserData? = null
+    var selectedUser: UserData? = null // 홈 화면에서 사용자 선택했을때 사용자 정보
+    var registerUser: UserData? = UserData() // 새로 등록할 사용자의 정보
 
-    var registerUser: UserData? = UserData()
-
-    fun addUser(userInfo: UserData) {
+    fun addUser(userInfo: UserData) { // 사용자 추가하기
         if (!userList.contains(userInfo)) {
             userList.add(userInfo)
         }
@@ -522,11 +530,12 @@ class MainViewModel @Inject constructor(
         watchHashData.entries.map { watchHashData[it.key] = 0 }
         chairHashData.entries.map { chairHashData[it.key] = 0 }
         medicalDeviceWatchData.update { WatchData(0, 0) }
-        medicalDeviceChairData.update { ChairData(0, 0, 0f, 0f) }
+        medicalDeviceChairData.update { ChairData(0, 0, 0, 0f, 0f) }
     }
 
     private fun clearConversationData() {
         chatList.clear()
+        recommendationInfo = null
         clearMedicationDeviceData()
         changeSaidMeText("")
         updateDisplayText("")

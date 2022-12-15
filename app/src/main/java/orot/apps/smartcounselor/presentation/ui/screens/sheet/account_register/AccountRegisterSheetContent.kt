@@ -387,7 +387,12 @@ private fun MedicineSelector(modifier: Modifier) {
                 }),
                 iTextCallback = object : ITextCallback {
                     override fun renderText(content: String) {
-                        mainViewModel.registerUser = mainViewModel.registerUser?.copy(medication = content.split(","))
+                        mainViewModel.registerUser = when(content){
+                            "고혈압" -> mainViewModel.registerUser?.copy(medication = listOf("htn"))
+                            "당뇨" -> mainViewModel.registerUser?.copy(medication = listOf("dm"))
+                            "고혈압 + 당뇨" -> mainViewModel.registerUser?.copy(medication = listOf("htn","dm"))
+                            else -> mainViewModel.registerUser?.copy(medication = content.split(","))
+                        }
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)

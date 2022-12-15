@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,41 +21,49 @@ import orot.apps.smartcounselor.model.local.ResultMeasurementCardInfo
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Display3
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.common.WarningTextContent
 
 
 /** 혈당, 맥박, 혈압 */
 @Composable
 fun GlucoseHrBpCard(modifier: Modifier) {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
-    val measurementCarList = listOf(
-        ResultMeasurementCardInfo(
-            "혈당", Pair(80f, "mg/dL"),
-            "주의가 필요해요", painterResource(id = R.drawable.result_glucose)
-        ),
-        ResultMeasurementCardInfo(
-            "맥박", Pair(92f, "bpm"),
-            "위험한 수치에요", painterResource(id = R.drawable.result_heartbeat)
-        ),
-        ResultMeasurementCardInfo(
-            "혈압", Pair(80f, "mmhg"),
-            "정상 범위에요", painterResource(id = R.drawable.result_bloodpressure)
-        ),
-    )
+    val measurementCardInfo = arrayListOf<ResultMeasurementCardInfo>().apply {
+        mainViewModel.recommendationInfo?.measurement?.let {
+            add(
+                ResultMeasurementCardInfo(
+                    "혈당", Pair(it.glucose.valueQuantity.value, it.glucose.valueQuantity.unit),
+                    it.glucose.status, painterResource(id = R.drawable.result_glucose)
+                )
+            )
+            add(
+                ResultMeasurementCardInfo(
+                    "맥박", Pair(it.heartRate.valueQuantity.value, it.heartRate.valueQuantity.unit),
+                    it.heartRate.status, painterResource(id = R.drawable.result_heartbeat)
+                )
+            )
+            add(
+                ResultMeasurementCardInfo(
+                    "혈압", Pair(it.bloodPressureSystolic.valueQuantity.value, it.bloodPressureSystolic.valueQuantity.unit),
+                    it.bloodPressureSystolic.status, painterResource(id = R.drawable.result_bloodpressure)
+                )
+            )
+        }
+    }
 
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        modifier = modifier, horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        measurementCarList.forEach {
+        measurementCardInfo.forEach {
             CardItem(
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White)
-                    .padding(vertical = 40.dp, horizontal = 20.dp),
-                cardInfo = it
+                    .padding(vertical = 40.dp, horizontal = 20.dp), cardInfo = it
             )
         }
     }
@@ -119,7 +128,7 @@ private fun CardItem(modifier: Modifier, cardInfo: ResultMeasurementCardInfo) {
                 .clip(RoundedCornerShape(8.dp))
                 .background(cardInfo.getBackgroundColor())
                 .padding(horizontal = 6.dp, vertical = 2.dp),
-            content = cardInfo.ment
+            status = cardInfo.status
         )
     }
 }

@@ -11,13 +11,13 @@ interface IResultMeasurementCardInfo {
 data class ResultMeasurementCardInfo(
     val type: String,
     val value: Pair<Float, String>, // 80, mg / dL
-    val ment: String,
+    val status: String?,
     val image: Painter?,
 ) : IResultMeasurementCardInfo {
     override fun getBackgroundColor(): Color {
-        return if (ment.contains("주의")) {
+        return if (status?.contains("warn") == true) {
             Color(0xFFFCE6CC)
-        } else if (ment.contains("위험")) {
+        } else if (status?.contains("alert") == true || status?.contains("high") == true) {
             Color(0xFFFCC4C4)
         } else {
             Color(0xFFD6FFDD)
@@ -25,9 +25,9 @@ data class ResultMeasurementCardInfo(
     }
 
     override fun getIconColor(): Color {
-        return if (ment.contains("주의")) {
+        return if (status?.contains("warn") == true) {
             Color(0xFFE7B638)
-        } else if (ment.contains("위험")) {
+        } else if (status?.contains("alert") == true || status?.contains("high") == true) {
             Color(0xFFFF5151)
         } else {
             Color(0xFF478F96)

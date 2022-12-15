@@ -18,7 +18,8 @@ data class UserData(
     var height: Float = 0f, // 키
     var weight: Float = 0f,// 체중
     var bodyMassIndex: Float = 0f,// 체질량 지수
-    var name: String = ""
+    var name: String = "",
+    val history: UserHistoryData? = null
 ) : IUserInputData {
     override fun isEmptyCheck(): Boolean {
         return medication.isEmpty() ||
@@ -33,6 +34,11 @@ data class UserData(
     }
 }
 
+data class UserHistoryData(
+    val bpList: List<Int>,
+    val glucoseList: List<Int>,
+    val hrList: List<Int>
+)
 
 val userList = mutableStateListOf<UserData>().apply {
     // 1번환자
@@ -49,7 +55,12 @@ val userList = mutableStateListOf<UserData>().apply {
             height = 155f,
             weight = 61.0f,
             bodyMassIndex = 25.4f,
-            name = "환자1 - 당뇨"
+            name = "환자1 - 당뇨",
+            history = UserHistoryData(
+                bpList = listOf(128, 126, 132, 130, 132, 132, 130, 132, 134, 135),
+                glucoseList = listOf(145, 138, 160, 157, 143, 155, 132, 144, 152, 150),
+                hrList = listOf(73, 70, 74, 72, 75, 76, 72, 70, 73, 75)
+            )
         )
     )
 
@@ -67,7 +78,12 @@ val userList = mutableStateListOf<UserData>().apply {
             height = 174f,
             weight = 55.0f,
             bodyMassIndex = 18.16f,
-            name = "환자2 - 정상인/고혈당"
+            name = "환자2 - 정상인/고혈당",
+            history = UserHistoryData(
+                bpList = listOf(115, 110, 114, 118, 115, 114, 116, 118, 116, 116),
+                glucoseList = listOf(116, 122, 120, 118, 116, 112, 114, 114, 116, 118),
+                hrList = listOf(92, 94, 92, 90, 91, 88, 86, 90, 90, 92)
+            )
         )
     )
 
@@ -85,7 +101,12 @@ val userList = mutableStateListOf<UserData>().apply {
             height = 185f,
             weight = 94f,
             bodyMassIndex = 27.5f,
-            name = "환자3 - 고혈압"
+            name = "환자3 - 고혈압",
+            history = UserHistoryData(
+                bpList = listOf(148, 150, 149, 160, 144, 146, 156, 149, 144, 148),
+                glucoseList = listOf(99, 98, 99, 95, 96, 98, 99, 95, 96, 94),
+                hrList = listOf(65, 68, 67, 65, 66, 67, 68, 66, 65, 68)
+            )
         )
     )
 
@@ -103,7 +124,12 @@ val userList = mutableStateListOf<UserData>().apply {
             height = 157f,
             weight = 58f,
             bodyMassIndex = 23.5f,
-            name = "환자4 - 정상인/고혈압"
+            name = "환자4 - 정상인/고혈압",
+            history = UserHistoryData(
+                bpList = listOf(141, 138, 136, 140, 142, 144, 141, 139, 140, 138),
+                glucoseList = listOf(95, 92, 90, 93, 91, 93, 92, 91, 90, 92),
+                hrList = listOf(85, 82, 83, 86, 88, 88, 87, 85, 86, 84)
+            )
         )
     )
 
@@ -121,7 +147,12 @@ val userList = mutableStateListOf<UserData>().apply {
             height = 175f,
             weight = 78f,
             bodyMassIndex = 25.5f,
-            name = "환자5 - 당뇨/고혈압"
+            name = "환자5 - 당뇨/고혈압",
+            history = UserHistoryData(
+                bpList = listOf(150, 148, 144, 156, 145, 146, 146, 146, 162, 149),
+                glucoseList = listOf(170, 160, 158, 155, 154, 156, 160, 168, 176, 165),
+                hrList = listOf(72, 71, 70, 68, 70, 69, 68, 69, 68, 70)
+            )
         )
     )
 }

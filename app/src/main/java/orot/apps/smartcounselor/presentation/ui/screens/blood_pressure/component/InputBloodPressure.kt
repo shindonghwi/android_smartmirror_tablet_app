@@ -1,6 +1,7 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
 import android.text.TextUtils
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -88,8 +89,10 @@ fun InputBloodPressure(modifier: Modifier) {
                     }
                     // 의자에서 수집되는 데이터
                     if (index == 1 && mainViewModel.chairHashData["bloodPressureSystolic"] != 0 ||
+                        index == 2 && mainViewModel.chairHashData["bloodPressureDiastolic"] != 0 ||
                         index == 3 && mainViewModel.chairHashData["glucose"] != 0 ||
-                        index == 7 && mainViewModel.chairHashData["weight"] != 0
+                        index == 7 && mainViewModel.chairHashData["weight"] != 0 ||
+                        index == 8 && mainViewModel.chairHashData["bodyMassIndex"] != 0
                     ) {
 
                         Icon(

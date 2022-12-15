@@ -1,8 +1,9 @@
 package orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card
 
 
-import android.util.Log
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,18 +27,37 @@ import orot.apps.smartcounselor.model.local.ResultMeasurementCardInfo
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.common.WarningTextContent
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundHGradient
 
 /** 키, 몸무게, bmi */
 @Composable
 fun HeightWeightBmiCard(modifier: Modifier) {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
-    val heightAndWeightDataList = listOf(
-        ResultMeasurementCardInfo("키", Pair(173f, "cm"), "", null),
-        ResultMeasurementCardInfo("몸무게", Pair(83f, "kg"), "", null),
-        ResultMeasurementCardInfo("비만도(BMI)", Pair(26f, ""), "주의가 필요해요", null),
-    )
+    val heightAndWeightDataList = arrayListOf<ResultMeasurementCardInfo>().apply {
+        mainViewModel.recommendationInfo?.measurement?.let {
+            add(
+                ResultMeasurementCardInfo(
+                    "키", Pair(it.height.valueQuantity.value, it.height.valueQuantity.unit), null, null
+                )
+            )
+            add(
+                ResultMeasurementCardInfo(
+                    "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit), null, null
+                )
+            )
+            add(
+                ResultMeasurementCardInfo(
+                    "비만도(BMI)",
+                    Pair(it.bodyMassIndex.valueQuantity.value, it.bodyMassIndex.valueQuantity.unit),
+                    status = it.bodyMassIndex.status,
+                    null
+                )
+            )
+        }
+    }
 
     Row(
         modifier = modifier,
@@ -46,8 +67,7 @@ fun HeightWeightBmiCard(modifier: Modifier) {
         HeightWeightCard(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(0.3f),
-            heightAndWeightDataList = heightAndWeightDataList
+                .weight(0.3f), heightAndWeightDataList = heightAndWeightDataList
         )
 
         BmiCard(
@@ -56,8 +76,7 @@ fun HeightWeightBmiCard(modifier: Modifier) {
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color.White)
-                .padding(vertical = 20.dp, horizontal = 12.dp),
-            heightAndWeightDataList = heightAndWeightDataList
+                .padding(vertical = 20.dp, horizontal = 12.dp), heightAndWeightDataList = heightAndWeightDataList
         )
     }
 }
@@ -68,8 +87,7 @@ private fun HeightWeightCard(modifier: Modifier, heightAndWeightDataList: List<R
     val width = configuration.screenWidthDp.dp * 0.25f
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceAround
+        modifier = modifier, verticalArrangement = Arrangement.SpaceAround
     ) {
         heightAndWeightDataList.filterIndexed { index, _ ->
             index < heightAndWeightDataList.lastIndex
@@ -107,8 +125,7 @@ private fun HeightWeightCard(modifier: Modifier, heightAndWeightDataList: List<R
 @Composable
 private fun BmiCard(modifier: Modifier, heightAndWeightDataList: List<ResultMeasurementCardInfo>) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center
+        modifier = modifier, verticalArrangement = Arrangement.Center
     ) {
         heightAndWeightDataList.filterIndexed { index, resultMeasurementCardInfo ->
             index == heightAndWeightDataList.lastIndex
@@ -150,7 +167,7 @@ private fun BmiWarningAndPercentage(resultMeasurementCardInfo: ResultMeasurement
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         BmiWarningText(resultMeasurementCardInfo = resultMeasurementCardInfo)
-        BmiPercentage(modifier = Modifier.weight(1f), resultMeasurementCardInfo = resultMeasurementCardInfo)
+        PercentageView(modifier = Modifier.weight(1f), resultMeasurementCardInfo = resultMeasurementCardInfo)
     }
 }
 
@@ -163,21 +180,28 @@ private fun BmiWarningText(resultMeasurementCardInfo: ResultMeasurementCardInfo)
             .clip(RoundedCornerShape(8.dp))
             .background(resultMeasurementCardInfo.getBackgroundColor())
             .padding(horizontal = 6.dp, vertical = 2.dp),
-        content = resultMeasurementCardInfo.ment
+        status = resultMeasurementCardInfo.status
     )
 }
 
 
 @Composable
-private fun BmiPercentage(modifier: Modifier, resultMeasurementCardInfo: ResultMeasurementCardInfo) {
+private fun PercentageView(modifier: Modifier, resultMeasurementCardInfo: ResultMeasurementCardInfo) {
     Column(
         modifier = modifier
     ) {
-        val bmiBaseList = listOf(12, 19, 26, 33, 40)
+        val bmiBaseList = when (resultMeasurementCardInfo.type) {
+            "혈압" -> listOf(120f, 140f, 160f)
+            "비만도(BMI)" -> listOf(18.5f, 24.5f, 30f)
+            "혈당" -> listOf(75f, 100f, 125f, 150f)
+            "맥박" -> listOf(60f, 90f, 120f)
+            else -> {
+                listOf()
+            }
+        }
 
-        ConstraintLayout(
-            modifier = Modifier.fillMaxWidth(),
-            constraintSet = ConstraintSet {
+        if (bmiBaseList.isNotEmpty()) {
+            ConstraintLayout(modifier = Modifier.fillMaxWidth(), constraintSet = ConstraintSet {
                 val circle = createRefFor("circle")
                 var circleRatio =
                     (resultMeasurementCardInfo.value.first - bmiBaseList.first()) / (bmiBaseList.last() - bmiBaseList.first())
@@ -188,43 +212,43 @@ private fun BmiPercentage(modifier: Modifier, resultMeasurementCardInfo: ResultM
                     linkTo(start = parent.start, end = parent.end, bias = circleRatio)
                 }
             }) {
-            Canvas(
+                Canvas(
+                    modifier = Modifier
+                        .layoutId("circle")
+                        .size(size = 8.dp)
+                        .clip(CircleShape)
+                        .border(color = Primary, width = 1.dp)
+                        .background(Primary)
+                ) {}
+            }
+
+            Divider(
                 modifier = Modifier
-                    .layoutId("circle")
-                    .size(size = 8.dp)
-                    .clip(CircleShape)
-                    .border(color = Primary, width = 1.dp)
-                    .background(Primary)
-            ) {}
-        }
-
-        Divider(
-            modifier = Modifier
-                .padding(top = 2.dp)
-                .height(12.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .backgroundHGradient(
-                    listOf(
-                        Color(0xFFB5D4F1),
-                        Color(0xFF81E5DB),
-                        Color(0xFFE8D284),
-                        Color(0xFFE2798E)
+                    .padding(top = 2.dp)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .backgroundHGradient(
+                        listOf(
+                            Color(0xFFB5D4F1).copy(alpha = 0.0f),
+                            Color(0xFF81E5DB).copy(alpha = 0.38f),
+                            Color(0xFFE8D284).copy(0.7f),
+                            Color(0xFFE2798E).copy(alpha = 1.0f)
+                        )
                     )
-                )
-        )
+            )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            bmiBaseList.forEach {
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = "$it",
-                    style = MaterialTheme.typography.caption,
-                    color = Black80,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                bmiBaseList.forEach {
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = "$it",
+                        style = MaterialTheme.typography.caption,
+                        color = Black80,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }

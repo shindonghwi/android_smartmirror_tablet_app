@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -18,10 +19,14 @@ import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
+import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 
 @Composable
 fun ResultFinalCommentCard(modifier: Modifier) {
+
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,

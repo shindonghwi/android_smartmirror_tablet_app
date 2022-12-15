@@ -19,11 +19,12 @@ data class WatchData(
 
 data class ChairData(
     val bloodPressureSystolic: Int, // 혈압
+    val bloodPressureDiastolic: Int, // 혈압
     val glucose: Int, // 혈당
     val weight: Float, // 체중
     val bodyMassIndex: Float, // 체지방
 ) : IChair {
     override fun isDataExist(): Boolean {
-        return bloodPressureSystolic + glucose + weight + bodyMassIndex != 0f
+        return bloodPressureSystolic + bloodPressureDiastolic + glucose + weight + bodyMassIndex != 0f
     }
 }

@@ -51,7 +51,7 @@ class OrotMessageParseHelper(private val iActionCallback: IActionCallback?) {
                     }
                 }
                 if (display?.measurement != null){
-                    iActionCallback?.showHealthOverView(voice?.text)
+                    iActionCallback?.showHealthOverView(voice?.text, display)
                 }else{
                     iActionCallback?.onReceivedSaidAI(voice?.text, voice?.text)
                 }

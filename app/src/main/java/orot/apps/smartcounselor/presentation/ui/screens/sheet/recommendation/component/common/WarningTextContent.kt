@@ -14,49 +14,37 @@ import androidx.compose.ui.unit.sp
 import orot.apps.smartcounselor.presentation.style.Black80
 
 @Composable
-fun WarningTextContent(modifier: Modifier, content: String, keyList: List<String> = listOf("주의", "위험")) {
-    var keywordPre = ""
-    var keyword = ""
-    var keywordAfter = ""
-    var findIndex = -1
-    var findKey = "정상"
+fun WarningTextContent(modifier: Modifier, status: String?) {
+    var preContent = ""
+    var mainContent = ""
 
-    for (key in keyList) {
-        findIndex = content.indexOf(string = key)
-
-        if (findIndex != -1) {
-            findKey = key
-            break
-        }
-    }
-
-    if (findIndex != -1) {
-        content.mapIndexed { index, item ->
-            if (index < findIndex) {
-                keywordPre += item
-            } else if (index < findIndex + findKey.length) {
-                keyword = findKey
-            } else {
-                keywordAfter += item
+    status?.let {
+        when(it){
+            "low","proper" -> {
+                preContent = "정상"
+                mainContent = "범위에요"
+            }
+            "warn" -> {
+                preContent = "주의"
+                mainContent = "가 필요해요"
+            }
+            "high","alert" -> {
+                preContent = "위험"
+                mainContent = "한 수치에요"
             }
         }
-    } else {
-        keywordAfter = content
-    }
 
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Black80, fontWeight = FontWeight.Normal, fontSize = 18.sp)) {
-                    append(keywordPre)
-                }
-                withStyle(style = SpanStyle(color = Black80, fontWeight = FontWeight.Bold, fontSize = 18.sp)) {
-                    append(keyword)
-                }
-                withStyle(style = SpanStyle(color = Black80, fontWeight = FontWeight.Normal, fontSize = 18.sp)) {
-                    append(keywordAfter)
-                }
-            }, overflow = TextOverflow.Ellipsis
-        )
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Black80, fontWeight = FontWeight.Bold, fontSize = 18.sp)) {
+                        append(preContent)
+                    }
+                    withStyle(style = SpanStyle(color = Black80, fontWeight = FontWeight.Normal, fontSize = 18.sp)) {
+                        append(mainContent)
+                    }
+                }, overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

@@ -1,5 +1,6 @@
 package mago.apps.sognorawebsocket.websocket.model.callback
 
+import mago.apps.sognorawebsocket.websocket.model.protocol.body.DisplayInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.RequestedMeasurementInfo
 
 interface IActionCallback {
@@ -67,6 +68,7 @@ interface IActionCallback {
     /** 헬스 측정 결과 보여주기 */
     fun showHealthOverView(
         voiceComment: String?,
+        displayInfo: DisplayInfo?,
         actionType: OrotActionType = OrotActionType.HEALTH_OVERVIEW
     )
 
