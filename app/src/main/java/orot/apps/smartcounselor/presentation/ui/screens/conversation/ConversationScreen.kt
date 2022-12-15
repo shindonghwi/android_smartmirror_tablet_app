@@ -40,8 +40,6 @@ import orot.apps.smartcounselor.presentation.ui.screens.chat_list.ChatViewConten
 
 @Composable
 fun ConversationScreen() {
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -53,7 +51,7 @@ fun ConversationScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
+                    .height(320.dp)
                     .padding(start = 20.dp, end = 20.dp, top = 40.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
@@ -73,7 +71,6 @@ fun ConversationScreen() {
                     AIReceivedTextContent()
                 }
             }
-            ChatViewContent()
         }
     }
 }

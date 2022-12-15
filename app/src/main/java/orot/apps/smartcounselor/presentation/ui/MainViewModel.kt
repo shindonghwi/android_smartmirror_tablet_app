@@ -86,9 +86,7 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun onConversationExit(
-                        voiceComment: String?,
-                        displayComment: String?,
-                        actionType: OrotActionType
+                        voiceComment: String?, displayComment: String?, actionType: OrotActionType
                     ) {
                         resultActionType = actionType
                         playTts(voiceComment)
@@ -104,9 +102,7 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun onReceivedFallback(
-                        voiceComment: String?,
-                        displayComment: String?,
-                        actionType: OrotActionType
+                        voiceComment: String?, displayComment: String?, actionType: OrotActionType
                     ) {
                         resultActionType = actionType
                         playTts(voiceComment)
@@ -201,9 +197,10 @@ class MainViewModel @Inject constructor(
         val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
         val heartRate = measurement?.heartRate ?: 0
 
-        userInputData = userInputData?.copy(
+        selectedUser = selectedUser?.copy(
             bloodPressureSystolic = bloodPressureSystolic, heartRate = heartRate
         )
+
         watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
         watchHashData["heartRate"] = heartRate
 
@@ -220,12 +217,13 @@ class MainViewModel @Inject constructor(
         val weight = measurement?.weight ?: 0f
         val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
 
-        userInputData = userInputData?.copy(
+        selectedUser = selectedUser?.copy(
             bloodPressureSystolic = bloodPressureSystolic,
             glucose = glucose,
             weight = weight,
             bodyMassIndex = bodyMassIndex
         )
+
         chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
         chairHashData["glucose"] = glucose
         chairHashData["weight"] = weight.toInt()
@@ -277,15 +275,6 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
 
-    var userInputData: UserInputData? = UserInputData(
-        medication = listOf("htn"),
-        glucose = 105,
-        bodyTemperature = 36.5f,
-        height = 182f,
-        weight = 92f,
-        bodyMassIndex = 25.2f,
-    )
-
     var watchHashData = HashMap<String, Int>().apply {
         put("bloodPressureSystolic", 0)
         put("heartRate", 0)
@@ -309,15 +298,11 @@ class MainViewModel @Inject constructor(
         ChairData(0, 0, 0f, 0f)
     )
 
-    val userListInfo = mutableStateListOf<String>().apply {
-        repeat((1..5).count()) { add("user$it") }
-    }
+    var selectedUser: UserData? = null
 
-    var addAccountInputData = ""
-
-    fun addUser(userInfo: String) {
-        if (!userListInfo.contains(userInfo)) {
-            userListInfo.add(userInfo)
+    fun addUser(userInfo: UserData) {
+        if (!userList.contains(userInfo)) {
+            userList.add(userInfo)
         }
     }
 
@@ -387,15 +372,14 @@ class MainViewModel @Inject constructor(
         val header: HeaderInfo
         val newBody: BodyInfo?
 
-        userInputData?.let {
+        selectedUser?.let {
             header = HeaderInfo().toStream(
                 type = protocolId, age = it.age, gender = it.gender
             )
 
             newBody = if (measurementBody != null) {
                 BodyInfo(
-                    before = orotWebSocket?.getLastInfo()?.body,
-                    measurement = measurementBody.measurement
+                    before = orotWebSocket?.getLastInfo()?.body, measurement = measurementBody.measurement
                 )
             } else {
                 BodyInfo(before = orotWebSocket?.getLastInfo()?.body)
@@ -461,9 +445,8 @@ class MainViewModel @Inject constructor(
                         moveScreen(null, BottomMenu.BloodPressure)
                     }
                     OrotActionType.WAITING_RESULT -> {
-                        val userData = userInputData
 
-                        userData?.let {
+                        selectedUser?.let {
                             sendProtocol(
                                 protocolNum = 18,
                                 measurementBody = orotWebSocket?.getLastInfo()?.body?.toMeasurement(
@@ -532,12 +515,12 @@ class MainViewModel @Inject constructor(
         moveScreen(Screens.Home, BottomMenu.Start)
     }
 
-    private fun clearMedicationDeviceData(){
+    private fun clearMedicationDeviceData() {
         updateMedicalEndStatus(false)
         watchHashData.entries.map { watchHashData[it.key] = 0 }
         chairHashData.entries.map { chairHashData[it.key] = 0 }
-        medicalDeviceWatchData.update { WatchData(0,0) }
-        medicalDeviceChairData.update { ChairData(0,0,0f,0f) }
+        medicalDeviceWatchData.update { WatchData(0, 0) }
+        medicalDeviceChairData.update { ChairData(0, 0, 0f, 0f) }
     }
 
     private fun clearConversationData() {
@@ -555,15 +538,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun clearUserInputData() {
-        userInputData = null
-        userInputData = UserInputData(
-            medication = listOf("htn"),
-            glucose = 105,
-            bodyTemperature = 36.5f,
-            height = 182f,
-            weight = 92f,
-            bodyMassIndex = 25.2f,
-        )
+        userList.filterIndexed { index, t -> index > 4 }.map { userList.remove(it) }
     }
 
     override fun onCleared() {

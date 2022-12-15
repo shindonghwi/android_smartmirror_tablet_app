@@ -40,8 +40,7 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
             .padding(top = 18.dp)
             .width(startWidth)
             .clickBounce {
-                Log.w(TAG, "BloodPressureSubmitButton: ${mainViewModel.userInputData}" )
-                val isValueEmpty = mainViewModel.userInputData?.isEmptyCheck()
+                val isValueEmpty = mainViewModel.selectedUser?.isEmptyCheck()
 
                 if (isValueEmpty == true){
                     Toast.makeText(context, "정보를 모두 입력해주세요", Toast.LENGTH_SHORT).show()

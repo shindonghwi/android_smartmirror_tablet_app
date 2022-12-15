@@ -257,9 +257,9 @@ private fun InputContent(modifier: Modifier, content: String, key: String, hint:
                 }
             ), iTextCallback = object : ITextCallback {
                 override fun renderText(content: String) {
-                    if (key == "성함") {
-                        mainViewModel.addAccountInputData = content
-                    }
+//                    if (key == "성함") {
+//                        mainViewModel.addAccountInputData = content
+//                    }
                 }
             }
         )
@@ -380,17 +380,17 @@ private fun RegisterButton() {
                 .background(Primary)
                 .noDuplicationClickable {
                     mainViewModel.run {
-                        if (addAccountInputData.isNotEmpty()) {
-                            addUser(addAccountInputData)
-                            changeAccountBottomSheetFlag(false)
-                            Toast
-                                .makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            Toast
-                                .makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+//                        if (addAccountInputData.isNotEmpty()) {
+//                            addUser(addAccountInputData)
+//                            changeAccountBottomSheetFlag(false)
+//                            Toast
+//                                .makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT)
+//                                .show()
+//                        } else {
+//                            Toast
+//                                .makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT)
+//                                .show()
+//                        }
                     }
                 },
             contentAlignment = Alignment.Center

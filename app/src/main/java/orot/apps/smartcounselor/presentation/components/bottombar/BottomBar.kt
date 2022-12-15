@@ -1,5 +1,6 @@
 package orot.apps.smartcounselor.presentation.components.bottombar
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -99,6 +100,7 @@ private fun StartBottomBar() {
 
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val configuration = LocalConfiguration.current
+    val context = LocalContext.current
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }
 
     Column(
@@ -125,9 +127,13 @@ private fun StartBottomBar() {
                     .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                     .background(Primary)
                     .noDuplicationClickable {
-                        mainViewModel.run {
-                            connectWebSocket()
-                            moveScreen(Screens.Guide, BottomMenu.Loading)
+                        if (mainViewModel.selectedUser != null){
+                            mainViewModel.run {
+                                connectWebSocket()
+                                moveScreen(Screens.Guide, BottomMenu.Loading)
+                            }
+                        }else{
+                            Toast.makeText(context, "사용자를 선택해주세요", Toast.LENGTH_SHORT).show()
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -419,7 +425,7 @@ fun ServerRetryBottomBar() {
 
 fun getBottomBarHeight(route: String): Float {
     return when (route) {
-        BottomMenu.Start.type -> 0.3f
+        BottomMenu.Start.type -> 0.35f
         BottomMenu.Loading.type -> 0.33f
         BottomMenu.Empty.type -> 0f
         BottomMenu.Conversation.type -> 0.4f

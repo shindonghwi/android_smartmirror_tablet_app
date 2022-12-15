@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.R
-import orot.apps.smartcounselor.model.remote.UserInputData
+import orot.apps.smartcounselor.model.remote.UserData
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
 import orot.apps.smartcounselor.presentation.components.input.KeyBoardActionUnit
@@ -54,7 +54,7 @@ fun InputBloodPressure(modifier: Modifier) {
     LazyColumn(modifier = modifier) {
 
         itemsIndexed(items = contentList, key = { index, item -> index }) { index, item ->
-            val defaultText: String = getDefaultText(mainViewModel.userInputData, index)
+            val defaultText: String = getDefaultText(mainViewModel.selectedUser, index)
 
             Row(
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -157,7 +157,7 @@ fun InputBloodPressure(modifier: Modifier) {
                                 else -> {}
                             }
 
-                            mainViewModel.userInputData?.let {
+                            mainViewModel.selectedUser?.let {
                                 when (index) {
                                     0 -> it.medication = content.split(",")
                                     1 -> it.bloodPressureSystolic = intTextNum
@@ -177,17 +177,17 @@ fun InputBloodPressure(modifier: Modifier) {
     }
 }
 
-private fun getDefaultText(userInputData: UserInputData?, index: Int): String {
+private fun getDefaultText(userData: UserData?, index: Int): String {
     return when (index) {
-        0 -> userInputData?.medication?.let { it1 -> TextUtils.join(",", it1) }.toString()
-        1 -> userInputData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        2 -> userInputData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        3 -> userInputData?.glucose.toString()
-        4 -> userInputData?.heartRate?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        5 -> userInputData?.bodyTemperature.toString()
-        6 -> userInputData?.height.toString()
-        7 -> userInputData?.weight.toString()
-        8 -> userInputData?.bodyMassIndex.toString()
+        0 -> userData?.medication?.let { it1 -> TextUtils.join(",", it1) }.toString()
+        1 -> userData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
+        2 -> userData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
+        3 -> userData?.glucose.toString()
+        4 -> userData?.heartRate?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
+        5 -> userData?.bodyTemperature.toString()
+        6 -> userData?.height.toString()
+        7 -> userData?.weight.toString()
+        8 -> userData?.bodyMassIndex.toString()
         else -> ""
     }
 }
