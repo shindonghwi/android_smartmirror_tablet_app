@@ -80,8 +80,8 @@ data class RecommendationInfo(
 )
 
 data class TodayRecommendationData(
-    val food: String,
-    val exercise: String
+    val food: String?,
+    val exercise: String?
 )
 
 data class RecommendationDetailData(

@@ -35,19 +35,26 @@ fun GlucoseHrBpCard(modifier: Modifier) {
             add(
                 ResultMeasurementCardInfo(
                     "혈당", Pair(it.glucose.valueQuantity.value, it.glucose.valueQuantity.unit),
-                    it.glucose.status, painterResource(id = R.drawable.result_glucose)
+                    it.glucose.status,
+                    painterResource(id = R.drawable.result_glucose),
+                    mainViewModel.selectedUser?.history
                 )
             )
             add(
                 ResultMeasurementCardInfo(
                     "맥박", Pair(it.heartRate.valueQuantity.value, it.heartRate.valueQuantity.unit),
-                    it.heartRate.status, painterResource(id = R.drawable.result_heartbeat)
+                    it.heartRate.status,
+                    painterResource(id = R.drawable.result_heartbeat),
+                    mainViewModel.selectedUser?.history
                 )
             )
             add(
                 ResultMeasurementCardInfo(
-                    "혈압", Pair(it.bloodPressureSystolic.valueQuantity.value, it.bloodPressureSystolic.valueQuantity.unit),
-                    it.bloodPressureSystolic.status, painterResource(id = R.drawable.result_bloodpressure)
+                    "혈압",
+                    Pair(it.bloodPressureSystolic.valueQuantity.value, it.bloodPressureSystolic.valueQuantity.unit),
+                    it.bloodPressureSystolic.status,
+                    painterResource(id = R.drawable.result_bloodpressure),
+                    mainViewModel.selectedUser?.history
                 )
             )
         }
@@ -130,5 +137,18 @@ private fun CardItem(modifier: Modifier, cardInfo: ResultMeasurementCardInfo) {
                 .padding(horizontal = 6.dp, vertical = 2.dp),
             status = cardInfo.status
         )
+
+//        cardInfo.history?.let {
+//            Graph(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(500.dp),
+//                xValues = (0..it.bpList.size).map { it },
+//                yValues = (0..it.bpList.size).map { (it) * 20 },
+//                points = it.bpList,
+//                paddingSpace = 16.dp,
+//                verticalStep = 20
+//            )
+//        }
     }
 }

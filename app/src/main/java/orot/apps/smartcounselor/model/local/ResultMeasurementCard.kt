@@ -2,6 +2,7 @@ package orot.apps.smartcounselor.model.local
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import orot.apps.smartcounselor.model.remote.UserHistoryData
 
 interface IResultMeasurementCardInfo {
     fun getBackgroundColor(): Color
@@ -13,6 +14,7 @@ data class ResultMeasurementCardInfo(
     val value: Pair<Float, String>, // 80, mg / dL
     val status: String?,
     val image: Painter?,
+    val history: UserHistoryData?
 ) : IResultMeasurementCardInfo {
     override fun getBackgroundColor(): Color {
         return if (status?.contains("warn") == true) {

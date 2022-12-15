@@ -199,13 +199,14 @@ class MainViewModel @Inject constructor(
         val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
         val heartRate = measurement?.heartRate ?: 0
 
-        selectedUser = selectedUser?.copy(
-            bloodPressureSystolic = bloodPressureSystolic, heartRate = heartRate
-        )
-
-        watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
-        watchHashData["heartRate"] = heartRate
-
+        if (heartRate != 0){
+            selectedUser = selectedUser?.copy(heartRate = heartRate)
+            watchHashData["heartRate"] = heartRate
+        }
+        if (bloodPressureSystolic != 0){
+            selectedUser = selectedUser?.copy(bloodPressureSystolic = bloodPressureSystolic)
+            watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
+        }
         medicalDeviceWatchData.update {
             WatchData(
                 bloodPressureSystolic = bloodPressureSystolic, heartRate = heartRate
@@ -220,19 +221,26 @@ class MainViewModel @Inject constructor(
         val weight = measurement?.weight ?: 0f
         val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
 
-        selectedUser = selectedUser?.copy(
-            bloodPressureSystolic = bloodPressureSystolic,
-            bloodPressureDiastolic = bloodPressureDiastolic,
-            glucose = glucose,
-            weight = weight,
-            bodyMassIndex = bodyMassIndex
-        )
-
-        chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
-        chairHashData["bloodPressureDiastolic"] = bloodPressureDiastolic
-        chairHashData["glucose"] = glucose
-        chairHashData["weight"] = weight.toInt()
-        chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
+        if (bloodPressureSystolic != 0){
+            selectedUser = selectedUser?.copy(bloodPressureSystolic = bloodPressureSystolic)
+            chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
+        }
+        if (bloodPressureDiastolic != 0){
+            selectedUser = selectedUser?.copy(bloodPressureDiastolic = bloodPressureDiastolic)
+            chairHashData["bloodPressureDiastolic"] = bloodPressureDiastolic
+        }
+        if (glucose != 0){
+            selectedUser = selectedUser?.copy(glucose = glucose)
+            chairHashData["glucose"] = glucose
+        }
+        if (weight != 0f){
+            selectedUser = selectedUser?.copy(weight = weight)
+            chairHashData["weight"] = weight.toInt()
+        }
+        if (bodyMassIndex != 0f){
+            selectedUser = selectedUser?.copy(bodyMassIndex = bodyMassIndex)
+            chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
+        }
 
         medicalDeviceChairData.update {
             ChairData(

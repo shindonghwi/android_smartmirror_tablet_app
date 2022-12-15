@@ -83,7 +83,7 @@ fun RecommendationSheetContent() {
             CloseButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .height(90.dp),
             )
         }
     }

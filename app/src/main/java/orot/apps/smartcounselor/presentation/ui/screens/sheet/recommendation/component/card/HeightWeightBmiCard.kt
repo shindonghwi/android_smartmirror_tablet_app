@@ -40,20 +40,21 @@ fun HeightWeightBmiCard(modifier: Modifier) {
         mainViewModel.recommendationInfo?.measurement?.let {
             add(
                 ResultMeasurementCardInfo(
-                    "키", Pair(it.height.valueQuantity.value, it.height.valueQuantity.unit), null, null
+                    "키", Pair(it.height.valueQuantity.value, it.height.valueQuantity.unit),
+                    null, null, null
                 )
             )
             add(
                 ResultMeasurementCardInfo(
-                    "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit), null, null
+                    "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit),
+                    null, null, null
                 )
             )
             add(
                 ResultMeasurementCardInfo(
                     "비만도(BMI)",
                     Pair(it.bodyMassIndex.valueQuantity.value, it.bodyMassIndex.valueQuantity.unit),
-                    status = it.bodyMassIndex.status,
-                    null
+                    it.bodyMassIndex.status, null, null
                 )
             )
         }
