@@ -300,6 +300,8 @@ class MainViewModel @Inject constructor(
 
     var selectedUser: UserData? = null
 
+    var registerUser: UserData? = UserData()
+
     fun addUser(userInfo: UserData) {
         if (!userList.contains(userInfo)) {
             userList.add(userInfo)
@@ -374,7 +376,7 @@ class MainViewModel @Inject constructor(
 
         selectedUser?.let {
             header = HeaderInfo().toStream(
-                type = protocolId, age = it.age, gender = it.gender
+                type = protocolId, age = it.age, gender = it.gender, height = it.height
             )
 
             newBody = if (measurementBody != null) {

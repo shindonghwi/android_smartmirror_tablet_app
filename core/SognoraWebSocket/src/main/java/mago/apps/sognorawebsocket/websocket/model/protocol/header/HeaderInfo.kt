@@ -10,8 +10,9 @@ data class HeaderInfo(
     val model: String? = null,
     val age: Int? = null,
     val gender: String? = null,
+    val height: Float? = null
 ) : IHeaderInfo {
-    override fun toStream(type: String, age: Int, gender: String): HeaderInfo {
+    override fun toStream(type: String, age: Int, gender: String, height: Float): HeaderInfo {
         return HeaderInfo(
             protocol_id = type,
             protocol_version = this.protocol_version,
@@ -19,7 +20,8 @@ data class HeaderInfo(
             device = "Mirror",
             model = Build.MODEL,
             age = age,
-            gender = gender
+            gender = gender,
+            height = height,
         )
     }
 }

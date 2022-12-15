@@ -29,8 +29,9 @@ fun UserRadioButton(modifier: Modifier) {
     val radioOptions = userList
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(UserData()) }
 
+
     Column {
-        radioOptions.chunked(if (radioOptions.size > 3) 3 else 3)
+        radioOptions.chunked(3)
             .forEachIndexed { rowIndex, rowList ->
                 Row(
                     modifier = modifier,
@@ -39,12 +40,7 @@ fun UserRadioButton(modifier: Modifier) {
                 ) {
                     rowList.forEachIndexed { index, item ->
                         Row(
-                            modifier = Modifier
-                                .weight(1f)
-                                .selectable(selected = (item == selectedOption), onClick = {
-                                    mainViewModel.selectedUser = item
-                                    onOptionSelected(item)
-                                }),
+                            modifier = Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -52,6 +48,7 @@ fun UserRadioButton(modifier: Modifier) {
                                 RadioButton(
                                     selected = (item == selectedOption),
                                     onClick = {
+                                        mainViewModel.selectedUser = item
                                         onOptionSelected(item)
                                     },
                                     colors = RadioButtonDefaults.colors(

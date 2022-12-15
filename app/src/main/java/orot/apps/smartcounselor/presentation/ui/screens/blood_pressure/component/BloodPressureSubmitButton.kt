@@ -1,6 +1,5 @@
 package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.component
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,13 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.graph.model.BottomMenu
-import orot.apps.smartcounselor.graph.model.Screens
-import orot.apps.smartcounselor.model.local.ActionType
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
-import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.clickBounce
 
 @Composable

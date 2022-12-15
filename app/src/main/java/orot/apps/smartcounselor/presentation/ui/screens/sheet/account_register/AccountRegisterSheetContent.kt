@@ -10,7 +10,10 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -58,9 +61,7 @@ fun AccountRegisterSheetContent() {
     )
 
     AnimatedVisibility(
-        visible = isShowing,
-        enter = fadeIn() + slideInVertically(),
-        exit = fadeOut() + slideOutVertically()
+        visible = isShowing, enter = fadeIn() + slideInVertically(), exit = fadeOut() + slideOutVertically()
     ) {
         Column(
             modifier = Modifier
@@ -115,9 +116,7 @@ private fun DescriptionContent(modifier: Modifier) {
         Text(buildAnnotatedString {
             withStyle(
                 style = SpanStyle(
-                    color = MaterialTheme.colors.primary,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 18.sp
+                    color = MaterialTheme.colors.primary, fontWeight = FontWeight.Normal, fontSize = 18.sp
                 )
             ) {
                 append("아래의 정보를 입력해주세요.")
@@ -127,27 +126,21 @@ private fun DescriptionContent(modifier: Modifier) {
             Text(buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 18.sp
+                        color = MaterialTheme.colors.primary, fontWeight = FontWeight.Normal, fontSize = 18.sp
                     )
                 ) {
                     append("이 과정은 등록을 위해 처음 ")
                 }
                 withStyle(
                     style = SpanStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold, fontSize = 18.sp
                     )
                 ) {
                     append("한 번만 진행")
                 }
                 withStyle(
                     style = SpanStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 18.sp
+                        color = MaterialTheme.colors.primary, fontWeight = FontWeight.Normal, fontSize = 18.sp
                     )
                 ) {
                     append("됩니다")
@@ -206,17 +199,14 @@ private fun InputContent(modifier: Modifier, content: String, key: String, hint:
     }
 
     hint?.let {
-        CustomTextField(
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .fillMaxWidth()
-                .height(48.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(16.dp)
-                ),
+        CustomTextField(modifier = Modifier
+            .padding(top = 12.dp)
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp, color = MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp)
+            ),
             innerTextPaddingValues = PaddingValues(start = 20.dp),
             trailingPaddingValues = PaddingValues(end = 8.dp),
             placeholderText = {
@@ -248,21 +238,20 @@ private fun InputContent(modifier: Modifier, content: String, key: String, hint:
                     }
                 },
             ),
-            keyBoardActionUnit = KeyBoardActionUnit(
-                onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Down)
-                },
-                onDone = {
-                    localFocusManager.clearFocus()
-                }
-            ), iTextCallback = object : ITextCallback {
+            keyBoardActionUnit = KeyBoardActionUnit(onNext = {
+                localFocusManager.moveFocus(FocusDirection.Down)
+            }, onDone = {
+                localFocusManager.clearFocus()
+            }),
+            iTextCallback = object : ITextCallback {
                 override fun renderText(content: String) {
-//                    if (key == "성함") {
-//                        mainViewModel.addAccountInputData = content
-//                    }
+                    when (key) {
+                        "성함" -> mainViewModel.registerUser = mainViewModel.registerUser?.copy(name = content)
+                        "나이" -> mainViewModel.registerUser = mainViewModel.registerUser?.copy(age = content.toInt())
+                        "신장" -> mainViewModel.registerUser = mainViewModel.registerUser?.copy(height = content.toFloat())
+                    }
                 }
-            }
-        )
+            })
     } ?: run {
         when (key) {
             "약" -> {
@@ -287,6 +276,7 @@ private fun InputContent(modifier: Modifier, content: String, key: String, hint:
 
 @Composable
 private fun GenderSelector(modifier: Modifier) {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val radioOptions = listOf("남", "여")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
 
@@ -300,6 +290,11 @@ private fun GenderSelector(modifier: Modifier) {
                 modifier = Modifier.selectable(
                     selected = (text == selectedOption),
                     onClick = {
+                        mainViewModel.registerUser = if (text == "남") {
+                            mainViewModel.registerUser?.copy(gender = "male")
+                        } else {
+                            mainViewModel.registerUser?.copy(gender = "female")
+                        }
                         onOptionSelected(text)
                     },
                 ),
@@ -325,37 +320,78 @@ private fun GenderSelector(modifier: Modifier) {
 
 @Composable
 private fun MedicineSelector(modifier: Modifier) {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val radioOptions = listOf("고혈압", "당뇨", "고혈압 + 당뇨", "해당사항 없음")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.last()) }
+    val isInputFiledShowing = remember { mutableStateOf(true) }
+    val localFocusManager = LocalFocusManager.current
 
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
-        radioOptions.forEach { text ->
-            Row(
-                modifier = Modifier.selectable(
-                    selected = (text == selectedOption),
-                    onClick = {
-                        onOptionSelected(text)
-                    },
-                ),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RadioButton(
-                    selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) },
-                    colors = RadioButtonDefaults.colors(
-                        unselectedColor = Gray20, selectedColor = Primary
+    Column {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            radioOptions.forEach { text ->
+                Row(
+                    modifier = Modifier.selectable(
+                        selected = (text == selectedOption),
+                        onClick = {
+                            isInputFiledShowing.value = text == "해당사항 없음"
+                            onOptionSelected(text)
+                        },
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = (text == selectedOption),
+                        onClick = { onOptionSelected(text) },
+                        colors = RadioButtonDefaults.colors(
+                            unselectedColor = Gray20, selectedColor = Primary
+                        )
                     )
-                )
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.body1,
-                    color = Black80,
-                )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.body1,
+                        color = Black80,
+                    )
+                }
             }
+        }
+
+        if (isInputFiledShowing.value) {
+            CustomTextField(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        width = 1.dp, color = MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp)
+                    ),
+                innerTextPaddingValues = PaddingValues(start = 20.dp),
+                trailingPaddingValues = PaddingValues(end = 8.dp),
+                placeholderText = {
+                    Text(
+                        text = "복용중인 약을 작성해주세요",
+                        style = MaterialTheme.typography.body1,
+                        color = Black80.copy(0.4f),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                textStyle = MaterialTheme.typography.body1.copy(color = Black80),
+                textAlignment = Alignment.CenterStart,
+                isSingleLine = true,
+                keyBoardActionUnit = KeyBoardActionUnit(onDone = {
+                    localFocusManager.clearFocus()
+                }),
+                iTextCallback = object : ITextCallback {
+                    override fun renderText(content: String) {
+                        mainViewModel.registerUser = mainViewModel.registerUser?.copy(medication = content.split(","))
+                    }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+            )
         }
     }
 }
@@ -380,20 +416,22 @@ private fun RegisterButton() {
                 .background(Primary)
                 .noDuplicationClickable {
                     mainViewModel.run {
-//                        if (addAccountInputData.isNotEmpty()) {
-//                            addUser(addAccountInputData)
-//                            changeAccountBottomSheetFlag(false)
-//                            Toast
-//                                .makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT)
-//                                .show()
-//                        } else {
-//                            Toast
-//                                .makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
+                        registerUser?.let {
+                            if (it.name.isNotEmpty()) {
+                                addUser(it)
+                                changeAccountBottomSheetFlag(false)
+                                Toast
+                                    .makeText(context, "등록이 완료되었습니다", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast
+                                    .makeText(context, "정보를 입력해주세요", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                        registerUser = null
                     }
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),
@@ -410,10 +448,14 @@ private fun RegisterButton() {
                 .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                 .background(Color(0xFFD9D9D9))
                 .noDuplicationClickable {
-                    Toast.makeText(context, "등록을 취소하였습니다", Toast.LENGTH_SHORT).show()
-                    mainViewModel.changeAccountBottomSheetFlag(false)
-                },
-            contentAlignment = Alignment.Center
+                    Toast
+                        .makeText(context, "등록을 취소하였습니다", Toast.LENGTH_SHORT)
+                        .show()
+                    mainViewModel.run {
+                        changeAccountBottomSheetFlag(false)
+                        registerUser = null
+                    }
+                }, contentAlignment = Alignment.Center
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),

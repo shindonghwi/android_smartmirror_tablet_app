@@ -8,7 +8,7 @@ interface IUserInputData {
 
 data class UserData(
     val age: Int = 60,
-    val gender: String = "M",
+    val gender: String = "male",
     var medication: List<String> = listOf(), // 약물 복용력
     var bloodPressureSystolic: Int = 0, // 수축기 혈압
     var bloodPressureDiastolic: Int = 0,// 이완기 혈압
@@ -39,7 +39,7 @@ val userList = mutableStateListOf<UserData>().apply {
     add(
         UserData(
             age = 65,
-            gender = "W",
+            gender = "female",
             medication = listOf("dm"),
             bloodPressureSystolic = 128,
             bloodPressureDiastolic = 72,
@@ -57,7 +57,7 @@ val userList = mutableStateListOf<UserData>().apply {
     add(
         UserData(
             age = 71,
-            gender = "M",
+            gender = "male",
             medication = listOf(""),
             bloodPressureSystolic = 115,
             bloodPressureDiastolic = 68,
@@ -75,7 +75,7 @@ val userList = mutableStateListOf<UserData>().apply {
     add(
         UserData(
             age = 63,
-            gender = "M",
+            gender = "male",
             medication = listOf("htn"),
             bloodPressureSystolic = 148,
             bloodPressureDiastolic = 86,
@@ -93,7 +93,7 @@ val userList = mutableStateListOf<UserData>().apply {
     add(
         UserData(
             age = 68,
-            gender = "W",
+            gender = "female",
             medication = listOf("htn"),
             bloodPressureSystolic = 141,
             bloodPressureDiastolic = 73,
@@ -111,7 +111,7 @@ val userList = mutableStateListOf<UserData>().apply {
     add(
         UserData(
             age = 66,
-            gender = "M",
+            gender = "male",
             medication = listOf("htn", "dm"),
             bloodPressureSystolic = 150,
             bloodPressureDiastolic = 96,
