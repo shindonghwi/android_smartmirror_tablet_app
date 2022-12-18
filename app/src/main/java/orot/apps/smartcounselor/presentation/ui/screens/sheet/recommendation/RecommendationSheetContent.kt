@@ -64,8 +64,7 @@ fun RecommendationSheetContent() {
                     .fillMaxHeight(0.5f)
                     .clip(RoundedCornerShape(bottomStart = 35.dp))
                     .background(Color.White)
-                    .padding(top = 70.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ResultMenu()
             }
@@ -89,12 +88,13 @@ private fun ResultMenu() {
         Pair("기록", R.drawable.result_chart),
     )
 
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(15.dp)) {
-        itemsIndexed(menuList, key = { index, item -> index }) { index, item ->
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        menuList.forEachIndexed { index, item ->
             Column(
                 modifier = Modifier
+                    .padding(vertical = 15.dp)
                     .size(80.dp)
-                    .clip(RoundedCornerShape(topStart = 35.dp, bottomStart = 35.dp))
+                    .clip(RoundedCornerShape(topStart = 25.dp, bottomStart = 25.dp))
                     .background(if (selectedIndex == index) Black80 else Color.White)
                     .noDuplicationClickable {
                         mainViewModel.changeSelectedResultMenu(index)
@@ -116,7 +116,37 @@ private fun ResultMenu() {
                 )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Column(
+            modifier = Modifier
+                .padding(vertical = 15.dp)
+                .size(80.dp)
+                .clip(RoundedCornerShape(topStart = 25.dp, bottomStart = 25.dp))
+                .background(Color.White)
+                .noDuplicationClickable {
+                    mainViewModel.proceedAfterMeasurement()
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(25.dp),
+                painter = painterResource(id = R.drawable.result_exit),
+                contentDescription = null,
+                tint = Black80
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = "나가기",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption,
+                color = Black80
+            )
+        }
     }
+
 }
 
 
@@ -125,7 +155,9 @@ private fun ResultContent() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
     when (mainViewModel.isSelectedResultMenu.collectAsState().value) {
-        0 -> ResultContentHome()
+        0 -> {
+            ResultContentHome()
+        }
         else -> {
             ResultContentHistory()
         }
@@ -163,8 +195,7 @@ private fun ResultContentHistory() {
 private fun HistoryChart(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.TopCenter
+        modifier = modifier, contentAlignment = Alignment.TopCenter
     ) {
 //        mainViewModel.riskPredictionInfo?.let {
         AndroidView(
@@ -267,13 +298,6 @@ private fun ResultContentHome() {
                 .fillMaxWidth()
                 .wrapContentHeight()
         )
-
-        CloseButton(
-            modifier = Modifier
-                .padding(top = 30.dp)
-                .fillMaxWidth()
-                .height(90.dp),
-        )
     }
 }
 
@@ -284,8 +308,7 @@ private fun CloseButton(modifier: Modifier) {
     val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }
 
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+        modifier = modifier, contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
@@ -295,8 +318,7 @@ private fun CloseButton(modifier: Modifier) {
                 .background(Primary)
                 .noDuplicationClickable {
                     mainViewModel.proceedAfterMeasurement()
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),
@@ -326,20 +348,14 @@ private fun RecommendationTitle(title: String) {
         }
 
         Box(
-            modifier = Modifier
-                .weight(1f),
-            contentAlignment = Alignment.CenterEnd
+            modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(48.dp)
-                    .noDuplicationClickable {
-                        mainViewModel.proceedAfterMeasurement()
-                    }
-                    .padding(8.dp),
-                imageVector = Icons.Default.Close,
-                contentDescription = null
-            )
+            Icon(modifier = Modifier
+                .size(48.dp)
+                .noDuplicationClickable {
+                    mainViewModel.proceedAfterMeasurement()
+                }
+                .padding(8.dp), imageVector = Icons.Default.Close, contentDescription = null)
         }
     }
 }

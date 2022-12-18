@@ -332,7 +332,7 @@ class MainViewModel @Inject constructor(
         isShowingAccountBottomSheet.update { flag }
     }
 
-    var isShowingRecommendationBottomSheet = MutableStateFlow(true)
+    var isShowingRecommendationBottomSheet = MutableStateFlow(false)
     fun changeRecommendationBottomSheetFlag(flag: Boolean) {
         isShowingRecommendationBottomSheet.update { flag }
     }
