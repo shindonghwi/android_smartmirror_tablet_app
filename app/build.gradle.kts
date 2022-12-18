@@ -48,6 +48,7 @@ dependencies {
 
     implementation(project(":core:SognoraWebSocket"))
     implementation(project(":core:SognoraAudio"))
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     Libraries.apply {
 

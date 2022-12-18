@@ -25,6 +25,7 @@ import mago.apps.sognorawebsocket.websocket.model.protocol.MessageProtocol
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.BodyInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.DisplayInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.RequestedMeasurementInfo
+import mago.apps.sognorawebsocket.websocket.model.protocol.body.RiskPredictionInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.header.HeaderInfo
 import mago.apps.sognorawebsocket.websocket.new_ws.OrotWebSocket
 import orot.apps.smartcounselor.graph.NavigationKit
@@ -142,10 +143,11 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun showHealthOverView(
-                        voiceComment: String?, displayInfo: DisplayInfo?, actionType: OrotActionType
+                        voiceComment: String?, displayInfo: DisplayInfo?, riskPrediction: RiskPredictionInfo?, actionType: OrotActionType
                     ) {
                         resultActionType = actionType
                         recommendationInfo = displayInfo
+                        riskPredictionInfo = riskPrediction
                         playTts(voiceComment)
                         changeSaidMeText("")
                         moveScreen(null, BottomMenu.Conversation)
@@ -290,6 +292,7 @@ class MainViewModel @Inject constructor(
      * */
 
     var recommendationInfo: DisplayInfo? = null
+    var riskPredictionInfo: RiskPredictionInfo? = null
 
     var watchHashData = HashMap<String, Int>().apply {
         put("bloodPressureSystolic", 0)
@@ -329,7 +332,7 @@ class MainViewModel @Inject constructor(
         isShowingAccountBottomSheet.update { flag }
     }
 
-    var isShowingRecommendationBottomSheet = MutableStateFlow(false)
+    var isShowingRecommendationBottomSheet = MutableStateFlow(true)
     fun changeRecommendationBottomSheetFlag(flag: Boolean) {
         isShowingRecommendationBottomSheet.update { flag }
     }

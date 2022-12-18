@@ -26,6 +26,7 @@ class OrotMessageParseHelper(private val iActionCallback: IActionCallback?) {
         val action = parseMsg.body?.action
         val voice = body?.voice
         val display = body?.display
+        val riskPrediction = body?.risk_prediction
         val measurement = body?.measurement
 
         saveMessageInfo(info = parseMsg)
@@ -51,7 +52,7 @@ class OrotMessageParseHelper(private val iActionCallback: IActionCallback?) {
                     }
                 }
                 if (display?.measurement != null){
-                    iActionCallback?.showHealthOverView(voice?.text, display)
+                    iActionCallback?.showHealthOverView(voice?.text, display, riskPrediction)
                 }else{
                     iActionCallback?.onReceivedSaidAI(voice?.text, voice?.text)
                 }

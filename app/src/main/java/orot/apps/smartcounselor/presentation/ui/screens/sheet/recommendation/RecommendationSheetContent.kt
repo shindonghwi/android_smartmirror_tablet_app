@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -28,9 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.data.RadarData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
+import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.GlucoseHrBpCard
@@ -38,6 +46,7 @@ import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.com
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.TemperatureWeightCard
 import orot.apps.smartcounselor.presentation.ui.utils.date.DateUtil.getCurrentDate
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.noDuplicationClickable
+
 
 @Composable
 fun RecommendationSheetContent() {
@@ -114,18 +123,115 @@ private fun ResultMenu() {
 @Composable
 private fun ResultContent() {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val selectedIndex = mainViewModel.isSelectedResultMenu.collectAsState().value
 
-    when (selectedIndex) {
+    when (mainViewModel.isSelectedResultMenu.collectAsState().value) {
         0 -> ResultContentHome()
-        else -> {}
+        else -> {
+            ResultContentHistory()
+        }
+    }
+}
+
+@Composable
+private fun ResultContentHistory() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+            .background(Color(0xFFFAFAFA))
+            .padding(all = 20.dp)
+    ) {
+        RecommendationTitle("기간별 위험 수치")
+
+        Text(
+            modifier = Modifier.padding(vertical = 50.dp),
+            text = "최근 10일간 의료데이터 기반으로 추출된 결과입니다.",
+            style = MaterialTheme.typography.body2,
+            color = Black80.copy(alpha = 0.5f)
+        )
+
+        HistoryChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .padding(horizontal = 20.dp)
+        )
+    }
+}
+
+@Composable
+private fun HistoryChart(modifier: Modifier) {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.TopCenter
+    ) {
+//        mainViewModel.riskPredictionInfo?.let {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                RadarChart(context)
+            },
+            update = { radarChart ->
+
+                val defaultDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
+
+                }, "default")
+                val healDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
+                    add(RadarEntry(15f))
+                    add(RadarEntry(25f))
+                    add(RadarEntry(35f))
+                    add(RadarEntry(45f))
+                    add(RadarEntry(55f))
+//                        add(RadarEntry(it.measurement.bloodPressureSystolic.value))
+//                        add(RadarEntry(it.measurement.bloodPressureDiastolic.value))
+//                        add(RadarEntry(it.measurement.bodyMassIndex.value))
+//                        add(RadarEntry(it.measurement.glucose.value))
+//                        add(RadarEntry(it.measurement.heartRate.value))
+                }, "healDataset")
+
+                defaultDataset.color = Color.Red.toArgb()
+                healDataset.color = Color(0xFFFF8A65).toArgb()
+
+                val radarData = RadarData()
+                radarData.addDataSet(defaultDataset)
+                radarData.addDataSet(healDataset)
+
+                val labels = arrayOf(
+                    "수축기혈압\n(SBP)",
+                    "확장기혈압\n(DBP)",
+                    "체질량지수\n(BMI)",
+                    "혈당\n(Glucose)",
+                    "맥박\n(Mean.HRT)"
+                )
+                val xAxis = radarChart.xAxis
+                xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+                val yAxis = radarChart.yAxis
+                yAxis.valueFormatter = IndexAxisValueFormatter(labels)
+
+                radarChart.apply {
+                    data = radarData
+                    legend.isEnabled = false
+                    description.isEnabled = false
+                    yAxis.mAxisMinimum = 0f
+                    yAxis.mAxisMaximum = 200f
+                    yAxis.setLabelCount(8, true)
+                }
+            },
+        )
+//        } ?: kotlin.run {
+//            Text(
+//                text = "기간별 정보가 없습니다.",
+//                textAlign = TextAlign.Center,
+//                style = MaterialTheme.typography.Display3,
+//                color = Black80
+//            )
+//        }
     }
 }
 
 @Composable
 private fun ResultContentHome() {
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -134,7 +240,7 @@ private fun ResultContentHome() {
             .background(Color(0xFFFAFAFA))
             .padding(all = 20.dp)
     ) {
-        RecommendationTitle()
+        RecommendationTitle("건강 지표 결과")
 
         TemperatureWeightCard(
             modifier = Modifier
@@ -204,12 +310,12 @@ private fun CloseButton(modifier: Modifier) {
 }
 
 @Composable
-private fun RecommendationTitle() {
+private fun RecommendationTitle(title: String) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Row {
         Column {
             Text(
-                text = "건강 지표 결과", style = MaterialTheme.typography.Display2, color = Black80
+                text = title, style = MaterialTheme.typography.Display2, color = Black80
             )
             Text(
                 modifier = Modifier.padding(top = 12.dp),

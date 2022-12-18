@@ -7,11 +7,15 @@ data class BodyInfo(
     val turn: Int? = null,
     val voice: VoiceInfo? = null,
     val display: DisplayInfo? = null,
+    val risk_prediction: RiskPredictionInfo? = null,
     val code: Int? = null,
     val message: String? = null,
     val reason: String? = null
 ) : IMeasurementInfo {
-    override fun toMeasurement(beforeBody: BodyInfo?, measurement: RequestedMeasurementInfo?): BodyInfo {
+    override fun toMeasurement(
+        beforeBody: BodyInfo?,
+        measurement: RequestedMeasurementInfo?
+    ): BodyInfo {
         return BodyInfo(
             before = beforeBody,
             measurement = measurement
@@ -64,7 +68,10 @@ data class MeasurementItemData(
 
 data class ValueQuantityData(
     val value: Float,
-    val unit: String
+    val unit: String,
+    val name: String? = null,
+    val min: Int? = null,
+    val max: Int? = null,
 )
 
 data class RecommendationInfo(
@@ -87,4 +94,23 @@ data class TodayRecommendationData(
 data class RecommendationDetailData(
     val weight: Float,
     val content: String
+)
+
+data class RiskPredictionInfo(
+    val measurement: RiskPredictionMeasurementData,
+    val recommendation: RiskPredictionRecommendationData
+)
+
+data class RiskPredictionMeasurementData(
+    val bloodPressureSystolic: ValueQuantityData,
+    val bloodPressureDiastolic: ValueQuantityData,
+    val bodyMassIndex: ValueQuantityData,
+    val glucose: ValueQuantityData,
+    val heartRate: ValueQuantityData,
+)
+
+data class RiskPredictionRecommendationData(
+    val current_status: Int,
+    val goal_status: Int,
+    val sentence: String,
 )

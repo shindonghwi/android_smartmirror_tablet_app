@@ -2,6 +2,7 @@ package mago.apps.sognorawebsocket.websocket.model.callback
 
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.DisplayInfo
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.RequestedMeasurementInfo
+import mago.apps.sognorawebsocket.websocket.model.protocol.body.RiskPredictionInfo
 
 interface IActionCallback {
 
@@ -69,6 +70,7 @@ interface IActionCallback {
     fun showHealthOverView(
         voiceComment: String?,
         displayInfo: DisplayInfo?,
+        riskPrediction: RiskPredictionInfo?,
         actionType: OrotActionType = OrotActionType.HEALTH_OVERVIEW
     )
 
