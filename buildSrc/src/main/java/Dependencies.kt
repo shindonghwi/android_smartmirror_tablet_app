@@ -52,6 +52,7 @@ object Libraries {
 
     object Kotlin {
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Kotlin.version}"
+        const val Reflect = "org.jetbrains.kotlin:kotlin-reflect"
     }
 
     object AndroidX {

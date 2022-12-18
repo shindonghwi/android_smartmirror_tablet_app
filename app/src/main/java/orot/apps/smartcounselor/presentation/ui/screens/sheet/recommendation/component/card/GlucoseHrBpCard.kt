@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -18,6 +19,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.model.local.ResultMeasurementCardInfo
+import orot.apps.smartcounselor.model.remote.userList
+import orot.apps.smartcounselor.presentation.components.chart.line.LineChart
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Display3
@@ -34,7 +37,8 @@ fun GlucoseHrBpCard(modifier: Modifier) {
         mainViewModel.recommendationInfo?.measurement?.let {
             add(
                 ResultMeasurementCardInfo(
-                    "혈당", Pair(it.glucose.valueQuantity.value, it.glucose.valueQuantity.unit),
+                    "혈당",
+                    Pair(it.glucose.valueQuantity.value, it.glucose.valueQuantity.unit),
                     it.glucose.status,
                     painterResource(id = R.drawable.result_glucose),
                     mainViewModel.selectedUser?.history
@@ -42,7 +46,8 @@ fun GlucoseHrBpCard(modifier: Modifier) {
             )
             add(
                 ResultMeasurementCardInfo(
-                    "맥박", Pair(it.heartRate.valueQuantity.value, it.heartRate.valueQuantity.unit),
+                    "맥박",
+                    Pair(it.heartRate.valueQuantity.value, it.heartRate.valueQuantity.unit),
                     it.heartRate.status,
                     painterResource(id = R.drawable.result_heartbeat),
                     mainViewModel.selectedUser?.history
@@ -51,7 +56,10 @@ fun GlucoseHrBpCard(modifier: Modifier) {
             add(
                 ResultMeasurementCardInfo(
                     "혈압",
-                    Pair(it.bloodPressureSystolic.valueQuantity.value, it.bloodPressureSystolic.valueQuantity.unit),
+                    Pair(
+                        it.bloodPressureSystolic.valueQuantity.value,
+                        it.bloodPressureSystolic.valueQuantity.unit
+                    ),
                     it.bloodPressureSystolic.status,
                     painterResource(id = R.drawable.result_bloodpressure),
                     mainViewModel.selectedUser?.history
@@ -70,7 +78,7 @@ fun GlucoseHrBpCard(modifier: Modifier) {
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White)
-                    .padding(vertical = 40.dp, horizontal = 20.dp), cardInfo = it
+                    .padding(vertical = 20.dp, horizontal = 10.dp), cardInfo = it
             )
         }
     }
@@ -90,7 +98,7 @@ private fun CardItem(modifier: Modifier, cardInfo: ResultMeasurementCardInfo) {
             cardInfo.image?.let {
                 Icon(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(70.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(cardInfo.getBackgroundColor())
                         .padding(10.dp),
@@ -108,13 +116,13 @@ private fun CardItem(modifier: Modifier, cardInfo: ResultMeasurementCardInfo) {
             )
         }
 
-        Row(modifier = Modifier.padding(top = 24.dp)) {
+        Row(modifier = Modifier.padding(top = 14.dp)) {
             Text(
                 modifier = Modifier.align(Alignment.Bottom),
-                text = "${cardInfo.value.first}",
-                style = MaterialTheme.typography.Display2,
+                text = "${cardInfo.value.first.toInt()}",
+                style = MaterialTheme.typography.Display3,
                 color = Black80,
-                fontWeight = FontWeight(400),
+                fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
@@ -126,29 +134,53 @@ private fun CardItem(modifier: Modifier, cardInfo: ResultMeasurementCardInfo) {
                 color = Black80.copy(0.4f),
                 overflow = TextOverflow.Ellipsis
             )
+            Spacer(modifier = Modifier.weight(1f))
+
+            Box(
+                modifier = Modifier
+                    .size(48.dp, 35.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(cardInfo.getIconColor()),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = cardInfo.getTransferStatusEntoKr(),
+                    style = MaterialTheme.typography.h3,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
 
-        WarningTextContent(
+        PercentageView(
             modifier = Modifier
-                .padding(top = 6.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(cardInfo.getBackgroundColor())
-                .padding(horizontal = 6.dp, vertical = 2.dp),
-            status = cardInfo.status
+                .padding(top = 14.dp)
+                .fillMaxWidth(),
+            resultMeasurementCardInfo = cardInfo
         )
 
-//        cardInfo.history?.let {
-//            Graph(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(500.dp),
-//                xValues = (0..it.bpList.size).map { it },
-//                yValues = (0..it.bpList.size).map { (it) * 20 },
-//                points = it.bpList,
-//                paddingSpace = 16.dp,
-//                verticalStep = 20
-//            )
-//        }
+        cardInfo.history?.let {
+            val chartData = arrayListOf<Pair<Int, Double>>().apply {
+                val dataList = when (cardInfo.type) {
+                    "혈당" -> it.glucoseList
+                    "맥박" -> it.hrList
+                    else -> it.bpList
+                }
+                dataList.reversed().forEachIndexed { index, data ->
+                    add(Pair(index + 1, data.toDouble()))
+                }
+            }
+
+            LineChart(
+                data = chartData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .align(CenterHorizontally),
+                isShowingX = false,
+                isShowingY = false,
+                graphColor = cardInfo.getIconColor()
+            )
+        }
     }
 }

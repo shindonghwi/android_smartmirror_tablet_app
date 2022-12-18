@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,75 +23,151 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import orot.apps.smartcounselor.graph.model.BottomMenu
+import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.GlucoseHrBpCard
-import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.HeightWeightBmiCard
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.ResultFinalCommentCard
+import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.TemperatureWeightCard
 import orot.apps.smartcounselor.presentation.ui.utils.date.DateUtil.getCurrentDate
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.noDuplicationClickable
 
 @Composable
 fun RecommendationSheetContent() {
-    val config = LocalConfiguration.current
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     val isShowing = mainViewModel.isShowingRecommendationBottomSheet.collectAsState().value
 
     AnimatedVisibility(
-        visible = isShowing, enter = fadeIn() + slideInVertically(), exit = fadeOut() + slideOutVertically()
+        visible = isShowing,
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(config.screenHeightDp.dp * 0.97f)
-                .verticalScroll(rememberScrollState())
-                .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
-                .background(Color(0xFFE8E7E7))
-                .padding(all = 40.dp)
-        ) {
-            RecommendationTitle()
-
-            HeightWeightBmiCard(
+        Row(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth()
-                    .height(180.dp)
-            )
-
-            GlucoseHrBpCard(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
-
-            ResultFinalCommentCard(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clip(RoundedCornerShape(12.dp))
+                    .fillMaxHeight(0.5f)
+                    .clip(RoundedCornerShape(bottomStart = 35.dp))
                     .background(Color.White)
-                    .padding(all = 20.dp)
-            )
-
-            CloseButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp),
-            )
+                    .padding(top = 70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ResultMenu()
+            }
+            ResultContent()
         }
     }
 
     BackHandler(enabled = isShowing) {
-        mainViewModel.changeRecommendationBottomSheetFlag(false)
+        mainViewModel.proceedAfterMeasurement()
+    }
+}
+
+
+@Composable
+private fun ResultMenu() {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    val selectedIndex = mainViewModel.isSelectedResultMenu.collectAsState().value
+
+    val menuList = listOf<Pair<String, Int>>(
+        Pair("홈", R.drawable.result_home),
+        Pair("기록", R.drawable.result_chart),
+    )
+
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(15.dp)) {
+        itemsIndexed(menuList, key = { index, item -> index }) { index, item ->
+            Column(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(topStart = 35.dp, bottomStart = 35.dp))
+                    .background(if (selectedIndex == index) Black80 else Color.White)
+                    .noDuplicationClickable {
+                        mainViewModel.changeSelectedResultMenu(index)
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    modifier = Modifier.size(35.dp),
+                    painter = painterResource(id = item.second),
+                    contentDescription = null,
+                    tint = if (selectedIndex == index) Color.White else Black80
+                )
+                Text(
+                    text = item.first,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.body1,
+                    color = if (selectedIndex == index) Color.White else Black80
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ResultContent() {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    val selectedIndex = mainViewModel.isSelectedResultMenu.collectAsState().value
+
+    when (selectedIndex) {
+        0 -> ResultContentHome()
+        else -> {}
+    }
+}
+
+@Composable
+private fun ResultContentHome() {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+            .background(Color(0xFFFAFAFA))
+            .padding(all = 20.dp)
+    ) {
+        RecommendationTitle()
+
+        TemperatureWeightCard(
+            modifier = Modifier
+                .padding(top = 60.dp)
+                .fillMaxWidth()
+                .heightIn(min = 100.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+        )
+
+        ResultFinalCommentCard(
+            modifier = Modifier
+                .padding(top = 35.dp)
+                .fillMaxWidth()
+                .height(420.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFFC0F0F).copy(0.1f))
+                .padding(all = 20.dp)
+        )
+
+        GlucoseHrBpCard(
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
+
+        CloseButton(
+            modifier = Modifier
+                .padding(top = 30.dp)
+                .fillMaxWidth()
+                .height(90.dp),
+        )
     }
 }
 

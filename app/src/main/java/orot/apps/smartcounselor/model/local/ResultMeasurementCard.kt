@@ -7,6 +7,7 @@ import orot.apps.smartcounselor.model.remote.UserHistoryData
 interface IResultMeasurementCardInfo {
     fun getBackgroundColor(): Color
     fun getIconColor(): Color
+    fun getTransferStatusEntoKr(): String
 }
 
 data class ResultMeasurementCardInfo(
@@ -30,9 +31,19 @@ data class ResultMeasurementCardInfo(
         return if (status?.contains("warn") == true) {
             Color(0xFFE7B638)
         } else if (status?.contains("alert") == true || status?.contains("high") == true) {
-            Color(0xFFFF5151)
+            Color(0xFFFD0F00)
         } else {
-            Color(0xFF478F96)
+            Color(0xFF02905D)
+        }
+    }
+
+    override fun getTransferStatusEntoKr(): String {
+        return if (status?.contains("warn") == true) {
+            "주의"
+        } else if (status?.contains("alert") == true || status?.contains("high") == true) {
+            "위험"
+        } else {
+            "정상"
         }
     }
 }

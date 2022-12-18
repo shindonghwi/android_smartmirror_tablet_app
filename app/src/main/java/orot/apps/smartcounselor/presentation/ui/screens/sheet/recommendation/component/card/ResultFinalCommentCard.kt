@@ -1,15 +1,16 @@
 package orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -17,71 +18,74 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Black80
-import orot.apps.smartcounselor.presentation.style.BodyL
 import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
+import java.util.*
 
 
 @Composable
 fun ResultFinalCommentCard(modifier: Modifier) {
 
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+    var content = ""
 
-    mainViewModel.recommendationInfo?.let {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "건강한 내일을 위한 오늘의 약속", style = MaterialTheme.typography.Display3, color = Primary
-            )
-            it.today_recommendation.food.let {
-                if (!it.isNullOrEmpty()) {
-                    ResultFinalCareItem(typeIsFood = true, content = it)
-                }
+    mainViewModel.recommendationInfo?.today_recommendation?.let {
+        content = if (!it.food.isNullOrEmpty() && !it.exercise.isNullOrEmpty()) {
+            if (Random().nextInt(2) == 0) {
+                it.food.toString()
+            } else {
+                it.exercise.toString()
             }
-            it.today_recommendation.exercise.let {
-                if (!it.isNullOrEmpty()) {
-                    ResultFinalCareItem(typeIsFood = false, content = it)
-                }
-            }
+        } else if (!it.food.isNullOrEmpty()) {
+            it.food.toString()
+        } else {
+            it.exercise.toString()
         }
     }
-}
 
-@Composable
-private fun ResultFinalCareItem(typeIsFood: Boolean, content: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.weight(0.4f), contentAlignment = Alignment.Center
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 60.dp)
+                .fillMaxWidth()
+                .height(320.dp)
+                .clip(RoundedCornerShape(120.dp))
+                .background(Color.White)
+                .padding(vertical = 40.dp, horizontal = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
+            Text(
+                text = "건강한 내일을 위한 오늘의 약속",
+                style = MaterialTheme.typography.Display3,
+                color = Primary,
+            )
+
+            mainViewModel.recommendationInfo?.today_recommendation?.let {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = content,
+                        style = MaterialTheme.typography.h2,
+                        color = Black80,
+                        fontWeight = FontWeight(400),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+            Icon(
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                painter = painterResource(
-                    id = if (typeIsFood) {
-                        R.drawable.result_sample_food
-                    } else {
-                        R.drawable.result_sample_exercise
-                    }
-                ),
+                    .padding(bottom = 10.dp, end = 10.dp)
+                    .size(150.dp),
+                painter = painterResource(id = R.drawable.result_person),
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                tint = Color.Unspecified
             )
         }
-        Text(
-            modifier = Modifier.weight(0.6f),
-            text = content,
-            style = MaterialTheme.typography.BodyL,
-            color = Black80,
-            fontWeight = FontWeight(400),
-            textAlign = TextAlign.Center
-        )
     }
 }

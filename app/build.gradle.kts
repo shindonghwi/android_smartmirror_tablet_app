@@ -48,12 +48,15 @@ dependencies {
 
     implementation(project(":core:SognoraWebSocket"))
     implementation(project(":core:SognoraAudio"))
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     Libraries.apply {
 
         Libraries.KTX.apply {
             implementation(core)
+        }
+
+        Libraries.Kotlin.apply {
+            implementation(Reflect)
         }
 
         Libraries.Compose.apply {

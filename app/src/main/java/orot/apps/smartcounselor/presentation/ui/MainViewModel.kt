@@ -334,6 +334,11 @@ class MainViewModel @Inject constructor(
         isShowingRecommendationBottomSheet.update { flag }
     }
 
+    var isSelectedResultMenu = MutableStateFlow(0)
+    fun changeSelectedResultMenu(index: Int) {
+        isSelectedResultMenu.update { index }
+    }
+
     /**
      * ================================================
      *     UI STATE
