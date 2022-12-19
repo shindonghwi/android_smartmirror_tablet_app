@@ -4,10 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -22,12 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.mikephil.charting.charts.RadarChart
@@ -39,7 +34,6 @@ import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.Display3
-import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.GlucoseHrBpCard
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card.ResultFinalCommentCard
@@ -54,9 +48,7 @@ fun RecommendationSheetContent() {
     val isShowing = mainViewModel.isShowingRecommendationBottomSheet.collectAsState().value
 
     AnimatedVisibility(
-        visible = isShowing,
-        enter = fadeIn() + slideInVertically(),
-        exit = fadeOut() + slideOutVertically()
+        visible = isShowing, enter = fadeIn() + slideInVertically(), exit = fadeOut() + slideOutVertically()
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -98,9 +90,7 @@ private fun ResultMenu() {
                     .background(if (selectedIndex == index) Black80 else Color.White)
                     .noDuplicationClickable {
                         mainViewModel.changeSelectedResultMenu(index)
-                    },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
             ) {
                 Icon(
                     modifier = Modifier.size(35.dp),
@@ -127,9 +117,7 @@ private fun ResultMenu() {
                 .background(Color.White)
                 .noDuplicationClickable {
                     mainViewModel.proceedAfterMeasurement()
-                },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 modifier = Modifier.size(25.dp),
@@ -177,7 +165,7 @@ private fun ResultContentHistory() {
 
         Text(
             modifier = Modifier.padding(vertical = 50.dp),
-            text = "최근 10일간 의료데이터 기반으로 추출된 결과입니다.",
+            text = "최근 2주간 의료데이터 기반으로 추출된 결과입니다.",
             style = MaterialTheme.typography.body2,
             color = Black80.copy(alpha = 0.5f)
         )
@@ -188,6 +176,41 @@ private fun ResultContentHistory() {
                 .height(600.dp)
                 .padding(horizontal = 20.dp)
         )
+
+        RiskPredictionRecommend()
+    }
+}
+
+@Composable
+private fun RiskPredictionRecommend() {
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+
+    mainViewModel.riskPredictionInfo?.recommendation?.let {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(Color.White)
+                .clip(RoundedCornerShape(12.dp))
+                .padding(vertical = 80.dp, horizontal = 20.dp),
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(
+                text = "수집된 2주간의 데이터 분석 결과",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.Display3,
+                color = Black80,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                modifier = Modifier.padding(top = 30.dp),
+                text = it.sentence,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h3,
+                color = Black80,
+                fontWeight = FontWeight(500)
+            )
+        }
     }
 }
 
@@ -195,69 +218,75 @@ private fun ResultContentHistory() {
 private fun HistoryChart(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Box(
-        modifier = modifier, contentAlignment = Alignment.TopCenter
+        modifier = modifier, contentAlignment = Alignment.Center
     ) {
-//        mainViewModel.riskPredictionInfo?.let {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                RadarChart(context)
-            },
-            update = { radarChart ->
+        mainViewModel.riskPredictionInfo?.let { info ->
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context ->
+                    RadarChart(context)
+                },
+                update = { radarChart ->
 
-                val defaultDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
+                    val labels = arrayListOf<String>()
 
-                }, "default")
-                val healDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
-                    add(RadarEntry(15f))
-                    add(RadarEntry(25f))
-                    add(RadarEntry(35f))
-                    add(RadarEntry(45f))
-                    add(RadarEntry(55f))
-//                        add(RadarEntry(it.measurement.bloodPressureSystolic.value))
-//                        add(RadarEntry(it.measurement.bloodPressureDiastolic.value))
-//                        add(RadarEntry(it.measurement.bodyMassIndex.value))
-//                        add(RadarEntry(it.measurement.glucose.value))
-//                        add(RadarEntry(it.measurement.heartRate.value))
-                }, "healDataset")
+                    val defaultDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
 
-                defaultDataset.color = Color.Red.toArgb()
-                healDataset.color = Color(0xFFFF8A65).toArgb()
+                    }, "default")
+                    val healDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
+                        info.measurement.bloodPressureSystolic?.value?.let {
+                            add(RadarEntry(it))
+                            labels.add("수축기혈압\n(SBP)")
+                        }
+                        info.measurement.bloodPressureDiastolic?.value?.let {
+                            add(RadarEntry(it))
+                            labels.add("확장기혈압\\n(DBP)")
+                        }
+                        info.measurement.bodyMassIndex?.value?.let {
+                            add(RadarEntry(it))
+                            labels.add("체질량지수\\n(BMI)")
+                        }
+                        info.measurement.glucose?.value?.let {
+                            add(RadarEntry(it))
+                            labels.add("혈당\\n(Glucose)")
+                        }
+                        info.measurement.heartRate?.value?.let {
+                            add(RadarEntry(it))
+                            labels.add("맥박\\n(Mean.HRT)")
+                        }
+                    }, "healDataset")
 
-                val radarData = RadarData()
-                radarData.addDataSet(defaultDataset)
-                radarData.addDataSet(healDataset)
+                    defaultDataset.color = Color.Red.toArgb()
+                    healDataset.color = Color(0xFFFF8A65).toArgb()
 
-                val labels = arrayOf(
-                    "수축기혈압\n(SBP)",
-                    "확장기혈압\n(DBP)",
-                    "체질량지수\n(BMI)",
-                    "혈당\n(Glucose)",
-                    "맥박\n(Mean.HRT)"
-                )
-                val xAxis = radarChart.xAxis
-                xAxis.valueFormatter = IndexAxisValueFormatter(labels)
-                val yAxis = radarChart.yAxis
-                yAxis.valueFormatter = IndexAxisValueFormatter(labels)
+                    val radarData = RadarData()
+                    radarData.addDataSet(defaultDataset)
+                    radarData.addDataSet(healDataset)
 
-                radarChart.apply {
-                    data = radarData
-                    legend.isEnabled = false
-                    description.isEnabled = false
-                    yAxis.mAxisMinimum = 0f
-                    yAxis.mAxisMaximum = 200f
-                    yAxis.setLabelCount(8, true)
-                }
-            },
-        )
-//        } ?: kotlin.run {
-//            Text(
-//                text = "기간별 정보가 없습니다.",
-//                textAlign = TextAlign.Center,
-//                style = MaterialTheme.typography.Display3,
-//                color = Black80
-//            )
-//        }
+                    val xAxis = radarChart.xAxis
+                    xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+                    val yAxis = radarChart.yAxis
+                    yAxis.valueFormatter = IndexAxisValueFormatter(labels)
+
+                    radarChart.apply {
+                        setTouchEnabled(false)
+                        data = radarData
+                        legend.isEnabled = false
+                        description.isEnabled = false
+                        yAxis.mAxisMinimum = 0f
+                        yAxis.mAxisMaximum = 100f
+                        yAxis.setLabelCount(10, true)
+                    }
+                },
+            )
+        } ?: kotlin.run {
+            Text(
+                text = "기간별 정보가 없습니다.",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.Display3,
+                color = Black80
+            )
+        }
     }
 }
 
@@ -298,36 +327,6 @@ private fun ResultContentHome() {
                 .fillMaxWidth()
                 .wrapContentHeight()
         )
-    }
-}
-
-@Composable
-private fun CloseButton(modifier: Modifier) {
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val configuration = LocalConfiguration.current
-    val startWidth: Dp by lazy { configuration.screenWidthDp.dp * 0.3f }
-
-    Box(
-        modifier = modifier, contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .width(startWidth)
-                .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
-                .background(Primary)
-                .noDuplicationClickable {
-                    mainViewModel.proceedAfterMeasurement()
-                }, contentAlignment = Alignment.Center
-        ) {
-            Text(
-                modifier = Modifier.padding(vertical = 18.dp, horizontal = 30.dp),
-                text = "이어서 진행하기",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h3,
-                color = Color.White
-            )
-        }
     }
 }
 

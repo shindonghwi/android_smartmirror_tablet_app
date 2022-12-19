@@ -102,11 +102,11 @@ data class RiskPredictionInfo(
 )
 
 data class RiskPredictionMeasurementData(
-    val bloodPressureSystolic: ValueQuantityData,
-    val bloodPressureDiastolic: ValueQuantityData,
-    val bodyMassIndex: ValueQuantityData,
-    val glucose: ValueQuantityData,
-    val heartRate: ValueQuantityData,
+    val bloodPressureSystolic: ValueQuantityData?,
+    val bloodPressureDiastolic: ValueQuantityData?,
+    val bodyMassIndex: ValueQuantityData?,
+    val glucose: ValueQuantityData?,
+    val heartRate: ValueQuantityData?,
 )
 
 data class RiskPredictionRecommendationData(

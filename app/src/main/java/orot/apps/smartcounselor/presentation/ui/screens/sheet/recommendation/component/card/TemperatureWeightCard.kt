@@ -41,21 +41,25 @@ fun TemperatureWeightCard(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
     val heightAndWeightDataList = arrayListOf<ResultMeasurementCardInfo>().apply {
-//        mainViewModel.recommendationInfo?.measurement?.let {
-        add(
-            ResultMeasurementCardInfo(
-//                    "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit),
-                "몸무게", Pair(85f, "kg"), null, null, null
+        mainViewModel.recommendationInfo?.measurement?.let {
+            add(
+                ResultMeasurementCardInfo(
+                    "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit),
+                    null,
+                    null,
+                    null,
+                )
             )
-        )
-        add(
-            ResultMeasurementCardInfo(
-                "체온",
-//                    Pair(it.bodyTemperature.valueQuantity.value, it.bodyTemperature.valueQuantity.unit),
-                Pair(36.5f, "c"), null, null, null
+            add(
+                ResultMeasurementCardInfo(
+                    "체온",
+                    Pair(it.bodyTemperature.valueQuantity.value, it.bodyTemperature.valueQuantity.unit),
+                    null,
+                    null,
+                    null,
+                )
             )
-        )
-//        }
+        }
     }
 
     Row(
@@ -74,8 +78,7 @@ private fun HealthSimpleCard(
     info: ResultMeasurementCardInfo,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround
     ) {
         Text(
             text = info.type,
@@ -87,16 +90,13 @@ private fun HealthSimpleCard(
         Icon(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
-                .size(60.dp),
-            painter = painterResource(
+                .size(60.dp), painter = painterResource(
                 id = if (info.type == "체온") {
                     R.drawable.temperature
                 } else {
                     R.drawable.weight
                 }
-            ),
-            contentDescription = null,
-            tint = Black80
+            ), contentDescription = null, tint = Black80
         )
         Text(
             text = "${info.value.first}${info.value.second}",
@@ -210,7 +210,8 @@ private fun BmiWarningText(resultMeasurementCardInfo: ResultMeasurementCardInfo)
             .wrapContentWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(resultMeasurementCardInfo.getBackgroundColor())
-            .padding(horizontal = 6.dp, vertical = 2.dp), status = resultMeasurementCardInfo.status
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+        status = resultMeasurementCardInfo.status
     )
 }
 
