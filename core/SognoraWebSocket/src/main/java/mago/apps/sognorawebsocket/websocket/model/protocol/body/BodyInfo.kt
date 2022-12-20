@@ -67,9 +67,10 @@ data class MeasurementItemData(
 )
 
 data class ValueQuantityData(
+    val name: String? = null,
     val value: Float,
     val unit: String,
-    val name: String? = null,
+    val score: Int,
     val min: Int? = null,
     val max: Int? = null,
 )

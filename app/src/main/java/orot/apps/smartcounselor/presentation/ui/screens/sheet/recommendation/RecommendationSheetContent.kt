@@ -48,7 +48,9 @@ fun RecommendationSheetContent() {
     val isShowing = mainViewModel.isShowingRecommendationBottomSheet.collectAsState().value
 
     AnimatedVisibility(
-        visible = isShowing, enter = fadeIn() + slideInVertically(), exit = fadeOut() + slideOutVertically()
+        visible = isShowing,
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -90,7 +92,9 @@ private fun ResultMenu() {
                     .background(if (selectedIndex == index) Black80 else Color.White)
                     .noDuplicationClickable {
                         mainViewModel.changeSelectedResultMenu(index)
-                    }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Icon(
                     modifier = Modifier.size(35.dp),
@@ -117,7 +121,9 @@ private fun ResultMenu() {
                 .background(Color.White)
                 .noDuplicationClickable {
                     mainViewModel.proceedAfterMeasurement()
-                }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 modifier = Modifier.size(25.dp),
@@ -231,37 +237,43 @@ private fun HistoryChart(modifier: Modifier) {
                     val labels = arrayListOf<String>()
 
                     val defaultDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
-
-                    }, "default")
+                        repeat((0 until 5).count()) { add(RadarEntry(50f)) }
+                    }, "default").apply {
+                        color = Color(0xFF026841).toArgb()
+                        fillColor = Color(0xFF026841).copy(alpha = 0.24f).toArgb()
+                        setDrawFilled(true)
+                    }
                     val healDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
-                        info.measurement.bloodPressureSystolic?.value?.let {
+//                        (0 until 5).forEach { add(RadarEntry((it+1) * 10f)) }
+                        info.measurement.bloodPressureSystolic?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("수축기혈압\n(SBP)")
                         }
-                        info.measurement.bloodPressureDiastolic?.value?.let {
+                        info.measurement.bloodPressureDiastolic?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("확장기혈압\\n(DBP)")
                         }
-                        info.measurement.bodyMassIndex?.value?.let {
+                        info.measurement.bodyMassIndex?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("체질량지수\\n(BMI)")
                         }
-                        info.measurement.glucose?.value?.let {
+                        info.measurement.glucose?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("혈당\\n(Glucose)")
                         }
-                        info.measurement.heartRate?.value?.let {
+                        info.measurement.heartRate?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("맥박\\n(Mean.HRT)")
                         }
-                    }, "healDataset")
-
-                    defaultDataset.color = Color.Red.toArgb()
-                    healDataset.color = Color(0xFFFF8A65).toArgb()
+                    }, "healDataset").apply {
+                        color = Color(0xFFFF8A65).toArgb()
+                        fillColor = Color(0xFFFF8A65).copy(alpha = 0.24f).toArgb()
+                        setDrawFilled(true)
+                    }
 
                     val radarData = RadarData()
-                    radarData.addDataSet(defaultDataset)
                     radarData.addDataSet(healDataset)
+                    radarData.addDataSet(defaultDataset)
 
                     val xAxis = radarChart.xAxis
                     xAxis.valueFormatter = IndexAxisValueFormatter(labels)
@@ -270,12 +282,12 @@ private fun HistoryChart(modifier: Modifier) {
 
                     radarChart.apply {
                         setTouchEnabled(false)
-                        data = radarData
                         legend.isEnabled = false
                         description.isEnabled = false
-                        yAxis.mAxisMinimum = 0f
-                        yAxis.mAxisMaximum = 100f
-                        yAxis.setLabelCount(10, true)
+                        getYAxis().axisMinimum = 0f
+                        getYAxis().axisMaximum = 100f
+                        getYAxis().setLabelCount(11, true)
+                        data = radarData
                     }
                 },
             )
