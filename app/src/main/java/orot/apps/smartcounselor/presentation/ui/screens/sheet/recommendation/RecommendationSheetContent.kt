@@ -176,12 +176,22 @@ private fun ResultContentHistory() {
             color = Black80.copy(alpha = 0.5f)
         )
 
-        HistoryChart(
+        HistoryRadarChart(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp)
-                .padding(horizontal = 20.dp)
+                .height(450.dp)
+                .padding(horizontal = 40.dp)
         )
+
+        HistoryBarChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(horizontal = 40.dp)
+                .background(Color.White)
+                .padding(vertical = 10.dp)
+        )
+
 
         RiskPredictionRecommend()
     }
@@ -194,11 +204,12 @@ private fun RiskPredictionRecommend() {
     mainViewModel.riskPredictionInfo?.recommendation?.let {
         Column(
             modifier = Modifier
+                .padding(top = 30.dp)
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .background(Color.White)
                 .clip(RoundedCornerShape(12.dp))
-                .padding(vertical = 80.dp, horizontal = 20.dp),
+                .padding(vertical = 20.dp, horizontal = 20.dp),
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Text(
@@ -221,7 +232,7 @@ private fun RiskPredictionRecommend() {
 }
 
 @Composable
-private fun HistoryChart(modifier: Modifier) {
+private fun HistoryRadarChart(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     Box(
         modifier = modifier, contentAlignment = Alignment.Center
@@ -244,7 +255,6 @@ private fun HistoryChart(modifier: Modifier) {
                         setDrawFilled(true)
                     }
                     val healDataset = RadarDataSet(arrayListOf<RadarEntry>().apply {
-//                        (0 until 5).forEach { add(RadarEntry((it+1) * 10f)) }
                         info.measurement.bloodPressureSystolic?.score?.toFloat()?.let {
                             add(RadarEntry(it))
                             labels.add("수축기혈압\n(SBP)")
@@ -301,6 +311,68 @@ private fun HistoryChart(modifier: Modifier) {
         }
     }
 }
+
+@Composable
+fun HistoryBarChart(modifier: Modifier) {
+
+    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+
+    mainViewModel.riskPredictionInfo?.recommendation?.let { info ->
+        Column(modifier = modifier) {
+
+            Text(
+                modifier = Modifier
+                    .weight(0.2f)
+                    .padding(start = 20.dp, top = 10.dp),
+                text = "심혈관 질환 점수",
+                style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Bold),
+                color = Black80
+            )
+
+            Row(
+                modifier = Modifier
+                    .weight(0.7f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .fillMaxHeight(fraction = info.current_status.toFloat() / 10.0.toFloat())
+                        .background(Color(0xFF026841))
+                ) {}
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .fillMaxHeight(fraction = info.goal_status.toFloat() / 10.0.toFloat())
+                        .background(Color(0xFFFF8A65))
+                ) {}
+            }
+            Row(
+                modifier = Modifier
+                    .weight(0.1f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = "현재(${info.current_status.toFloat() * 10})",
+                    style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+                    color = Black80
+                )
+                Text(
+                    text = "목표(${info.goal_status.toFloat() * 10})",
+                    style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+                    color = Black80
+                )
+
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun ResultContentHome() {

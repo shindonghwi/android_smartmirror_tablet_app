@@ -22,10 +22,7 @@ import mago.apps.sognorawebsocket.websocket.model.ServerState
 import mago.apps.sognorawebsocket.websocket.model.callback.IActionCallback
 import mago.apps.sognorawebsocket.websocket.model.callback.OrotActionType
 import mago.apps.sognorawebsocket.websocket.model.protocol.MessageProtocol
-import mago.apps.sognorawebsocket.websocket.model.protocol.body.BodyInfo
-import mago.apps.sognorawebsocket.websocket.model.protocol.body.DisplayInfo
-import mago.apps.sognorawebsocket.websocket.model.protocol.body.RequestedMeasurementInfo
-import mago.apps.sognorawebsocket.websocket.model.protocol.body.RiskPredictionInfo
+import mago.apps.sognorawebsocket.websocket.model.protocol.body.*
 import mago.apps.sognorawebsocket.websocket.model.protocol.header.HeaderInfo
 import mago.apps.sognorawebsocket.websocket.new_ws.OrotWebSocket
 import orot.apps.smartcounselor.graph.NavigationKit
@@ -143,10 +140,10 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun showHealthOverView(
-                        voiceComment: String?, displayInfo: DisplayInfo?, riskPrediction: RiskPredictionInfo?, actionType: OrotActionType
+                        voiceComment: String?, display: DisplayInfo?, riskPrediction: RiskPredictionInfo?, actionType: OrotActionType
                     ) {
                         resultActionType = actionType
-                        recommendationInfo = displayInfo
+                        displayInfo = display
                         riskPredictionInfo = riskPrediction
                         playTts(voiceComment)
                         changeSaidMeText("")
@@ -291,7 +288,7 @@ class MainViewModel @Inject constructor(
      * ================================================
      * */
 
-    var recommendationInfo: DisplayInfo? = null
+    var displayInfo: DisplayInfo? = null
     var riskPredictionInfo: RiskPredictionInfo? = null
 
     var watchHashData = HashMap<String, Int>().apply {
@@ -551,7 +548,8 @@ class MainViewModel @Inject constructor(
 
     private fun clearConversationData() {
         chatList.clear()
-        recommendationInfo = null
+        displayInfo = null
+        riskPredictionInfo = null
         clearMedicationDeviceData()
         changeSaidMeText("")
         updateDisplayText("")

@@ -185,12 +185,12 @@ private fun getDefaultText(userData: UserData?, index: Int): String {
         0 -> userData?.medication?.let { it1 -> TextUtils.join(",", it1) }.toString()
         1 -> userData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         2 -> userData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        3 -> userData?.glucose.toString()
+        3 -> userData?.glucose?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         4 -> userData?.heartRate?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        5 -> userData?.bodyTemperature.toString()
-        6 -> userData?.height.toString()
-        7 -> userData?.weight.toString()
-        8 -> userData?.bodyMassIndex.toString()
+        5 -> userData?.bodyTemperature?.takeIf { it != 0f }?.run { this.toString() } ?: run { "" }
+        6 -> userData?.height?.takeIf { it != 0f }?.run { this.toString() } ?: run { "" }
+        7 -> userData?.weight?.takeIf { it != 0f }?.run { this.toString() } ?: run { "" }
+        8 -> userData?.bodyMassIndex?.takeIf { it != 0f }?.run { this.toString() } ?: run { "" }
         else -> ""
     }
 }

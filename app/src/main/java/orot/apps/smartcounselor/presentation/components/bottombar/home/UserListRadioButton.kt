@@ -49,6 +49,7 @@ fun UserRadioButton(modifier: Modifier) {
                                     selected = (item == selectedOption),
                                     onClick = {
                                         mainViewModel.selectedUser = item
+                                        Log.w("Asdasdasd", "UserRadioButton: $item", )
                                         onOptionSelected(item)
                                     },
                                     colors = RadioButtonDefaults.colors(

@@ -1,7 +1,6 @@
 package orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.card
 
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.model.local.ResultMeasurementCardInfo
 import orot.apps.smartcounselor.presentation.style.Black80
 import orot.apps.smartcounselor.presentation.style.Display3
@@ -33,7 +33,6 @@ import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.component.common.WarningTextContent
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundHGradient
-import orot.apps.smartcounselor.R
 
 /** 키, 몸무게, bmi */
 @Composable
@@ -41,7 +40,7 @@ fun TemperatureWeightCard(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
     val heightAndWeightDataList = arrayListOf<ResultMeasurementCardInfo>().apply {
-        mainViewModel.recommendationInfo?.measurement?.let {
+        mainViewModel.displayInfo?.measurement?.let {
             add(
                 ResultMeasurementCardInfo(
                     "몸무게", Pair(it.weight.valueQuantity.value, it.weight.valueQuantity.unit),
@@ -53,7 +52,10 @@ fun TemperatureWeightCard(modifier: Modifier) {
             add(
                 ResultMeasurementCardInfo(
                     "체온",
-                    Pair(it.bodyTemperature.valueQuantity.value, it.bodyTemperature.valueQuantity.unit),
+                    Pair(
+                        it.bodyTemperature.valueQuantity.value,
+                        it.bodyTemperature.valueQuantity.unit
+                    ),
                     null,
                     null,
                     null,
@@ -78,7 +80,8 @@ private fun HealthSimpleCard(
     info: ResultMeasurementCardInfo,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         Text(
             text = info.type,

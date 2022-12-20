@@ -34,7 +34,7 @@ fun GlucoseHrBpCard(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
 
     val measurementCardInfo = arrayListOf<ResultMeasurementCardInfo>().apply {
-        mainViewModel.recommendationInfo?.measurement?.let {
+        mainViewModel.displayInfo?.measurement?.let {
             add(
                 ResultMeasurementCardInfo(
                     "혈당",

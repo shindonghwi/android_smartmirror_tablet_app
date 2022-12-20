@@ -69,7 +69,7 @@ interface IActionCallback {
     /** 헬스 측정 결과 보여주기 */
     fun showHealthOverView(
         voiceComment: String?,
-        displayInfo: DisplayInfo?,
+        display: DisplayInfo?,
         riskPrediction: RiskPredictionInfo?,
         actionType: OrotActionType = OrotActionType.HEALTH_OVERVIEW
     )

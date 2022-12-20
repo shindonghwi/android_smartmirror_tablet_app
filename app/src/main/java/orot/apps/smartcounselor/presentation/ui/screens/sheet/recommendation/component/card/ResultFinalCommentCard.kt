@@ -30,7 +30,7 @@ fun ResultFinalCommentCard(modifier: Modifier) {
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
     var content = ""
 
-    mainViewModel.recommendationInfo?.today_recommendation?.let {
+    mainViewModel.displayInfo?.today_recommendation?.let {
         content = if (!it.food.isNullOrEmpty() && !it.exercise.isNullOrEmpty()) {
             if (Random().nextInt(2) == 0) {
                 it.food.toString()
@@ -61,7 +61,7 @@ fun ResultFinalCommentCard(modifier: Modifier) {
                 color = Primary,
             )
 
-            mainViewModel.recommendationInfo?.today_recommendation?.let {
+            mainViewModel.displayInfo?.today_recommendation?.let {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
