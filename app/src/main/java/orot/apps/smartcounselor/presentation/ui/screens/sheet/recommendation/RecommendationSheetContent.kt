@@ -358,12 +358,12 @@ fun HistoryBarChart(modifier: Modifier) {
                 verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = "현재(${info.current_status.toFloat() * 10})",
+                    text = "현재 ${info.current_status} 단계",
                     style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
                     color = Black80
                 )
                 Text(
-                    text = "목표(${info.goal_status.toFloat() * 10})",
+                    text = "목표 ${info.goal_status} 단계",
                     style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
                     color = Black80
                 )
