@@ -21,11 +21,34 @@ android {
     }
 
     buildTypes {
+        getByName("debug"){
+            isDebuggable = true
+            isMinifyEnabled = false
+        }
         getByName("release") {
+            isDebuggable = true
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+        }
+    }
+
+    flavorDimensions += listOf("mode")
+    productFlavors {          // 2
+        create("full") {
+            dimension = "mode"
+            versionNameSuffix = "-full"
+            applicationIdSuffix = ".full"
+            buildConfigField("Boolean", "CHAIR_SHOWING", "true")
+            manifestPlaceholders["appLabel"] = "SmartCounselor"
+        }
+        create("chairShowing") {
+            versionNameSuffix = "-watch"
+            dimension = "mode"
+            applicationIdSuffix = ".watch"
+            buildConfigField("Boolean", "CHAIR_SHOWING", "false")
+            manifestPlaceholders["appLabel"] = "SmartCounselor(watch)"
         }
     }
 

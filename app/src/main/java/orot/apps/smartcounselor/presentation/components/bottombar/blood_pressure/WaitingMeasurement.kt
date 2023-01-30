@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.presentation.style.Green80
 import orot.apps.smartcounselor.presentation.style.Primary
@@ -58,8 +59,7 @@ private fun HeartAnimationIcon() {
     )
 
     AnimatedVisibility(
-        visibleState = animVisibleState,
-        enter = fadeIn(
+        visibleState = animVisibleState, enter = fadeIn(
             animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
         ), exit = fadeOut(
             animationSpec = tween(durationMillis = 2500, easing = LinearOutSlowInEasing)
@@ -100,8 +100,7 @@ private fun WatchIcon() {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            modifier = Modifier
-                .size(200.dp),
+            modifier = Modifier.size(200.dp),
             painter = painterResource(id = R.drawable.watch),
             contentDescription = null,
             tint = if (isWatchDataIsExist) Green80 else Color.White.copy(0.8f)
@@ -119,25 +118,26 @@ private fun WatchIcon() {
 
 @Composable
 private fun ChairIcon() {
-    val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    val chair = mainViewModel.medicalDeviceChairData.collectAsState().value
-    val isChairDataIsExist = chair.isDataExist()
+    if (BuildConfig.CHAIR_SHOWING) {
+        val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
+        val chair = mainViewModel.medicalDeviceChairData.collectAsState().value
+        val isChairDataIsExist = chair.isDataExist()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            modifier = Modifier
-                .size(200.dp),
-            painter = painterResource(id = R.drawable.chair),
-            contentDescription = null,
-            tint = if (isChairDataIsExist) Green80 else Color.White.copy(0.8f)
-        )
-        Text(
-            modifier = Modifier.padding(vertical = 22.dp, horizontal = 30.dp),
-            text = if (isChairDataIsExist) "데이터 수신 완료" else "데이터 수신 준비완료",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h3,
-            color = if (isChairDataIsExist) Green80 else Color.White.copy(0.8f)
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                modifier = Modifier.size(200.dp),
+                painter = painterResource(id = R.drawable.chair),
+                contentDescription = null,
+                tint = if (isChairDataIsExist) Green80 else Color.White.copy(0.8f)
+            )
+            Text(
+                modifier = Modifier.padding(vertical = 22.dp, horizontal = 30.dp),
+                text = if (isChairDataIsExist) "데이터 수신 완료" else "데이터 수신 준비완료",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h3,
+                color = if (isChairDataIsExist) Green80 else Color.White.copy(0.8f)
+            )
+        }
     }
 }
 

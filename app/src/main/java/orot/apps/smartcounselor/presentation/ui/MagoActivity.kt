@@ -7,43 +7,25 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.graph.NavGraph
 import orot.apps.smartcounselor.graph.NavigationKit
 import orot.apps.smartcounselor.presentation.components.appbar.MagoAppBar
 import orot.apps.smartcounselor.presentation.components.bottombar.MagoBottomBar
 import orot.apps.smartcounselor.presentation.style.Black
 import orot.apps.smartcounselor.presentation.style.Black80
-import orot.apps.smartcounselor.presentation.style.Display3
 import orot.apps.smartcounselor.presentation.style.SmartCounselorTheme
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.account_register.AccountRegisterSheetContent
 import orot.apps.smartcounselor.presentation.ui.screens.sheet.recommendation.RecommendationSheetContent
 import orot.apps.smartcounselor.presentation.ui.utils.modifier.backgroundVGradient
 import orot.apps.smartcounselor.presentation.ui.utils.permission.CheckPermission
 import orot.apps.systems.hideSystemUI
-
 
 @AndroidEntryPoint
 class MagoActivity : ComponentActivity() {
@@ -56,7 +38,6 @@ class MagoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemUI()
         setContent {
-            hiltViewModel<MainViewModel>()
             mainViewModel.value.navigationKit = NavigationKit(rememberNavController())
             CheckPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_RECODE_AUDIO)
             MagoHCApp()

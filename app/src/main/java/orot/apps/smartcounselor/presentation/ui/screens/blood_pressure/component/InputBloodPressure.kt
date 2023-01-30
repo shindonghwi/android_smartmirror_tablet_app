@@ -2,6 +2,7 @@ package orot.apps.smartcounselor.presentation.ui.screens.blood_pressure.componen
 
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.model.remote.UserData
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
@@ -88,21 +90,23 @@ fun InputBloodPressure(modifier: Modifier) {
                         )
                     }
                     // 의자에서 수집되는 데이터
-                    if (index == 1 && mainViewModel.chairHashData["bloodPressureSystolic"] != 0 ||
-                        index == 2 && mainViewModel.chairHashData["bloodPressureDiastolic"] != 0 ||
-                        index == 3 && mainViewModel.chairHashData["glucose"] != 0 ||
-                        index == 7 && mainViewModel.chairHashData["weight"] != 0 ||
-                        index == 8 && mainViewModel.chairHashData["bodyMassIndex"] != 0
-                    ) {
+                    if (BuildConfig.CHAIR_SHOWING) {
+                        if (index == 1 && mainViewModel.chairHashData["bloodPressureSystolic"] != 0 ||
+                            index == 2 && mainViewModel.chairHashData["bloodPressureDiastolic"] != 0 ||
+                            index == 3 && mainViewModel.chairHashData["glucose"] != 0 ||
+                            index == 7 && mainViewModel.chairHashData["weight"] != 0 ||
+                            index == 8 && mainViewModel.chairHashData["bodyMassIndex"] != 0
+                        ) {
 
-                        Icon(
-                            modifier = Modifier
-                                .size(30.dp)
-                                .padding(end = 8.dp),
-                            painter = painterResource(id = R.drawable.chair),
-                            contentDescription = null,
-                            tint = Color.White
-                        )
+                            Icon(
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .padding(end = 8.dp),
+                                painter = painterResource(id = R.drawable.chair),
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
 
@@ -183,8 +187,10 @@ fun InputBloodPressure(modifier: Modifier) {
 private fun getDefaultText(userData: UserData?, index: Int): String {
     return when (index) {
         0 -> userData?.medication?.let { it1 -> TextUtils.join(",", it1) }.toString()
-        1 -> userData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
-        2 -> userData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
+        1 -> userData?.bloodPressureSystolic?.takeIf { it != 0 }?.run { this.toString() }
+            ?: run { "" }
+        2 -> userData?.bloodPressureDiastolic?.takeIf { it != 0 }?.run { this.toString() }
+            ?: run { "" }
         3 -> userData?.glucose?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         4 -> userData?.heartRate?.takeIf { it != 0 }?.run { this.toString() } ?: run { "" }
         5 -> userData?.bodyTemperature?.takeIf { it != 0f }?.run { this.toString() } ?: run { "" }
