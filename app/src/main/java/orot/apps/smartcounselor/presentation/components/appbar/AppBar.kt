@@ -2,14 +2,21 @@ package orot.apps.smartcounselor.presentation.components.appbar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
+import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.presentation.style.Display2
+import orot.apps.smartcounselor.presentation.style.White
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 
 @Composable
@@ -24,15 +31,36 @@ fun MagoAppBar() {
                     .padding(start = 20.dp, end = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Image(
-                    modifier = Modifier
-                        .weight(0.25f)
-                        .padding(top = 10.dp),
-                    painter = painterResource(id = R.drawable.mago_full_logo_white),
-                    contentDescription = "mago-logo",
-                    contentScale = ContentScale.FillWidth
-                )
-                Spacer(modifier = Modifier.weight(0.33f))
+                if (BuildConfig.CHAIR_SHOWING) {
+                    Image(
+                        modifier = Modifier
+                            .weight(0.25f)
+                            .padding(top = 10.dp),
+                        painter = painterResource(id = R.drawable.mago_full_logo_white),
+                        contentDescription = "mago-logo",
+                        contentScale = ContentScale.FillWidth
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier.padding(top = 10.dp),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "대한민국 대표 음성 의료서비스",
+                            style = MaterialTheme.typography.h3,
+                            color = White,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp),
+                            text = "Smart Counselor",
+                            style = MaterialTheme.typography.body1,
+                            color = White.copy(alpha = 0.9f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
     }
