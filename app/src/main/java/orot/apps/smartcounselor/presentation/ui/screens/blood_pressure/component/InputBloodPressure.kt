@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.model.local.BuildShowMode
 import orot.apps.smartcounselor.model.remote.UserData
 import orot.apps.smartcounselor.presentation.components.input.CustomTextField
 import orot.apps.smartcounselor.presentation.components.input.ITextCallback
@@ -90,7 +91,7 @@ fun InputBloodPressure(modifier: Modifier) {
                         )
                     }
                     // 의자에서 수집되는 데이터
-                    if (BuildConfig.CHAIR_SHOWING) {
+                    if (BuildConfig.SHOW_MODE == BuildShowMode.FULL.value) {
                         if (index == 1 && mainViewModel.chairHashData["bloodPressureSystolic"] != 0 ||
                             index == 2 && mainViewModel.chairHashData["bloodPressureDiastolic"] != 0 ||
                             index == 3 && mainViewModel.chairHashData["glucose"] != 0 ||

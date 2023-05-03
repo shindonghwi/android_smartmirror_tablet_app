@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.model.local.BuildShowMode
 import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.White
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
@@ -31,35 +32,24 @@ fun MagoAppBar() {
                     .padding(start = 20.dp, end = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                if (BuildConfig.CHAIR_SHOWING) {
-                    Image(
-                        modifier = Modifier
-                            .weight(0.25f)
-                            .padding(top = 10.dp),
-                        painter = painterResource(id = R.drawable.mago_full_logo_white),
-                        contentDescription = "mago-logo",
-                        contentScale = ContentScale.FillWidth
+                Column(
+                    modifier = Modifier.padding(top = 20.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "대한민국 대표 음성 의료서비스",
+                        style = MaterialTheme.typography.h3,
+                        color = White,
+                        textAlign = TextAlign.Center
                     )
-                } else {
-                    Column(
-                        modifier = Modifier.padding(top = 10.dp),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "대한민국 대표 음성 의료서비스",
-                            style = MaterialTheme.typography.h3,
-                            color = White,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            modifier = Modifier.padding(top = 4.dp),
-                            text = "Smart Counselor",
-                            style = MaterialTheme.typography.body1,
-                            color = White.copy(alpha = 0.9f),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = "Smart Counselor",
+                        style = MaterialTheme.typography.body1,
+                        color = White.copy(alpha = 0.9f),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

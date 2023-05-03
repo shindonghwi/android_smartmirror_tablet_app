@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
+import orot.apps.smartcounselor.model.local.BuildShowMode
 import orot.apps.smartcounselor.presentation.style.Green80
 import orot.apps.smartcounselor.presentation.style.Primary
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
@@ -118,7 +119,7 @@ private fun WatchIcon() {
 
 @Composable
 private fun ChairIcon() {
-    if (BuildConfig.CHAIR_SHOWING) {
+    if (BuildConfig.SHOW_MODE == BuildShowMode.FULL.value) {
         val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
         val chair = mainViewModel.medicalDeviceChairData.collectAsState().value
         val isChairDataIsExist = chair.isDataExist()

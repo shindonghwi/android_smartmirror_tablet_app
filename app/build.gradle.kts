@@ -40,14 +40,21 @@ android {
             dimension = "mode"
             versionNameSuffix = "-full"
             applicationIdSuffix = ".full"
-            buildConfigField("Boolean", "CHAIR_SHOWING", "true")
+            buildConfigField("String", "SHOW_MODE", "\"FULL\"")
             manifestPlaceholders["appLabel"] = "SmartCounselor"
         }
-        create("chairShowing") {
+        create("onlyWatch") {
             versionNameSuffix = "-watch"
             dimension = "mode"
             applicationIdSuffix = ".watch"
-            buildConfigField("Boolean", "CHAIR_SHOWING", "false")
+            buildConfigField("String", "SHOW_MODE", "\"WATCH\"")
+            manifestPlaceholders["appLabel"] = "SmartCounselor(watch)"
+        }
+        create("onlyRecommendation") {
+            versionNameSuffix = "-watch"
+            dimension = "mode"
+            applicationIdSuffix = ".recommendation"
+            buildConfigField("String", "SHOW_MODE", "\"RECOMMENDATION\"")
             manifestPlaceholders["appLabel"] = "SmartCounselor(watch)"
         }
     }
