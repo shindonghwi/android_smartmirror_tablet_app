@@ -24,9 +24,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import orot.apps.smartcounselor.BuildConfig
 import orot.apps.smartcounselor.R
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
+import orot.apps.smartcounselor.model.local.BuildShowMode
 import orot.apps.smartcounselor.presentation.components.animation.WavesAnimation
 import orot.apps.smartcounselor.presentation.components.bottombar.blood_pressure.WaitingMeasurement
 import orot.apps.smartcounselor.presentation.components.bottombar.home.UserRadioButton
@@ -127,13 +129,19 @@ private fun StartBottomBar() {
                     .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                     .background(Primary)
                     .noDuplicationClickable {
-                        if (mainViewModel.selectedUser != null){
+                        if (mainViewModel.selectedUser != null) {
                             mainViewModel.run {
-                                connectWebSocket()
-                                moveScreen(Screens.Guide, BottomMenu.Loading)
+                                if (BuildConfig.SHOW_MODE == BuildShowMode.RECOMMENDATION.value) {
+                                    moveScreen(null, BottomMenu.BloodPressure)
+                                } else {
+                                    connectWebSocket()
+                                    moveScreen(Screens.Guide, BottomMenu.Loading)
+                                }
                             }
-                        }else{
-                            Toast.makeText(context, "사용자를 선택해주세요", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast
+                                .makeText(context, "사용자를 선택해주세요", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -242,10 +250,9 @@ private fun RetryAndChatBottomBar() {
 @Composable
 private fun BloodPressureBottomBar() {
     val mainViewModel = (LocalContext.current as MagoActivity).mainViewModel.value
-
     val isEndMeasurement = mainViewModel.isEndMedicalMeasurement.collectAsState().value
 
-    if (isEndMeasurement){
+    if (isEndMeasurement || BuildConfig.SHOW_MODE == BuildShowMode.RECOMMENDATION.value) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -260,7 +267,7 @@ private fun BloodPressureBottomBar() {
                 BloodPressureSubmitButton()
             }
         }
-    }else{
+    } else {
         WaitingMeasurement()
     }
 }

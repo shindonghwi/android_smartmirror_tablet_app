@@ -48,14 +48,14 @@ android {
             dimension = "mode"
             applicationIdSuffix = ".watch"
             buildConfigField("String", "SHOW_MODE", "\"WATCH\"")
-            manifestPlaceholders["appLabel"] = "SmartCounselor(watch)"
+            manifestPlaceholders["appLabel"] = "SmartCounselor(시계)"
         }
         create("onlyRecommendation") {
             versionNameSuffix = "-watch"
             dimension = "mode"
             applicationIdSuffix = ".recommendation"
             buildConfigField("String", "SHOW_MODE", "\"RECOMMENDATION\"")
-            manifestPlaceholders["appLabel"] = "SmartCounselor(watch)"
+            manifestPlaceholders["appLabel"] = "SmartCounselor(권고)"
         }
     }
 

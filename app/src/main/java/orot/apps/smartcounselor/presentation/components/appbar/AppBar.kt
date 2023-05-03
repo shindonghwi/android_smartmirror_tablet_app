@@ -1,22 +1,15 @@
 package orot.apps.smartcounselor.presentation.components.appbar
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
-import orot.apps.smartcounselor.BuildConfig
-import orot.apps.smartcounselor.R
-import orot.apps.smartcounselor.model.local.BuildShowMode
-import orot.apps.smartcounselor.presentation.style.Display2
 import orot.apps.smartcounselor.presentation.style.White
 import orot.apps.smartcounselor.presentation.ui.MagoActivity
 

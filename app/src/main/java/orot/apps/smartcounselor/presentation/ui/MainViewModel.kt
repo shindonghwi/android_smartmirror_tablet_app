@@ -9,11 +9,14 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mago.apps.sognoraaudio.audio_recoder.SognoraAudioRecorder
 import mago.apps.sognoraaudio.google_tts.OrotTTS
 import mago.apps.sognorawebsocket.websocket.model.ChatData
@@ -25,14 +28,19 @@ import mago.apps.sognorawebsocket.websocket.model.protocol.MessageProtocol
 import mago.apps.sognorawebsocket.websocket.model.protocol.body.*
 import mago.apps.sognorawebsocket.websocket.model.protocol.header.HeaderInfo
 import mago.apps.sognorawebsocket.websocket.new_ws.OrotWebSocket
+import orot.apps.smartcounselor.api.retrofitClient
 import orot.apps.smartcounselor.graph.NavigationKit
 import orot.apps.smartcounselor.graph.model.BottomMenu
 import orot.apps.smartcounselor.graph.model.Screens
 import orot.apps.smartcounselor.model.local.*
 import orot.apps.smartcounselor.model.remote.*
 import orot.apps.smartcounselor.presentation.ui.MagoActivity.Companion.TAG
+import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.coroutineScopeOnIO
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onDefault
 import orot.apps.smartcounselor.presentation.ui.utils.viewmodel.scope.onIO
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 
@@ -140,7 +148,10 @@ class MainViewModel @Inject constructor(
                     }
 
                     override fun showHealthOverView(
-                        voiceComment: String?, display: DisplayInfo?, riskPrediction: RiskPredictionInfo?, actionType: OrotActionType
+                        voiceComment: String?,
+                        display: DisplayInfo?,
+                        riskPrediction: RiskPredictionInfo?,
+                        actionType: OrotActionType
                     ) {
                         resultActionType = actionType
                         displayInfo = display
@@ -198,11 +209,11 @@ class MainViewModel @Inject constructor(
         val bloodPressureSystolic = measurement?.bloodPressureSystolic ?: 0
         val heartRate = measurement?.heartRate ?: 0
 
-        if (heartRate != 0){
+        if (heartRate != 0) {
             selectedUser = selectedUser?.copy(heartRate = heartRate)
             watchHashData["heartRate"] = heartRate
         }
-        if (bloodPressureSystolic != 0){
+        if (bloodPressureSystolic != 0) {
             selectedUser = selectedUser?.copy(bloodPressureSystolic = bloodPressureSystolic)
             watchHashData["bloodPressureSystolic"] = bloodPressureSystolic
         }
@@ -220,23 +231,23 @@ class MainViewModel @Inject constructor(
         val weight = measurement?.weight ?: 0f
         val bodyMassIndex = measurement?.bodyMassIndex ?: 0f
 
-        if (bloodPressureSystolic != 0){
+        if (bloodPressureSystolic != 0) {
             selectedUser = selectedUser?.copy(bloodPressureSystolic = bloodPressureSystolic)
             chairHashData["bloodPressureSystolic"] = bloodPressureSystolic
         }
-        if (bloodPressureDiastolic != 0){
+        if (bloodPressureDiastolic != 0) {
             selectedUser = selectedUser?.copy(bloodPressureDiastolic = bloodPressureDiastolic)
             chairHashData["bloodPressureDiastolic"] = bloodPressureDiastolic
         }
-        if (glucose != 0){
+        if (glucose != 0) {
             selectedUser = selectedUser?.copy(glucose = glucose)
             chairHashData["glucose"] = glucose
         }
-        if (weight != 0f){
+        if (weight != 0f) {
             selectedUser = selectedUser?.copy(weight = weight)
             chairHashData["weight"] = weight.toInt()
         }
-        if (bodyMassIndex != 0f){
+        if (bodyMassIndex != 0f) {
             selectedUser = selectedUser?.copy(bodyMassIndex = bodyMassIndex)
             chairHashData["bodyMassIndex"] = bodyMassIndex.toInt()
         }
@@ -402,7 +413,8 @@ class MainViewModel @Inject constructor(
 
             newBody = if (measurementBody != null) {
                 BodyInfo(
-                    before = orotWebSocket?.getLastInfo()?.body, measurement = measurementBody.measurement
+                    before = orotWebSocket?.getLastInfo()?.body,
+                    measurement = measurementBody.measurement
                 )
             } else {
                 BodyInfo(before = orotWebSocket?.getLastInfo()?.body)

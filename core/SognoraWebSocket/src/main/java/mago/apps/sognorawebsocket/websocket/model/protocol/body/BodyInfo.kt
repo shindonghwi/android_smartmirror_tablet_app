@@ -44,10 +44,10 @@ data class VoiceInfo(
 
 data class DisplayInfo(
     val id: String,
-    val medication: List<String>,
+    val medication: List<String>? = null,
     val measurement: ReceivedMeasurementInfo? = null,
-    val recommendation: RecommendationInfo,
-    val today_recommendation: TodayRecommendationData,
+    val recommendation: RecommendationInfo? = null,
+    val today_recommendation: TodayRecommendationData? = null,
 )
 
 data class ReceivedMeasurementInfo(

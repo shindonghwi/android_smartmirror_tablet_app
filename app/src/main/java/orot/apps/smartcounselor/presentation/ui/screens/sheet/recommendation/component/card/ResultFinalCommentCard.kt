@@ -28,19 +28,19 @@ import java.util.*
 fun ResultFinalCommentCard(modifier: Modifier) {
 
     val mainViewModel = ((LocalContext.current) as MagoActivity).mainViewModel.value
-    var content = ""
+    var content: String? = null
 
     mainViewModel.displayInfo?.today_recommendation?.let {
         content = if (!it.food.isNullOrEmpty() && !it.exercise.isNullOrEmpty()) {
             if (Random().nextInt(2) == 0) {
-                it.food.toString()
+                it.food
             } else {
-                it.exercise.toString()
+                it.exercise
             }
         } else if (!it.food.isNullOrEmpty()) {
-            it.food.toString()
+            it.food
         } else {
-            it.exercise.toString()
+            it.exercise
         }
     }
 
@@ -68,7 +68,7 @@ fun ResultFinalCommentCard(modifier: Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = content,
+                        text = content ?: "오늘의 건강 권고 멘트가 없습니다",
                         style = MaterialTheme.typography.h2,
                         color = Black80,
                         fontWeight = FontWeight(400),

@@ -42,37 +42,6 @@ fun HomeScreen() {
             contentDescription = "mago-logo",
             contentScale = ContentScale.FillWidth
         )
-//        if (BuildConfig.SHOW_MODE == BuildShowMode.FULL.value) {
-//            Image(
-//                modifier = Modifier
-//                    .layoutId("description")
-//                    .widthIn(min = logoWidth),
-//                painter = painterResource(id = R.drawable.mago_full_logo_white),
-//                contentDescription = "mago-logo",
-//                contentScale = ContentScale.FillWidth
-//            )
-//        } else {
-//            Column(
-//                modifier = Modifier
-//                    .layoutId("description")
-//                    .widthIn(min = logoWidth),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Text(
-//                    text = "대한민국 대표 음성 의료서비스",
-//                    style = MaterialTheme.typography.Display2,
-//                    color = White,
-//                    textAlign = TextAlign.Center
-//                )
-//                Text(
-//                    modifier = Modifier.padding(top = 20.dp),
-//                    text = "Smart Counselor",
-//                    style = MaterialTheme.typography.h1,
-//                    color = White.copy(alpha = 0.9f),
-//                    textAlign = TextAlign.Center
-//                )
-//            }
-//        }
     }
 }
 
