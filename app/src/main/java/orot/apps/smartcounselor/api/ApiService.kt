@@ -16,18 +16,18 @@ object retrofitClient {
     private const val BASE_URL = "http://saturn.mago52.com:9501/"
     val apiService: ApiService get() = instance.create(ApiService::class.java)
 
-    class AppInterceptor : Interceptor {
-        override fun intercept(chain: Interceptor.Chain) = with(chain) {
-            val newRequest = request().newBuilder()
-                .build()
-            proceed(newRequest)
-        }
-    }
+//    class AppInterceptor : Interceptor, Throwable() {
+//        override fun intercept(chain: Interceptor.Chain) = with(chain) {
+//            val newRequest = request().newBuilder()
+//                .build()
+//            proceed(newRequest)
+//        }
+//    }
 
     private val instance = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(OkHttpClient.Builder().run {
-            addInterceptor(AppInterceptor())
+//            addInterceptor(AppInterceptor())
             connectTimeout(100, TimeUnit.SECONDS)
             readTimeout(300, TimeUnit.SECONDS)
             writeTimeout(300, TimeUnit.SECONDS)

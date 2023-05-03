@@ -79,6 +79,8 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
                                         ),
                                     )
 
+                                    Log.w("Asdsad", "request Data: ${Gson().toJson(data)}", )
+
                                     val mediaType = "application/json".toMediaTypeOrNull()
                                     val requestBody = Gson()
                                         .toJson(data)
@@ -86,13 +88,20 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
 
                                     try {
                                         coroutineScopeOnDefault {
-                                            val response = retrofitClient.apiService.postRecommendation(requestBody)
-                                            var isSuccess = response.isSuccessful || response.code() == 200
+                                            val response =
+                                                retrofitClient.apiService.postRecommendation(
+                                                    requestBody
+                                                )
+                                            Log.w("Asdsad", "response Data: ${Gson().toJson(response.body())}", )
 
-                                            if (isSuccess){
+                                            var isSuccess =
+                                                response.isSuccessful || response.code() == 200
+
+                                            if (isSuccess) {
                                                 val body = response.body()
-                                                isSuccess = !(body?.data == null || body.recommendation == null)
-                                                if (isSuccess){
+                                                isSuccess =
+                                                    !(body?.data == null || body.recommendation == null)
+                                                if (isSuccess) {
                                                     body?.let { res ->
                                                         mainViewModel.let { vm ->
                                                             vm.displayInfo = DisplayInfo(
@@ -102,18 +111,19 @@ fun BloodPressureSubmitButton(modifier: Modifier = Modifier) {
                                                                 recommendation = res.recommendation?.recommendation,
                                                                 today_recommendation = res.recommendation?.today_recommendation,
                                                             )
-                                                            vm.riskPredictionInfo = res.risk_prediction
+                                                            vm.riskPredictionInfo =
+                                                                res.risk_prediction
                                                         }
                                                         changeRecommendationBottomSheetFlag(true)
                                                     }
-                                                }else{
+                                                } else {
                                                     showErrorToast(context)
                                                 }
-                                            }else{
+                                            } else {
                                                 showErrorToast(context)
                                             }
                                         }
-                                    }catch (e: Exception){
+                                    } catch (e: Exception) {
                                         showErrorToast(context, "서버 연결 실패. 재 시도 해주세요")
                                     }
                                 }
